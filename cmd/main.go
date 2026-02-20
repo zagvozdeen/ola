@@ -9,6 +9,7 @@ import (
 	"github.com/zagvozdeen/ola/internal/config"
 	"github.com/zagvozdeen/ola/internal/db"
 	"github.com/zagvozdeen/ola/internal/logger"
+	"github.com/zagvozdeen/ola/internal/store"
 )
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 	log := logger.New(cfg)
 	pool := db.New(ctx, cfg, log)
 	defer pool.Close()
+	storage := store.New(log, pool)
 
-	api.New(cfg, log, pool).Run(ctx)
+	api.New(cfg, log, storage).Run(ctx)
 }

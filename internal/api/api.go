@@ -17,13 +17,13 @@ import (
 type Service struct {
 	cfg          *config.Config
 	log          *logger.Logger
-	store        store.Storage
+	store        *store.Store
 	processingTS sync.Map
 	bot          *bot.Bot
 	botStarted   chan struct{}
 }
 
-func New(cfg *config.Config, log *logger.Logger, store store.Storage) *Service {
+func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
 	return &Service{
 		cfg:          cfg,
 		log:          log,
@@ -72,12 +72,14 @@ func (s *Service) Run(ctx context.Context) {
 func (s *Service) getRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	if !s.cfg.IsProduction {
-		mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-			http.ServeFile(w, r, "dev.html")
-		})
-		mux.Handle("GET /node_modules/", http.StripPrefix("/node_modules/", http.FileServer(http.Dir("node_modules"))))
-	}
+	mux.HandleFunc("GET /", s.index)
+
+	//if !s.cfg.IsProduction {
+	//	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+	//		http.ServeFile(w, r, "dev.html")
+	//	})
+	//	mux.Handle("GET /node_modules/", http.StripPrefix("/node_modules/", http.FileServer(http.Dir("node_modules"))))
+	//}
 
 	mux.HandleFunc("POST /api/auth", s.login)
 	//mux.HandleFunc("GET /api/test-sessions", s.auth(s.getTestSessions))
