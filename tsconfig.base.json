@@ -8,8 +8,6 @@
     "skipLibCheck": true,
     "noEmit": true,
     "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["web/shared/src/*"]
-    }
+    "paths": {}
   }
 }
