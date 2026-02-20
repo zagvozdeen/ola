@@ -13,7 +13,16 @@ type PageData struct {
 
 func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.URL.Path)
-	tmlp, err := template.ParseFiles("web/landing/index.html")
+	if r.URL.Path == "/favicon.ico" {
+		http.ServeFile(w, r, "public/favicon.ico")
+		return
+	}
+	funcMap := template.FuncMap{
+		"image": func(name string) (string, error) {
+			return "http://localhost:5173/images/" + name, nil
+		},
+	}
+	tmlp, err := template.New("index.html").Funcs(funcMap).ParseFiles("web/landing/index.html")
 	if err != nil {
 		s.log.Error("error 1", err)
 		return

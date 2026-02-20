@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+@theme {
+    --font-gothic: "Gothic A1", sans-serif;
+}
