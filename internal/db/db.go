@@ -27,7 +27,7 @@ func New(ctx context.Context, cfg *config.Config, log *logger.Logger) *pgxpool.P
 
 func connect(ctx context.Context, cfg *config.Config, log *logger.Logger) (*pgxpool.Pool, error) {
 	connCfg, err := pgxpool.ParseConfig(fmt.Sprintf(
-		"postgres://%s:%s@%s/%s:%s?sslmode=disable",
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.DBUsername,
 		cfg.DBPassword,
 		cfg.DBHost,

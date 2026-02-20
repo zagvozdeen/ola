@@ -15,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/zagvozdeen/ola/internal/api/core"
+	"github.com/zagvozdeen/ola/internal/store/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -42,11 +43,11 @@ func (s *Service) login(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "invalid username or password", http.StatusUnauthorized)
 			return
 		}
-		s.log.Error("Failed to load user", slog.Any("err", err), slog.String("username", req.Username))
+		s.log.Error("Failed to load user", err, slog.String("username", req.Username))
 		http.Error(w, "failed to authenticate", http.StatusInternalServerError)
 		return
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password.V), []byte(req.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(req.Password))
 	if err != nil {
 		s.log.Warn("Invalid credentials", slog.String("username", req.Username))
 		http.Error(w, "invalid username or password", http.StatusUnauthorized)
@@ -58,14 +59,14 @@ func (s *Service) login(w http.ResponseWriter, r *http.Request) {
 	})
 	token, err := t.SignedString([]byte(s.cfg.AppSecret))
 	if err != nil {
-		s.log.Error("Failed to sign auth token", slog.Any("err", err))
+		s.log.Error("Failed to sign auth token", err)
 		http.Error(w, "failed to create token", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	err = json.MarshalWrite(w, authResponse{Token: token})
 	if err != nil {
-		s.log.Warn("Failed to write response", slog.Any("err", err))
+		s.log.Error("Failed to write response", err)
 	}
 }
 
@@ -74,16 +75,17 @@ func (s *Service) auth(fn core.HandlerFunc) http.HandlerFunc {
 		user, res := s.checkAuth(r, r.Header.Get("Authorization"))
 		if res != nil {
 			status := res.Response(w, s.log)
-			s.metrics.AppResponsesTotalInc(r.Pattern, status)
+			_ = status // TODO
 			return
 		}
-		log := s.log.With(slog.Int("user_id", user.ID))
-		status := fn(r, user).Response(w, log)
-		s.metrics.AppResponsesTotalInc(r.Pattern, status)
+		//log := s.log.With(slog.Int("user_id", user.ID))
+		status := fn(r, user).Response(w, s.log)
+		_ = status // TODO
+		//s.metrics.AppResponsesTotalInc(r.Pattern, status)
 	}
 }
 
-func (s *Service) checkAuth(r *http.Request, token string) (*store.User, core.Response) {
+func (s *Service) checkAuth(r *http.Request, token string) (*models.User, core.Response) {
 	switch {
 	case strings.HasPrefix(token, "tma "):
 		return s.authTMA(r, token)
@@ -94,7 +96,7 @@ func (s *Service) checkAuth(r *http.Request, token string) (*store.User, core.Re
 	}
 }
 
-func (s *Service) authTMA(r *http.Request, token string) (*store.User, core.Response) {
+func (s *Service) authTMA(r *http.Request, token string) (*models.User, core.Response) {
 	token = strings.TrimPrefix(token, "tma ")
 	values, err := url.ParseQuery(token)
 	if err != nil {
@@ -104,7 +106,7 @@ func (s *Service) authTMA(r *http.Request, token string) (*store.User, core.Resp
 	if !ok {
 		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid tma token"))
 	}
-	var user *store.User
+	var user *models.User
 	user, err = s.store.GetUserByTID(r.Context(), u.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -115,7 +117,7 @@ func (s *Service) authTMA(r *http.Request, token string) (*store.User, core.Resp
 	return user, nil
 }
 
-func (s *Service) authBearer(r *http.Request, token string) (*store.User, core.Response) {
+func (s *Service) authBearer(r *http.Request, token string) (*models.User, core.Response) {
 	token = strings.TrimPrefix(token, "Bearer ")
 	var claims jwt.RegisteredClaims
 	t, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (any, error) {
@@ -131,7 +133,7 @@ func (s *Service) authBearer(r *http.Request, token string) (*store.User, core.R
 	if err != nil {
 		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid token: %w, id=%s", err, claims.ID))
 	}
-	var user *store.User
+	var user *models.User
 	user, err = s.store.GetUserByID(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

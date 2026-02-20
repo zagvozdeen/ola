@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/zagvozdeen/ola/internal/logger"
-	"github.com/zagvozdeen/ola/internal/models"
+	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
 type HandlerFunc func(*http.Request, *models.User) Response
