@@ -1,0 +1,77 @@
+package logger
+
+import (
+	"fmt"
+	"log"
+	"log/slog"
+	"os"
+
+	"github.com/zagvozdeen/ola/internal/config"
+)
+
+type Logger struct {
+	log *slog.Logger
+}
+
+func New(cfg *config.Config) *Logger {
+	return &Logger{
+		log: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource:   false,
+			Level:       slog.LevelDebug,
+			ReplaceAttr: nil,
+		})),
+	}
+}
+
+func (l *Logger) GetLog() *log.Logger {
+	return slog.NewLogLogger(l.log.Handler(), slog.LevelDebug)
+}
+
+func (l *Logger) Debug(msg string, args ...slog.Attr) {
+	l.log.Debug(msg, toAnySlice(args)...)
+}
+
+func (l *Logger) Debugf(format string, a ...any) {
+	l.log.Debug(fmt.Sprintf(format, a...))
+}
+
+func (l *Logger) Info(msg string, args ...slog.Attr) {
+	l.log.Info(msg, toAnySlice(args)...)
+}
+
+func (l *Logger) Infof(format string, a ...any) {
+	l.log.Info(fmt.Sprintf(format, a...))
+}
+
+func (l *Logger) Warn(msg string, args ...slog.Attr) {
+	l.log.Warn(msg, toAnySlice(args)...)
+}
+
+func (l *Logger) Warnf(format string, a ...any) {
+	l.log.Warn(fmt.Sprintf(format, a...))
+}
+
+func (l *Logger) Error(msg string, err error, args ...slog.Attr) {
+	args = append(args, slog.Any("error", err))
+	l.log.Error(msg, toAnySlice(args)...)
+}
+
+func (l *Logger) Errorf(format string, a ...any) {
+	l.log.Error(fmt.Sprintf(format, a...))
+}
+
+func (l *Logger) Fatalf(format string, a ...any) {
+	l.Errorf(format, a...)
+}
+
+func (l *Logger) Printf(format string, a ...any) {
+	l.Infof(format, a...)
+}
+
+func toAnySlice[T any](s []T) []any {
+	r := make([]any, 0, len(s))
+	for _, e := range s {
+		r = append(r, e)
+	}
+	return r
+}
