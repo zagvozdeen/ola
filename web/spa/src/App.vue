@@ -1,8 +1,7 @@
 <template>
-  testss
+  <router-view />
 </template>
 
-<script>
-const te = "fsd";
+<script lang="ts" setup>
 
 </script>
