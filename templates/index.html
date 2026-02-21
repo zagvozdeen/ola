@@ -199,7 +199,83 @@
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Поделитесь своим мнением!</h2>
         <h3 class="text-center font-bold text-xl mb-25">Ваша обратная связь помогает нам развиваться и<br>становиться лучше.</h3>
-<!--        write code here -->
+        <form id="review-form" class="mx-auto max-w-3xl" novalidate>
+            <div class="mb-6">
+                <label for="review-name" class="block text-base font-bold text-black">Ваше имя</label>
+                <input id="review-name" name="name" type="text" autocomplete="name" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
+                <p data-error-for="name" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="mb-6">
+                <label for="review-phone" class="block text-base font-bold text-black">Ваш телефон</label>
+                <input id="review-phone" name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
+                <p data-error-for="phone" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="mb-6">
+                <label for="review-message" class="block text-base font-bold text-black">Ваш отзыв</label>
+                <textarea id="review-message" name="message" rows="5" class="mt-2 block w-full resize-y border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required></textarea>
+                <p data-error-for="message" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="mb-8">
+                <label for="review-consent" class="flex items-start gap-3 text-sm font-medium text-black/80 select-none cursor-pointer">
+                    <input id="review-consent" name="consent" type="checkbox" class="mt-0.5 size-4 shrink-0 accent-yellow-400" required>
+                    <span>
+                        Я даю согласие на <a href="#" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">обработку персональных данных</a>
+                        и ознакомлен(а) с <a href="#" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">Политикой обработки персональных данных</a>.
+                    </span>
+                </label>
+                <p data-error-for="consent" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="flex justify-center">
+                <button type="submit" class="inline-flex items-center rounded-full cursor-pointer bg-yellow-400 px-8 py-3 text-sm font-bold uppercase text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60">отправить отзыв</button>
+            </div>
+            <p data-form-status class="invisible mt-3 min-h-5 text-sm font-semibold" aria-live="polite"></p>
+        </form>
+    </div>
+</div>
+
+<div class="mt-30 mb-33">
+    <div class="max-w-250 mx-auto px-4">
+        <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Готовы создать незабываемый праздник?</h2>
+        <h3 class="text-center font-bold text-xl mb-25">Оставьте заявку, и мы подготовим для вас<br>индивидуальное предложение.</h3>
+        <form id="review-form" class="mx-auto max-w-3xl" novalidate>
+            <div class="mb-6">
+                <label for="review-name" class="block text-base font-bold text-black">Ваше имя</label>
+                <input id="review-name" name="name" type="text" autocomplete="name" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
+                <p data-error-for="name" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="mb-6">
+                <label for="review-phone" class="block text-base font-bold text-black">Ваш телефон</label>
+                <input id="review-phone" name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
+                <p data-error-for="phone" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="mb-6">
+                <label for="review-message" class="block text-base font-bold text-black">Ваш отзыв</label>
+                <textarea id="review-message" name="message" rows="5" class="mt-2 block w-full resize-y border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required></textarea>
+                <p data-error-for="message" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="mb-8">
+                <label for="review-consent" class="flex items-start gap-3 text-sm font-medium text-black/80 select-none cursor-pointer">
+                    <input id="review-consent" name="consent" type="checkbox" class="mt-0.5 size-4 shrink-0 accent-yellow-400" required>
+                    <span>
+                        Я даю согласие на <a href="#" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">обработку персональных данных</a>
+                        и ознакомлен(а) с <a href="#" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">Политикой обработки персональных данных</a>.
+                    </span>
+                </label>
+                <p data-error-for="consent" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
+            </div>
+
+            <div class="flex justify-center">
+                <button type="submit" class="inline-flex items-center rounded-full cursor-pointer bg-yellow-400 px-8 py-3 text-sm font-bold uppercase text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60">отправить</button>
+            </div>
+            <p data-form-status class="invisible mt-3 min-h-5 text-sm font-semibold" aria-live="polite"></p>
+        </form>
     </div>
 </div>
 {{ end }}

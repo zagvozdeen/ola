@@ -1,4 +1,10 @@
 import './styles.css'
+import IMask from 'imask'
+
+type PhoneMask = {
+  unmaskedValue: string
+  value: string
+}
 
 const initReviewsSlider = (): void => {
   const slider = document.getElementById('reviews-slider')
@@ -66,8 +72,143 @@ const initReviewsSlider = (): void => {
   render()
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initReviewsSlider, { once: true })
-} else {
+const initReviewForm = (): void => {
+  const form = document.getElementById('review-form')
+  if (!(form instanceof HTMLFormElement)) {
+    return
+  }
+
+  const nameInput = form.querySelector<HTMLInputElement>('#review-name')
+  const phoneInput = form.querySelector<HTMLInputElement>('#review-phone')
+  const textInput = form.querySelector<HTMLTextAreaElement>('#review-message')
+  const consentInput = form.querySelector<HTMLInputElement>('#review-consent')
+  const statusNode = form.querySelector<HTMLElement>('[data-form-status]')
+  const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')
+
+  if (
+    !(nameInput instanceof HTMLInputElement) ||
+    !(phoneInput instanceof HTMLInputElement) ||
+    !(textInput instanceof HTMLTextAreaElement) ||
+    !(consentInput instanceof HTMLInputElement) ||
+    !(statusNode instanceof HTMLElement) ||
+    !(submitButton instanceof HTMLButtonElement)
+  ) {
+    return
+  }
+
+  const setError = (field: string, message = ''): void => {
+    const errorNode = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`)
+    if (!(errorNode instanceof HTMLElement)) {
+      return
+    }
+
+    errorNode.textContent = message
+    errorNode.classList.toggle('invisible', message.length === 0)
+  }
+
+  const setStatus = (message = '', type: 'idle' | 'error' | 'success' = 'idle'): void => {
+    statusNode.textContent = message
+    statusNode.classList.remove('text-red-600', 'text-green-700')
+    if (type === 'error') {
+      statusNode.classList.add('text-red-600')
+    }
+    if (type === 'success') {
+      statusNode.classList.add('text-green-700')
+    }
+    statusNode.classList.toggle('invisible', message.length === 0)
+  }
+
+  const clearErrors = (): void => {
+    setError('name')
+    setError('phone')
+    setError('message')
+    setError('consent')
+  }
+
+  const phoneMask: PhoneMask = IMask(phoneInput, {
+    mask: '+{7} (000) 000-00-00',
+  })
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    clearErrors()
+    setStatus()
+
+    const name = nameInput.value.trim()
+    const message = textInput.value.trim()
+    const phone = phoneInput.value.trim()
+    const phoneDigits = phone.replace(/\D/g, '')
+
+    let hasError = false
+
+    if (!name) {
+      setError('name', 'Укажите ваше имя')
+      hasError = true
+    }
+
+    if (phoneDigits.length !== 11 || !phoneDigits.startsWith('7')) {
+      setError('phone', 'Введите номер в формате +7 (999) 123-45-67')
+      hasError = true
+    }
+
+    if (!message) {
+      setError('message', 'Напишите отзыв')
+      hasError = true
+    }
+
+    if (!consentInput.checked) {
+      setError('consent', 'Нужно согласие на обработку данных')
+      hasError = true
+    }
+
+    if (hasError) {
+      return
+    }
+
+    submitButton.disabled = true
+
+    try {
+      const response = await fetch('/api/reviews/submit-placeholder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          phone,
+          message,
+          consent: consentInput.checked,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorText = (await response.text()).trim()
+        setStatus(errorText || 'Не удалось отправить отзыв', 'error')
+        return
+      }
+
+      const result = (await response.json()) as { message?: string }
+      setStatus(result.message ?? 'Спасибо! Отзыв отправлен', 'success')
+      form.reset()
+
+      if (phoneMask) {
+        phoneMask.value = ''
+      }
+    } catch {
+      setStatus('Ошибка сети. Попробуйте позже', 'error')
+    } finally {
+      submitButton.disabled = false
+    }
+  })
+}
+
+const initLandingPage = (): void => {
   initReviewsSlider()
+  initReviewForm()
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLandingPage, { once: true })
+} else {
+  initLandingPage()
 }
