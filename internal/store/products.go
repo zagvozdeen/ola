@@ -7,28 +7,26 @@ import (
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
+// GetAllProducts
 func (s *Store) GetAllProducts(ctx context.Context) ([]models.Product, error) {
-	rows, err := s.pool.Query(ctx, "SELECT p.id, p.uuid::text, p.name, p.description, p.price_from, p.price_to, p.file_id, f.content, p.user_id, p.created_at, p.updated_at FROM products p JOIN files f ON f.id = p.file_id ORDER BY p.created_at DESC")
+	rows, err := s.pool.Query(ctx, "SELECT p.id, p.uuid, p.name, p.description, p.price_from, p.price_to, p.file_id, f.content, p.user_id, p.created_at, p.updated_at FROM products p JOIN files f ON f.id = p.file_id ORDER BY p.created_at DESC")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	products := make([]models.Product, 0)
 	for rows.Next() {
-		product := models.Product{}
-		fileContent := ""
-		err = rows.Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.FileID, &fileContent, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
+		var product models.Product
+		err = rows.Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.FileID, &product.FileContent, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
-		product.FileContent = &fileContent
 		products = append(products, product)
 	}
-	if err = rows.Err(); err != nil {
+	err = rows.Err()
+	if err != nil {
 		return nil, err
 	}
-
 	return products, nil
 }
 

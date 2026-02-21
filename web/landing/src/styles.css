@@ -5,3 +5,16 @@
 @theme {
     --font-gothic: "Gothic A1", sans-serif;
 }
+
+@keyframes categories-marquee {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.categories-marquee-track {
+    animation: categories-marquee 48s linear infinite;
+}

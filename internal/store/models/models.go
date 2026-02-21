@@ -34,7 +34,7 @@ type File struct {
 
 type Product struct {
 	ID          int       `json:"id"`
-	UUID        string    `json:"uuid"`
+	UUID        uuid.UUID `json:"uuid"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	PriceFrom   int       `json:"price_from"`
@@ -97,7 +97,7 @@ type Feedback struct {
 
 type Category struct {
 	ID        int       `json:"id"`
-	UUID      string    `json:"uuid"`
+	UUID      uuid.UUID `json:"uuid"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

@@ -13,6 +13,8 @@ import (
 type PageData struct {
 	InsertRootDiv bool
 	Head          template.HTML
+	Products      []models.Product
+	Categories    []models.Category
 	Reviews       []models.Review
 }
 
@@ -33,6 +35,16 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 	data := PageData{
 		InsertRootDiv: false,
 		Head:          `<script type="module" src="http://localhost:5173/@vite/client"></script> <script type="module" src="http://localhost:5173/landing/src/main.ts"></script>`,
+	}
+	data.Products, err = s.store.GetAllProducts(r.Context())
+	if err != nil {
+		s.log.Error("Failed to get products", err)
+		return
+	}
+	data.Categories, err = s.store.GetAllCategories(r.Context())
+	if err != nil {
+		s.log.Error("Failed to get categories", err)
+		return
 	}
 	data.Reviews, err = s.store.GetAllReviews(r.Context())
 	if err != nil {
