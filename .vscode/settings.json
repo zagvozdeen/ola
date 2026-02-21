@@ -1,0 +1,9 @@
+{
+    "makefile.configureOnOpen": false,
+    "go.toolsEnvVars": {
+        "GOEXPERIMENT": "jsonv2"
+    },
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+}

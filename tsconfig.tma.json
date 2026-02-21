@@ -1,0 +1,8 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+      "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tma.tsbuildinfo",
+      "types": ["vite/client"]
+    },
+    "include": ["web/spa/tma/src/**/*", "web/spa/tma/env.d.ts", "web/shared/src/**/*"]
+  }

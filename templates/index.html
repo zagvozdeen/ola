@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>OLA studio</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    {{ .Head }}
+</head>
+<body class="antialiased font-gothic">
+{{ if .InsertRootDiv }}
+<div id="app"></div>
+{{ else }}
+<header class="absolute w-full z-10">
+    <div class="max-w-350 mx-auto px-4">
+        <div class="flex justify-between items-center gap-2">
+            <div class="flex items-center gap-8">
+                <img class="w-20" src="/logo.png" alt="Логотип">
+                <ul class="flex gap-4">
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">о нас</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">услуги</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">отзывы</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">контакты</a></li>
+                </ul>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="font-semibold text-white text-sm">г. Екатеринбург</span>
+                <a class="bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-6 py-2 font-bold" href="#">оформить праздник</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="relative h-132">
+    <img class="-z-20 absolute inset-0 h-full w-full object-cover" src="/image_1.png" alt="">
+    <div class="-z-20 absolute inset-0 bg-black/10"></div>
+    <div class="max-w-350 mx-auto pt-40">
+        <div class="text-6xl text-white font-bold">Воздушный декор<br>для неповторимых<br>событий</div>
+        <a class="inline-block mt-10 bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-10 py-4 font-bold text-xl" href="#">оформить праздник</a>
+    </div>
+</div>
+
+<div class="mt-30 mb-33">
+    <div class="max-w-250 mx-auto px-4">
+        <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Почему выбирают OLA Studio?</h2>
+        <h3 class="text-center font-bold text-xl">Мы подходим к каждому заказу с душой. Наша главная задача<br>— сделать ваш праздник особенным и подарить яркие<br>впечатления!</h3>
+        <ul class="flex flex-col">
+            <li>
+                <div class="relative">
+                    <h4>Test</h4>
+                    <p>test test</p>
+                    <span class="absolute -z-10 left-0 right-0 top-0">01</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+{{ end }}
+</body>
+</html>
