@@ -43,7 +43,7 @@ func New() *Config {
 		DBPassword:         os.Getenv("DB_PASSWORD"),
 		DBDownMigrations:   false,
 		APIHost:            "127.0.0.1",
-		APIPort:            "8081",
+		APIPort:            "8079",
 		TelegramBotToken:   os.Getenv("TG_BOT_TOKEN"),
 		TelegramBotEnabled: os.Getenv("TG_BOT_ENABLED") == "true",
 		TelegramBotGroup:   parseInt("TG_BOT_GROUP", 0),

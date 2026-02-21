@@ -21,15 +21,25 @@ type PageData struct {
 }
 
 func isWebSocketUpgrade(r *http.Request) bool {
-	// Upgrade: websocket + Connection: Upgrade
-	return strings.EqualFold(r.Header.Get("Upgrade"), "websocket") &&
-		strings.Contains(strings.ToLower(r.Header.Get("Connection")), "upgrade")
+	return strings.EqualFold(r.Header.Get("Upgrade"), "websocket") && strings.Contains(strings.ToLower(r.Header.Get("Connection")), "upgrade")
 }
 
 func (s *Service) index(w http.ResponseWriter, r *http.Request) {
+	if s.cfg.IsProduction {
+		s.renderMainPage(w, r)
+		return
+	}
 	if isWebSocketUpgrade(r) {
 		s.viteProxy.ServeHTTP(w, r)
 		return
+	}
+	if strings.HasPrefix(r.URL.Path, "/admin/") {
+		r.URL.Path = "/spa/admin/"
+		s.viteProxy.ServeHTTP(w, r)
+	}
+	if strings.HasPrefix(r.URL.Path, "/tma/") {
+		r.URL.Path = "/spa/tma/"
+		s.viteProxy.ServeHTTP(w, r)
 	}
 	vitePassThroughPrefixes := []string{
 		"/@vite/",
@@ -56,6 +66,10 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	s.renderMainPage(w, r)
+}
+
+func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 	tmlp, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		s.log.Error("Failed to parse template", err)

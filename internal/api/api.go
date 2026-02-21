@@ -84,34 +84,6 @@ func (s *Service) getRoutes() *http.ServeMux {
 
 	mux.HandleFunc("GET /", s.index)
 
-	mux.HandleFunc("GET /admin/", func(w http.ResponseWriter, r *http.Request) {
-		r.URL.Path = "/spa/admin/"
-		s.viteProxy.ServeHTTP(w, r)
-	})
-	mux.HandleFunc("GET /tma/", func(w http.ResponseWriter, r *http.Request) {
-		r.URL.Path = "/spa/tma/"
-		s.viteProxy.ServeHTTP(w, r)
-	})
-
-	//mux.Handle("GET /admin/", rewritePath(s.viteProxy, func(p string) string {
-	//	return "/spa/admin/"
-	//	d := "/spa/admin/" + strings.TrimPrefix(p, "/admin/")
-	//	fmt.Println("TEST", d)
-	//	return d
-	//}))
-
-	// 2) TMA: /tma/... -> /spa/tma/...
-	//mux.Handle("GET /tma/", rewritePath(s.viteProxy, func(p string) string {
-	//	return "/spa/tma/" + strings.TrimPrefix(p, "/tma/")
-	//}))
-
-	//if !s.cfg.IsProduction {
-	//	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-	//		http.ServeFile(w, r, "dev.html")
-	//	})
-	//	mux.Handle("GET /node_modules/", http.StripPrefix("/node_modules/", http.FileServer(http.Dir("node_modules"))))
-	//}
-
 	mux.HandleFunc("POST /api/auth", s.login)
 	//mux.HandleFunc("GET /api/test-sessions", s.auth(s.getTestSessions))
 	//mux.HandleFunc("GET /api/test-sessions/{uuid}", s.auth(s.getTestSession))

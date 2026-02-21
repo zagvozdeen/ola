@@ -5,8 +5,8 @@ After=multi-user.target
 [Service]
 User=root
 Group=root
-WorkingDirectory=/var/www/ml.creavo.ru
-ExecStart=/bin/bash -c "cd /var/www/ml.creavo.ru && ./malicious-learning"
+WorkingDirectory=/var/www/ola.creavo.ru
+ExecStart=/bin/bash -c "cd /var/www/ola.creavo.ru && ./ola"
 
 [Install]
 WantedBy=multi-user.target

@@ -118,70 +118,70 @@ CREATE TABLE IF NOT EXISTS feedback
 
 -- DEV ONLY (DELETE IN PRODUCTION)
 INSERT INTO users (id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at)
-VALUES (1, NULL, uuidv7(), 'Ivan', 'Ivanov', 'ivan', 'ivan@mail.ru', NULL, 'admin', NOW(), NOW());
+VALUES (1, NULL, gen_random_uuid(), 'Ivan', 'Ivanov', 'ivan', 'ivan@mail.ru', NULL, 'admin', NOW(), NOW());
 
 INSERT INTO files (id, uuid, content, size, mime_type, origin_name, user_id, created_at)
-VALUES (1, uuidv7(), '/files/1.jpg', 0, 'image/jpeg', '1.jpg', 1, NOW()),
-       (2, uuidv7(), '/files/2.jpg', 0, 'image/jpeg', '2.jpg', 1, NOW()),
-       (3, uuidv7(), '/files/3.jpg', 0, 'image/jpeg', '3.jpg', 1, NOW()),
-       (4, uuidv7(), '/files/4.jpg', 0, 'image/jpeg', '4.jpg', 1, NOW()),
-       (5, uuidv7(), '/files/5.jpg', 0, 'image/jpeg', '5.jpg', 1, NOW()),
-       (6, uuidv7(), '/files/6.jpg', 0, 'image/jpeg', '6.jpg', 1, NOW()),
-       (7, uuidv7(), '/files/7.jpg', 0, 'image/jpeg', '7.jpg', 1, NOW()),
-       (8, uuidv7(), '/files/8.jpg', 0, 'image/jpeg', '8.jpg', 1, NOW()),
-       (9, uuidv7(), '/files/9.jpg', 0, 'image/jpeg', '9.jpg', 1, NOW());
+VALUES (1, gen_random_uuid(), '/files/1.jpg', 0, 'image/jpeg', '1.jpg', 1, NOW()),
+       (2, gen_random_uuid(), '/files/2.jpg', 0, 'image/jpeg', '2.jpg', 1, NOW()),
+       (3, gen_random_uuid(), '/files/3.jpg', 0, 'image/jpeg', '3.jpg', 1, NOW()),
+       (4, gen_random_uuid(), '/files/4.jpg', 0, 'image/jpeg', '4.jpg', 1, NOW()),
+       (5, gen_random_uuid(), '/files/5.jpg', 0, 'image/jpeg', '5.jpg', 1, NOW()),
+       (6, gen_random_uuid(), '/files/6.jpg', 0, 'image/jpeg', '6.jpg', 1, NOW()),
+       (7, gen_random_uuid(), '/files/7.jpg', 0, 'image/jpeg', '7.jpg', 1, NOW()),
+       (8, gen_random_uuid(), '/files/8.jpg', 0, 'image/jpeg', '8.jpg', 1, NOW()),
+       (9, gen_random_uuid(), '/files/9.jpg', 0, 'image/jpeg', '9.jpg', 1, NOW());
 
 INSERT INTO products (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at)
-VALUES (1, uuidv7(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события', 3500,
+VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события', 3500,
         NULL, 1, 1,
         NOW(), NOW()),
-       (2, uuidv7(), 'Оформление помещения / фотозона', 'Декорирование любого помещения по индивидуальному дизайну',
+       (2, gen_random_uuid(), 'Оформление помещения / фотозона', 'Декорирование любого помещения по индивидуальному дизайну',
         7000, NULL,
         2, 1, NOW(), NOW()),
-       (3, uuidv7(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000, NULL, 3, 1,
+       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000, NULL, 3, 1,
         NOW(),
         NOW()),
-       (4, uuidv7(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1, NOW(),
+       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1, NOW(),
         NOW());
 
 INSERT INTO services (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at)
-VALUES (1, uuidv7(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события', 3500,
+VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события', 3500,
         NULL, 1, 1,
         NOW(), NOW()),
-       (2, uuidv7(), 'Оформление помещения / фотозона', 'Декорирование любого помещения по индивидуальному дизайну',
+       (2, gen_random_uuid(), 'Оформление помещения / фотозона', 'Декорирование любого помещения по индивидуальному дизайну',
         7000, NULL,
         2, 1, NOW(), NOW()),
-       (3, uuidv7(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000, NULL, 3, 1,
+       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000, NULL, 3, 1,
         NOW(),
         NOW()),
-       (4, uuidv7(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1, NOW(),
+       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1, NOW(),
         NOW());
 
 INSERT INTO categories (uuid, name, created_at, updated_at)
-VALUES (uuidv7(), 'Детские праздники', NOW(), NOW()),
-       (uuidv7(), 'Корпоратив', NOW(), NOW()),
-       (uuidv7(), 'День рождение', NOW(), NOW()),
-       (uuidv7(), 'Свадьба', NOW(), NOW()),
-       (uuidv7(), 'Выписка', NOW(), NOW()),
-       (uuidv7(), 'Гендер пати', NOW(), NOW()),
-       (uuidv7(), '8 марта', NOW(), NOW()),
-       (uuidv7(), '23 февраля', NOW(), NOW()),
-       (uuidv7(), 'Без повода', NOW(), NOW());
+VALUES (gen_random_uuid(), 'Детские праздники', NOW(), NOW()),
+       (gen_random_uuid(), 'Корпоратив', NOW(), NOW()),
+       (gen_random_uuid(), 'День рождение', NOW(), NOW()),
+       (gen_random_uuid(), 'Свадьба', NOW(), NOW()),
+       (gen_random_uuid(), 'Выписка', NOW(), NOW()),
+       (gen_random_uuid(), 'Гендер пати', NOW(), NOW()),
+       (gen_random_uuid(), '8 марта', NOW(), NOW()),
+       (gen_random_uuid(), '23 февраля', NOW(), NOW()),
+       (gen_random_uuid(), 'Без повода', NOW(), NOW());
 
 INSERT INTO reviews (id, uuid, name, content, file_id, user_id, published_at, created_at, updated_at)
-VALUES (1, uuidv7(), 'Елена',
+VALUES (1, gen_random_uuid(), 'Елена',
         'Огромное спасибо за шарики! Именинник был в восторге и доставка порадовала, все вовремя) Не пожалела, что обратилась именно к вам!',
         5, 1, NOW(), NOW(), NOW()),
-       (2, uuidv7(), 'Евгений',
+       (2, gen_random_uuid(), 'Евгений',
         'Обратился за бабл боксом с украшением внутри, хотелось поздравить девушку с годовщиной. Она очень удивилась такой креативной идее. Я тоже не видел ничего подобного в нашем городе до этого)) Желаю вам дальнейшего развития, вы классные!',
         6, 1, NOW(), NOW(), NOW()),
-       (3, uuidv7(), 'Александр',
+       (3, gen_random_uuid(), 'Александр',
         'Выражаю благодарность студии за профессиональное оформление нашего корпоратива. Требовался лаконичный декор в цветах компании. Результат превзошел ожидания: композиции у входа и фотозона были выполнены безупречно, с вниманием к деталям. Отдельно отмечу пунктуальность, четкое соблюдение сроков и договоренностей.',
         7, 1, NOW(), NOW(), NOW()),
-       (4, uuidv7(), 'Любовь',
+       (4, gen_random_uuid(), 'Любовь',
         'Благодарю персонал за то, что взялись за очень срочный заказ, выполнили и доставили максимально быстро. Посоветую вас друзьям и сама обращусь еще не раз.',
         8, 1, NOW(), NOW(), NOW()),
-       (5, uuidv7(), 'Анна',
+       (5, gen_random_uuid(), 'Анна',
         'Как человек, который ценит визуал, долго искала в Екатеринбурге студию, которая умеет в тренды. Команда Ola предложила крутые цветовые сочетания для моей вечеринки. Шары держались несколько дней, не теряя вид! Ни одного лопнувшего. Это показатель. Если вам важен дизайн, атмосфера и стойкость - выбор очевиден.',
         9, 1, NOW(), NOW(), NOW());
 

@@ -14,6 +14,20 @@ type Logger struct {
 }
 
 func New(cfg *config.Config) *Logger {
+	if cfg.IsProduction {
+		file, err := os.OpenFile("ola.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			slog.Error("Failed to open log file", slog.Any("error", err))
+			os.Exit(1)
+		}
+		return &Logger{
+			log: slog.New(slog.NewTextHandler(file, &slog.HandlerOptions{
+				AddSource:   false,
+				Level:       slog.LevelDebug,
+				ReplaceAttr: nil,
+			})),
+		}
+	}
 	return &Logger{
 		log: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			AddSource:   false,
