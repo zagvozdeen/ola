@@ -19,6 +19,7 @@ export default defineConfig({
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
     manifest: true,
+    copyPublicDir: true,
     rollupOptions: {
       input: {
         landing: resolve(__dirname, 'web/landing/index.html'),

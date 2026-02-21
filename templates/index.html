@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html class="scroll-smooth" lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -22,15 +22,16 @@
             <div class="flex items-center gap-8">
                 <img class="w-20" src="/logo.png" alt="Логотип" width="80" height="80">
                 <ul class="flex gap-4">
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">о нас</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">услуги</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">отзывы</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#">контакты</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#about">о нас</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#products">ассортимент</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#services">услуги</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#reviews">отзывы</a></li>
+                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#contacts">контакты</a></li>
                 </ul>
             </div>
             <div class="flex items-center gap-4">
                 <span class="font-semibold text-white text-sm">г. Екатеринбург</span>
-                <a class="bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-6 py-2 font-bold" href="#">оформить праздник</a>
+                <a class="bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-6 py-2 font-bold" href="#order">оформить праздник</a>
             </div>
         </div>
     </div>
@@ -45,7 +46,7 @@
     </div>
 </div>
 
-<div class="mt-30 mb-33">
+<div id="about" class="mt-30 mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Почему выбирают OLA Studio?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Мы подходим к каждому заказу с душой. Наша главная задача<br>— сделать ваш праздник особенным и подарить яркие<br>впечатления!</h3>
@@ -75,11 +76,32 @@
     </div>
 </div>
 
-<div class="mt-30 mb-33">
+<div id="products" class="mt-30 mb-33">
     <div class="max-w-300 mx-auto px-4">
         <h2 class="text-center text-5xl text-purple-500 font-bold mb-10">Наш ассортимент</h2>
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
             {{ range .Products }}
+            <article class="flex h-full flex-col bg-white">
+                <img class="h-80 w-full object-cover" src="{{ with .FileContent }}{{ . }}{{ else }}/logo.png{{ end }}" alt="{{ .Name }}" width="360" height="208">
+                <p class="mt-4 text-lg font-bold text-purple-500">от {{ .PriceFrom }} ₽</p>
+                <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
+                <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>
+                <a href="#" class="mt-auto rounded-full inline-flex items-center justify-center bg-yellow-400 px-4 py-2 text-xs font-bold text-black transition hover:bg-yellow-300">узнать больше и сделать заказ</a>
+            </article>
+            {{ else }}
+            <article class="bg-white">
+                <p class="text-xs font-medium text-black/70">Скоро здесь появятся товары.</p>
+            </article>
+            {{ end }}
+        </div>
+    </div>
+</div>
+
+<div id="services" class="mt-30 mb-33">
+    <div class="max-w-300 mx-auto px-4">
+        <h2 class="text-center text-5xl text-purple-500 font-bold mb-10">Услуги</h2>
+        <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+            {{ range .Services }}
             <article class="flex h-full flex-col bg-white">
                 <img class="h-80 w-full object-cover" src="{{ with .FileContent }}{{ . }}{{ else }}/logo.png{{ end }}" alt="{{ .Name }}" width="360" height="208">
                 <p class="mt-4 text-lg font-bold text-purple-500">от {{ .PriceFrom }} ₽</p>
@@ -164,7 +186,7 @@
     </div>
 </div>
 
-<div class="mt-30 mb-33">
+<div id="reviews" class="mt-30 mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Что наши клиенты говорят о нас?</h2>
         <div class="mb-6 flex items-center justify-center gap-4">
@@ -237,11 +259,11 @@
     </div>
 </div>
 
-<div class="mt-30 mb-33">
+<div id="order" class="mt-30 mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Готовы создать незабываемый праздник?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Оставьте заявку, и мы подготовим для вас<br>индивидуальное предложение.</h3>
-        <form id="review-form" class="mx-auto max-w-3xl" novalidate>
+        <form id="order-form" class="mx-auto max-w-3xl" novalidate>
             <div class="mb-6">
                 <label for="review-name" class="block text-base font-bold text-black">Ваше имя</label>
                 <input id="review-name" name="name" type="text" autocomplete="name" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
@@ -279,7 +301,7 @@
     </div>
 </div>
 
-<div class="mt-30 mb-33">
+<div id="contacts" class="mt-30 mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Контакты</h2>
         <ul class="flex flex-col items-center gap-2">

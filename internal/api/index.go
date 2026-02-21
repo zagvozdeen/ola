@@ -2,6 +2,7 @@ package api
 
 import (
 	"html/template"
+	"log/slog"
 	"net/http"
 	"path/filepath"
 	"slices"
@@ -14,11 +15,33 @@ type PageData struct {
 	InsertRootDiv bool
 	Head          template.HTML
 	Products      []models.Product
+	Services      []models.Service
 	Categories    []models.Category
 	Reviews       []models.Review
 }
 
+func isWebSocketUpgrade(r *http.Request) bool {
+	// Upgrade: websocket + Connection: Upgrade
+	return strings.EqualFold(r.Header.Get("Upgrade"), "websocket") &&
+		strings.Contains(strings.ToLower(r.Header.Get("Connection")), "upgrade")
+}
+
 func (s *Service) index(w http.ResponseWriter, r *http.Request) {
+	if isWebSocketUpgrade(r) {
+		s.viteProxy.ServeHTTP(w, r)
+		return
+	}
+	vitePassThroughPrefixes := []string{
+		"/@vite/",
+		"/@id/",
+		"/@fs/",
+		"/__vite_ping",
+		"/src/",         // if you ever reference /src directly
+		"/assets/",      // dev assets
+		"/landing/src/", // landing entry/modules
+		"/spa/admin/src/",
+		"/spa/tma/src/",
+	}
 	if !s.cfg.IsProduction && strings.HasPrefix(r.URL.Path, "/files/") {
 		http.ServeFile(w, r, ".data"+r.URL.Path)
 		return
@@ -26,6 +49,12 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 	if !s.cfg.IsProduction && slices.Contains([]string{".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg"}, filepath.Ext(r.URL.Path)) {
 		http.ServeFile(w, r, "web/public"+r.URL.Path)
 		return
+	}
+	for _, pref := range vitePassThroughPrefixes {
+		if strings.HasPrefix(r.URL.Path, pref) {
+			s.viteProxy.ServeHTTP(w, r)
+			return
+		}
 	}
 	tmlp, err := template.ParseFiles("templates/index.html")
 	if err != nil {
@@ -41,6 +70,11 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 		s.log.Error("Failed to get products", err)
 		return
 	}
+	data.Services, err = s.store.GetAllServices(r.Context())
+	if err != nil {
+		s.log.Error("Failed to get services", err)
+		return
+	}
 	data.Categories, err = s.store.GetAllCategories(r.Context())
 	if err != nil {
 		s.log.Error("Failed to get categories", err)
@@ -53,7 +87,7 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 	}
 	err = tmlp.Execute(w, data)
 	if err != nil {
-		s.log.Error("Failed to execute template", err)
+		s.log.Error("Failed to execute template", err, slog.String("proto", r.Proto), slog.String("url", r.URL.String()))
 		return
 	}
 }

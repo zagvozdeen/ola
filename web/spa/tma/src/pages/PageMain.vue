@@ -1,5 +1,5 @@
 <template>
-  <div>TEST PAGE</div>
+  <div>MAIN PAGE</div>
 </template>
 
 <script setup lang="ts">
