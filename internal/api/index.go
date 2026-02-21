@@ -1,11 +1,16 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/zagvozdeen/ola/internal/store/models"
@@ -18,6 +23,20 @@ type PageData struct {
 	Services      []models.Service
 	Categories    []models.Category
 	Reviews       []models.Review
+}
+
+type viteManifestEntry struct {
+	File    string   `json:"file"`
+	Imports []string `json:"imports"`
+	CSS     []string `json:"css"`
+}
+
+type viteHeadParams struct {
+	ManifestPath         string
+	EntryKey             string
+	AssetsURLPrefix      string
+	IncludeCSS           bool
+	IncludeModulePreload bool
 }
 
 func isWebSocketUpgrade(r *http.Request) bool {
@@ -75,9 +94,26 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		s.log.Error("Failed to parse template", err)
 		return
 	}
+
+	head := template.HTML(`<script type="module" src="http://localhost:5173/@vite/client"></script>
+<script type="module" src="http://localhost:5173/landing/src/main.ts"></script>`)
+	if s.cfg.IsProduction {
+		head, err = s.renderViteHead(viteHeadParams{
+			ManifestPath:         "public/.vite/manifest.json",
+			EntryKey:             "landing/index.html",
+			AssetsURLPrefix:      "/",
+			IncludeCSS:           true,
+			IncludeModulePreload: true,
+		})
+		if err != nil {
+			s.log.Error("Failed to render vite head", err)
+			return
+		}
+	}
+
 	data := PageData{
 		InsertRootDiv: false,
-		Head:          `<script type="module" src="http://localhost:5173/@vite/client"></script> <script type="module" src="http://localhost:5173/landing/src/main.ts"></script>`,
+		Head:          head,
 	}
 	data.Products, err = s.store.GetAllProducts(r.Context())
 	if err != nil {
@@ -104,4 +140,84 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		s.log.Error("Failed to execute template", err, slog.String("proto", r.Proto), slog.String("url", r.URL.String()))
 		return
 	}
+}
+
+func (s *Service) renderViteHead(params viteHeadParams) (template.HTML, error) {
+	if params.ManifestPath == "" {
+		return "", errors.New("vite manifest path is required")
+	}
+	if params.EntryKey == "" {
+		return "", errors.New("vite manifest entry key is required")
+	}
+
+	prefix := params.AssetsURLPrefix
+	if prefix == "" {
+		prefix = "/"
+	}
+	if !strings.HasPrefix(prefix, "/") {
+		prefix = "/" + prefix
+	}
+	prefix = strings.TrimSuffix(prefix, "/")
+
+	content, err := os.ReadFile(params.ManifestPath)
+	if err != nil {
+		return "", fmt.Errorf("read vite manifest: %w", err)
+	}
+
+	manifest := make(map[string]viteManifestEntry)
+	if err = json.Unmarshal(content, &manifest); err != nil {
+		return "", fmt.Errorf("parse vite manifest: %w", err)
+	}
+
+	entry, ok := manifest[params.EntryKey]
+	if !ok {
+		return "", fmt.Errorf("manifest entry %q not found", params.EntryKey)
+	}
+	if entry.File == "" {
+		return "", fmt.Errorf("manifest entry %q has empty file", params.EntryKey)
+	}
+
+	formatAssetPath := func(asset string) string {
+		asset = strings.TrimPrefix(asset, "/")
+		return prefix + "/" + asset
+	}
+
+	links := make([]string, 0, len(entry.Imports))
+	if params.IncludeModulePreload {
+		visited := make(map[string]struct{})
+		var collectImports func(importKeys []string) error
+		collectImports = func(importKeys []string) error {
+			for _, key := range importKeys {
+				if _, exists := visited[key]; exists {
+					continue
+				}
+				visited[key] = struct{}{}
+
+				importEntry, exists := manifest[key]
+				if !exists {
+					return fmt.Errorf("manifest import %q not found", key)
+				}
+				if importEntry.File != "" {
+					links = append(links, `<link rel="modulepreload" href=`+strconv.Quote(formatAssetPath(importEntry.File))+`>`)
+				}
+				if err := collectImports(importEntry.Imports); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+
+		if err := collectImports(entry.Imports); err != nil {
+			return "", err
+		}
+	}
+
+	if params.IncludeCSS {
+		for _, css := range entry.CSS {
+			links = append(links, `<link rel="stylesheet" href=`+strconv.Quote(formatAssetPath(css))+`>`)
+		}
+	}
+
+	links = append(links, `<script type="module" src=`+strconv.Quote(formatAssetPath(entry.File))+`></script>`)
+	return template.HTML(strings.Join(links, "\n")), nil
 }
