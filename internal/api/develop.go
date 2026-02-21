@@ -1,16 +1,17 @@
 package api
 
 import (
-	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"time"
+
+	"github.com/zagvozdeen/ola/internal/logger"
 )
 
-func newViteProxy(viteBase *url.URL) *httputil.ReverseProxy {
-	proxy := &httputil.ReverseProxy{
+func newViteProxy(log *logger.Logger, viteBase *url.URL) *httputil.ReverseProxy {
+	return &httputil.ReverseProxy{
 		Rewrite: func(preq *httputil.ProxyRequest) {
 			preq.Out.URL.Scheme = "http"
 			preq.Out.URL.Host = viteBase.Host
@@ -32,20 +33,14 @@ func newViteProxy(viteBase *url.URL) *httputil.ReverseProxy {
 			TLSHandshakeTimeout:   10 * time.Second,
 			ExpectContinueTimeout: 1 * time.Second,
 		},
+		ErrorLog: log.GetLog(),
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
-			log.Printf("[proxy] %s %s -> error: %v", r.Method, r.URL.String(), err)
+			log.Errorf("[proxy] %s %s -> error: %v", r.Method, r.URL.String(), err)
 			w.WriteHeader(http.StatusBadGateway)
-			_, _ = w.Write([]byte("Vite dev server is not reachable"))
+			_, err = w.Write([]byte("Vite dev server is not reachable"))
+			if err != nil {
+				log.Errorf("[proxy] %s %s -> error: %v", r.Method, r.URL.String(), err)
+			}
 		},
-	}
-
-	return proxy
-}
-
-// rewritePath returns a handler that rewrites r.URL.Path and then proxies.
-func rewritePath(proxy *httputil.ReverseProxy, rewrite func(p string) string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		r.URL.Path = rewrite(r.URL.Path)
-		proxy.ServeHTTP(w, r)
 	}
 }

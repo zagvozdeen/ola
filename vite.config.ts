@@ -15,6 +15,7 @@ export default defineConfig({
       '@shared': resolve(__dirname, 'web/shared/src'),
     },
   },
+  envDir: resolve(__dirname),
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,

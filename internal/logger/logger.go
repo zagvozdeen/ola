@@ -5,12 +5,15 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"sync"
 
 	"github.com/zagvozdeen/ola/internal/config"
 )
 
 type Logger struct {
-	log *slog.Logger
+	log  *slog.Logger
+	file *os.File
+	once sync.Once
 }
 
 func New(cfg *config.Config) *Logger {
@@ -26,6 +29,7 @@ func New(cfg *config.Config) *Logger {
 				Level:       slog.LevelDebug,
 				ReplaceAttr: nil,
 			})),
+			file: file,
 		}
 	}
 	return &Logger{
@@ -35,6 +39,16 @@ func New(cfg *config.Config) *Logger {
 			ReplaceAttr: nil,
 		})),
 	}
+}
+
+func (l *Logger) Close() {
+	l.once.Do(func() {
+		if l.file != nil {
+			if err := l.file.Close(); err != nil {
+				slog.Error("Failed to close log file", slog.Any("error", err))
+			}
+		}
+	})
 }
 
 func (l *Logger) GetLog() *log.Logger {

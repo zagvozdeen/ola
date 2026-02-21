@@ -32,7 +32,7 @@ export default defineConfig([
       },
     },
     rules: {
-      'vue/component-name-in-template-casing': ['error', 'PascalCase'],
+      // 'vue/component-name-in-template-casing': ['error', 'PascalCase'],
       'vue/multi-word-component-names': 'off',
     },
   },

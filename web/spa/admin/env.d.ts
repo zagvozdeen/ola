@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import 'telegram-web-app'
 
 declare module '*.vue' {
     import type { DefineComponent } from 'vue'

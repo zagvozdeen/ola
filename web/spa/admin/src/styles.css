@@ -1,1 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200..1000&display=swap");
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 @import "tailwindcss";
+
+@theme {
+    --font-nunito: "Nunito", sans-serif;
+}

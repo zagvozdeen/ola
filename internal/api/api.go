@@ -42,7 +42,7 @@ func (s *Service) Run(ctx context.Context) {
 		s.log.Error("Failed to parse url", err)
 		return
 	}
-	s.viteProxy = newViteProxy(u)
+	s.viteProxy = newViteProxy(s.log, u)
 
 	server := &http.Server{
 		Addr:     net.JoinHostPort(s.cfg.APIHost, s.cfg.APIPort),
@@ -61,7 +61,7 @@ func (s *Service) Run(ctx context.Context) {
 	select {
 	case <-ctx.Done():
 		s.log.Info("Context canceled")
-	case err := <-errCh:
+	case err = <-errCh:
 		if errors.Is(err, http.ErrServerClosed) {
 			s.log.Info("Server has been closed")
 			return

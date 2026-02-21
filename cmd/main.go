@@ -18,6 +18,7 @@ func main() {
 
 	cfg := config.New()
 	log := logger.New(cfg)
+	defer log.Close()
 	pool := db.New(ctx, cfg, log)
 	defer pool.Close()
 	storage := store.New(log, pool)

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"html/template"
@@ -52,19 +52,22 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 		s.viteProxy.ServeHTTP(w, r)
 		return
 	}
-	if strings.HasPrefix(r.URL.Path, "/admin/") {
+	if strings.HasPrefix(r.URL.Path, "/admin") {
 		r.URL.Path = "/spa/admin/"
 		s.viteProxy.ServeHTTP(w, r)
+		return
 	}
-	if strings.HasPrefix(r.URL.Path, "/tma/") {
+	if strings.HasPrefix(r.URL.Path, "/tma") {
 		r.URL.Path = "/spa/tma/"
 		s.viteProxy.ServeHTTP(w, r)
+		return
 	}
 	vitePassThroughPrefixes := []string{
 		"/@vite/",
 		"/@id/",
 		"/@fs/",
 		"/__vite_ping",
+		"/shared/",
 		"/src/",         // if you ever reference /src directly
 		"/assets/",      // dev assets
 		"/landing/src/", // landing entry/modules
@@ -200,14 +203,14 @@ func (s *Service) renderViteHead(params viteHeadParams) (template.HTML, error) {
 				if importEntry.File != "" {
 					links = append(links, `<link rel="modulepreload" href=`+strconv.Quote(formatAssetPath(importEntry.File))+`>`)
 				}
-				if err := collectImports(importEntry.Imports); err != nil {
+				if err = collectImports(importEntry.Imports); err != nil {
 					return err
 				}
 			}
 			return nil
 		}
 
-		if err := collectImports(entry.Imports); err != nil {
+		if err = collectImports(entry.Imports); err != nil {
 			return "", err
 		}
 	}
