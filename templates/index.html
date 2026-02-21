@@ -142,6 +142,45 @@
         </div>
     </div>
 </div>
+
+<div class="mt-30 mb-33">
+    <div class="max-w-250 mx-auto px-4">
+        <h2 class="text-center text-6xl text-purple-500 font-bold mb-10">Что наши клиенты говорят о нас?</h2>
+        <div class="mb-6 flex items-center justify-center gap-4">
+            <button id="reviews-prev" type="button" class="flex size-12 cursor-pointer items-center justify-center rounded-full bg-yellow-400 text-xl font-bold text-black transition hover:bg-yellow-300" aria-label="Предыдущий отзыв">
+                &#8592;
+            </button>
+            <button id="reviews-next" type="button" class="flex size-12 cursor-pointer items-center justify-center rounded-full bg-yellow-400 text-xl font-bold text-black transition hover:bg-yellow-300" aria-label="Следующий отзыв">
+                &#8594;
+            </button>
+        </div>
+        <div id="reviews-slider" class="mx-auto max-w-4xl bg-white">
+            <div id="reviews-track" class="flex gap-6 transition-transform duration-500 ease-in-out will-change-transform">
+                <article class="review-slide w-[82%] shrink-0 bg-white p-8 sm:w-[74%]">
+                    <div class="flex items-start gap-4">
+                        <img class="size-16 rounded-full object-cover" src="/files/5.jpg" alt="Елена" width="64" height="64">
+                        <h3 class="pt-3 text-2xl font-bold text-purple-500">Елена</h3>
+                    </div>
+                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">Огромное спасибо за шарики! Именинник был в восторге, доставка приехала вовремя, а декор держался очень долго.</p>
+                </article>
+                <article class="review-slide w-[82%] shrink-0 bg-white p-8 sm:w-[74%]">
+                    <div class="flex items-start gap-4">
+                        <img class="size-16 rounded-full object-cover" src="/files/6.jpg" alt="Евгений" width="64" height="64">
+                        <h3 class="pt-3 text-2xl font-bold text-purple-500">Евгений</h3>
+                    </div>
+                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">Заказывал бабл-бокс на годовщину. Получилось стильно, необычно и очень аккуратно, девушка была в полном восторге.</p>
+                </article>
+                <article class="review-slide w-[82%] shrink-0 bg-white p-8 sm:w-[74%]">
+                    <div class="flex items-start gap-4">
+                        <img class="size-16 rounded-full object-cover" src="/files/7.jpg" alt="Александр" width="64" height="64">
+                        <h3 class="pt-3 text-2xl font-bold text-purple-500">Александр</h3>
+                    </div>
+                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">Оформление корпоратива сделали безупречно: быстро, четко и точно в фирменных цветах. Команда очень профессиональная.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
 {{ end }}
 </body>
 </html>

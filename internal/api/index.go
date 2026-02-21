@@ -14,12 +14,12 @@ type PageData struct {
 }
 
 func (s *Service) index(w http.ResponseWriter, r *http.Request) {
-	if !s.cfg.IsProduction && slices.Contains([]string{".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg"}, filepath.Ext(r.URL.Path)) {
-		http.ServeFile(w, r, "web/public"+r.URL.Path)
-		return
-	}
 	if !s.cfg.IsProduction && strings.HasPrefix(r.URL.Path, "/files/") {
 		http.ServeFile(w, r, ".data"+r.URL.Path)
+		return
+	}
+	if !s.cfg.IsProduction && slices.Contains([]string{".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg"}, filepath.Ext(r.URL.Path)) {
+		http.ServeFile(w, r, "web/public"+r.URL.Path)
 		return
 	}
 	tmlp, err := template.ParseFiles("templates/index.html")
