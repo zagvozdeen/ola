@@ -45,6 +45,13 @@ type Service struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type Review struct {
+	ID        string    `json:"id"`
+	UserID    *int      `json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type Order struct {
 	ID        string    `json:"id"`
 	UserID    int       `json:"user_id"`

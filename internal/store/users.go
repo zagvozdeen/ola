@@ -17,3 +17,7 @@ func (s *Store) GetUserByTID(ctx context.Context, tid int64) (*models.User, erro
 func (s *Store) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
 	panic("implement")
 }
+
+func (s *Store) CreateUser(ctx context.Context, user *models.User) error {
+	panic("implement")
+}

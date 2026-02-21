@@ -1,11 +1,8 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
   test page
 </template>
 
-<style scoped>
+<script setup lang="ts">
 
-</style>
+</script>
+
