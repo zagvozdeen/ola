@@ -8,17 +8,47 @@ import (
 )
 
 func (s *Store) GetAllProducts(ctx context.Context) ([]models.Product, error) {
-	panic("implement")
+	rows, err := s.pool.Query(ctx, "SELECT p.id, p.uuid::text, p.name, p.description, p.price_from, p.price_to, p.file_id, f.content, p.user_id, p.created_at, p.updated_at FROM products p JOIN files f ON f.id = p.file_id ORDER BY p.created_at DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	products := make([]models.Product, 0)
+	for rows.Next() {
+		product := models.Product{}
+		fileContent := ""
+		err = rows.Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.FileID, &fileContent, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		product.FileContent = &fileContent
+		products = append(products, product)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
 }
 
 func (s *Store) GetProductByUUID(ctx context.Context, uuid uuid.UUID) (*models.Product, error) {
-	panic("implement")
+	product := &models.Product{}
+	fileContent := ""
+	err := s.pool.QueryRow(ctx, "SELECT p.id, p.uuid::text, p.name, p.description, p.price_from, p.price_to, p.file_id, f.content, p.user_id, p.created_at, p.updated_at FROM products p JOIN files f ON f.id = p.file_id WHERE p.uuid = $1", uuid.String()).Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.FileID, &fileContent, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	product.FileContent = &fileContent
+	return product, nil
 }
 
-func (s *Store) CreateProduct(ctx context.Context, service *models.Product) error {
-	panic("implement")
+func (s *Store) CreateProduct(ctx context.Context, product *models.Product) error {
+	_, err := s.pool.Exec(ctx, "INSERT INTO products (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)", product.ID, product.UUID, product.Name, product.Description, product.PriceFrom, product.PriceTo, product.FileID, product.UserID, product.CreatedAt, product.UpdatedAt)
+	return err
 }
 
-func (s *Store) UpdateProduct(ctx context.Context, service *models.Product) error {
-	panic("implement")
+func (s *Store) UpdateProduct(ctx context.Context, product *models.Product) error {
+	_, err := s.pool.Exec(ctx, "UPDATE products SET name = $1, description = $2, price_from = $3, price_to = $4, file_id = $5, user_id = $6, updated_at = $7 WHERE id = $8", product.Name, product.Description, product.PriceFrom, product.PriceTo, product.FileID, product.UserID, product.UpdatedAt, product.ID)
+	return err
 }

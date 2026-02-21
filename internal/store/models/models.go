@@ -32,7 +32,7 @@ type File struct {
 }
 
 type Product struct {
-	ID          string    `json:"id"`
+	ID          int       `json:"id"`
 	UUID        string    `json:"uuid"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -46,7 +46,7 @@ type Product struct {
 }
 
 type Service struct {
-	ID          string    `json:"id"`
+	ID          int       `json:"id"`
 	UUID        string    `json:"uuid"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -60,7 +60,7 @@ type Service struct {
 }
 
 type Review struct {
-	ID          string    `json:"id"`
+	ID          int       `json:"id"`
 	UUID        string    `json:"uuid"`
 	Name        string    `json:"name"`
 	Content     string    `json:"content"`
@@ -73,7 +73,7 @@ type Review struct {
 }
 
 type Order struct {
-	ID        string    `json:"id"`
+	ID        int       `json:"id"`
 	UUID      string    `json:"uuid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
@@ -84,7 +84,7 @@ type Order struct {
 }
 
 type Feedback struct {
-	ID        string    `json:"id"`
+	ID        int       `json:"id"`
 	UUID      string    `json:"uuid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
