@@ -1,9 +1,11 @@
 import './styles.css'
 import IMask from 'imask'
 
-type PhoneMask = {
-  unmaskedValue: string
-  value: string
+type FeedbackFormConfig = {
+  endpoint: string
+  successMessage: string
+  submitErrorMessage: string
+  messageRequiredText: string
 }
 
 const initReviewsSlider = (): void => {
@@ -72,16 +74,14 @@ const initReviewsSlider = (): void => {
   render()
 }
 
-const initReviewForm = (): void => {
-  const form = document.getElementById('review-form')
-  if (!(form instanceof HTMLFormElement)) {
-    return
-  }
-
-  const nameInput = form.querySelector<HTMLInputElement>('#review-name')
-  const phoneInput = form.querySelector<HTMLInputElement>('#review-phone')
-  const textInput = form.querySelector<HTMLTextAreaElement>('#review-message')
-  const consentInput = form.querySelector<HTMLInputElement>('#review-consent')
+const initFeedbackForm = (
+  form: HTMLFormElement,
+  config: FeedbackFormConfig,
+): void => {
+  const nameInput = form.elements.namedItem('name')
+  const phoneInput = form.elements.namedItem('phone')
+  const textInput = form.elements.namedItem('message')
+  const consentInput = form.elements.namedItem('consent')
   const statusNode = form.querySelector<HTMLElement>('[data-form-status]')
   const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')
 
@@ -109,12 +109,15 @@ const initReviewForm = (): void => {
   const setStatus = (message = '', type: 'idle' | 'error' | 'success' = 'idle'): void => {
     statusNode.textContent = message
     statusNode.classList.remove('text-red-600', 'text-green-700')
+
     if (type === 'error') {
       statusNode.classList.add('text-red-600')
     }
+
     if (type === 'success') {
       statusNode.classList.add('text-green-700')
     }
+
     statusNode.classList.toggle('invisible', message.length === 0)
   }
 
@@ -125,7 +128,7 @@ const initReviewForm = (): void => {
     setError('consent')
   }
 
-  const phoneMask: PhoneMask = IMask(phoneInput, {
+  const phoneMask = IMask(phoneInput, {
     mask: '+{7} (000) 000-00-00',
   })
 
@@ -152,7 +155,7 @@ const initReviewForm = (): void => {
     }
 
     if (!message) {
-      setError('message', 'Напишите отзыв')
+      setError('message', config.messageRequiredText)
       hasError = true
     }
 
@@ -168,7 +171,7 @@ const initReviewForm = (): void => {
     submitButton.disabled = true
 
     try {
-      const response = await fetch('/api/reviews/submit-placeholder', {
+      const response = await fetch(config.endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -183,17 +186,14 @@ const initReviewForm = (): void => {
 
       if (!response.ok) {
         const errorText = (await response.text()).trim()
-        setStatus(errorText || 'Не удалось отправить отзыв', 'error')
+        setStatus(errorText || config.submitErrorMessage, 'error')
         return
       }
 
       const result = (await response.json()) as { message?: string }
-      setStatus(result.message ?? 'Спасибо! Отзыв отправлен', 'success')
+      setStatus(result.message ?? config.successMessage, 'success')
       form.reset()
-
-      if (phoneMask) {
-        phoneMask.value = ''
-      }
+      phoneMask.value = ''
     } catch {
       setStatus('Ошибка сети. Попробуйте позже', 'error')
     } finally {
@@ -202,9 +202,33 @@ const initReviewForm = (): void => {
   })
 }
 
+const initReviewForms = (): void => {
+  const forms = Array.from(document.querySelectorAll<HTMLFormElement>('form#review-form'))
+
+  const reviewForm = forms[0]
+  if (reviewForm) {
+    initFeedbackForm(reviewForm, {
+      endpoint: '/api/reviews/submit-placeholder',
+      successMessage: 'Спасибо! Отзыв отправлен',
+      submitErrorMessage: 'Не удалось отправить отзыв',
+      messageRequiredText: 'Напишите отзыв',
+    })
+  }
+
+  const requestForm = forms[1]
+  if (requestForm) {
+    initFeedbackForm(requestForm, {
+      endpoint: '/api/requests/submit-placeholder',
+      successMessage: 'Спасибо! Заявка отправлена',
+      submitErrorMessage: 'Не удалось отправить заявку',
+      messageRequiredText: 'Укажите, что вас интересует',
+    })
+  }
+}
+
 const initLandingPage = (): void => {
   initReviewsSlider()
-  initReviewForm()
+  initReviewForms()
 }
 
 if (document.readyState === 'loading') {
