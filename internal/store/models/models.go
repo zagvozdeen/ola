@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/zagvozdeen/ola/internal/store/enums"
 )
 
@@ -61,7 +62,7 @@ type Service struct {
 
 type Review struct {
 	ID          int       `json:"id"`
-	UUID        string    `json:"uuid"`
+	UUID        uuid.UUID `json:"uuid"`
 	Name        string    `json:"name"`
 	Content     string    `json:"content"`
 	FileID      int       `json:"file_id"`

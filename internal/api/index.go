@@ -6,11 +6,14 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
 type PageData struct {
 	InsertRootDiv bool
 	Head          template.HTML
+	Reviews       []models.Review
 }
 
 func (s *Service) index(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +33,11 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 	data := PageData{
 		InsertRootDiv: false,
 		Head:          `<script type="module" src="http://localhost:5173/@vite/client"></script> <script type="module" src="http://localhost:5173/landing/src/main.ts"></script>`,
+	}
+	data.Reviews, err = s.store.GetAllReviews(r.Context())
+	if err != nil {
+		s.log.Error("Failed to get all reviews", err)
+		return
 	}
 	err = tmlp.Execute(w, data)
 	if err != nil {

@@ -7,28 +7,26 @@ import (
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
+// GetAllReviews
 func (s *Store) GetAllReviews(ctx context.Context) ([]models.Review, error) {
-	rows, err := s.pool.Query(ctx, "SELECT r.id, r.uuid::text, r.name, r.content, r.file_id, f.content, r.user_id, r.published_at, r.created_at, r.updated_at FROM reviews r JOIN files f ON f.id = r.file_id ORDER BY r.published_at DESC")
+	rows, err := s.pool.Query(ctx, "SELECT r.id, r.uuid, r.name, r.content, r.file_id, f.content, r.user_id, r.published_at, r.created_at, r.updated_at FROM reviews r JOIN files f ON f.id = r.file_id ORDER BY r.published_at DESC")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	reviews := make([]models.Review, 0)
 	for rows.Next() {
-		review := models.Review{}
-		fileContent := ""
-		err = rows.Scan(&review.ID, &review.UUID, &review.Name, &review.Content, &review.FileID, &fileContent, &review.UserID, &review.PublishedAt, &review.CreatedAt, &review.UpdatedAt)
+		var review models.Review
+		err = rows.Scan(&review.ID, &review.UUID, &review.Name, &review.Content, &review.FileID, &review.FileContent, &review.UserID, &review.PublishedAt, &review.CreatedAt, &review.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
-		review.FileContent = &fileContent
 		reviews = append(reviews, review)
 	}
-	if err = rows.Err(); err != nil {
+	err = rows.Err()
+	if err != nil {
 		return nil, err
 	}
-
 	return reviews, nil
 }
 

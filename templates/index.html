@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     {{ .Head }}
 </head>
-<body class="antialiased font-gothic">
+<body class="antialiased font-gothic overflow-x-hidden">
 {{ if .InsertRootDiv }}
 <div id="app"></div>
 {{ else }}
@@ -156,27 +156,19 @@
         </div>
         <div id="reviews-slider" class="mx-auto max-w-4xl bg-white">
             <div id="reviews-track" class="flex gap-6 transition-transform duration-500 ease-in-out will-change-transform">
+                {{ range .Reviews }}
                 <article class="review-slide w-[82%] shrink-0 bg-white p-8 sm:w-[74%]">
                     <div class="flex items-start gap-4">
-                        <img class="size-16 rounded-full object-cover" src="/files/5.jpg" alt="Елена" width="64" height="64">
-                        <h3 class="pt-3 text-2xl font-bold text-purple-500">Елена</h3>
+                        <img class="size-16 rounded-full object-cover" src="{{ with .FileContent }}{{ . }}{{ else }}/logo.png{{ end }}" alt="{{ .Name }}" width="64" height="64">
+                        <h3 class="pt-3 text-2xl font-bold text-purple-500">{{ .Name }}</h3>
                     </div>
-                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">Огромное спасибо за шарики! Именинник был в восторге, доставка приехала вовремя, а декор держался очень долго.</p>
+                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">{{ .Content }}</p>
                 </article>
+                {{ else }}
                 <article class="review-slide w-[82%] shrink-0 bg-white p-8 sm:w-[74%]">
-                    <div class="flex items-start gap-4">
-                        <img class="size-16 rounded-full object-cover" src="/files/6.jpg" alt="Евгений" width="64" height="64">
-                        <h3 class="pt-3 text-2xl font-bold text-purple-500">Евгений</h3>
-                    </div>
-                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">Заказывал бабл-бокс на годовщину. Получилось стильно, необычно и очень аккуратно, девушка была в полном восторге.</p>
+                    <p class="text-lg font-medium leading-relaxed text-black/85">Пока нет отзывов.</p>
                 </article>
-                <article class="review-slide w-[82%] shrink-0 bg-white p-8 sm:w-[74%]">
-                    <div class="flex items-start gap-4">
-                        <img class="size-16 rounded-full object-cover" src="/files/7.jpg" alt="Александр" width="64" height="64">
-                        <h3 class="pt-3 text-2xl font-bold text-purple-500">Александр</h3>
-                    </div>
-                    <p class="mt-5 text-lg font-medium leading-relaxed text-black/85">Оформление корпоратива сделали безупречно: быстро, четко и точно в фирменных цветах. Команда очень профессиональная.</p>
-                </article>
+                {{ end }}
             </div>
         </div>
     </div>
