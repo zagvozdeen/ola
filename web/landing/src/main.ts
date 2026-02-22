@@ -1,11 +1,31 @@
 import './styles.css'
 import IMask from 'imask'
+import { i18n } from '@shared/composables/useI18n'
 import type { ValidationError } from '@shared/types'
 
 type FeedbackFormConfig = {
   endpoint: string
   successMessage: string
   submitErrorMessage: string
+}
+
+type ValidationField = 'name' | 'phone' | 'content'
+type FormField = ValidationField | 'consent'
+
+const validationFields: ValidationField[] = ['name', 'phone', 'content']
+
+const getValidationMessage = (field: string, tag: string): string => {
+  const fieldMessage = i18n[`validation.${field}.${tag}`]
+  if (fieldMessage !== undefined) {
+    return fieldMessage
+  }
+
+  const tagMessage = i18n[`validation.${tag}`]
+  if (tagMessage !== undefined) {
+    return tagMessage
+  }
+
+  return i18n['validation.invalid'] || 'Некорректное значение'
 }
 
 const initReviewsSlider = (): void => {
@@ -111,8 +131,8 @@ const initFeedbackForm = (
     statusNode.classList.toggle('invisible', message.length === 0)
   }
 
-  const setConsentError = (message = ''): void => {
-    const errorNode = form.querySelector<HTMLElement>('[data-error-for="consent"]')
+  const setFieldError = (field: FormField, message = ''): void => {
+    const errorNode = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`)
     if (!(errorNode instanceof HTMLElement)) {
       return
     }
@@ -121,27 +141,49 @@ const initFeedbackForm = (
     errorNode.classList.toggle('invisible', message.length === 0)
   }
 
+  const clearFieldErrors = (): void => {
+    validationFields.forEach((field) => setFieldError(field))
+    setFieldError('consent')
+  }
+
+  const setValidationErrors = (errors: Record<string, string>): boolean => {
+    let hasValidationErrors = false
+
+    validationFields.forEach((field) => {
+      const tag = errors[field]
+      if (typeof tag !== 'string' || tag.length === 0) {
+        setFieldError(field)
+        return
+      }
+
+      setFieldError(field, getValidationMessage(field, tag))
+      hasValidationErrors = true
+    })
+
+    return hasValidationErrors
+  }
+
   const phoneMask = IMask(phoneInput, {
     mask: '+{7} (000) 000-00-00',
   })
 
   consentInput.addEventListener('change', () => {
     if (consentInput.checked) {
-      setConsentError()
+      setFieldError('consent')
     }
   })
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
     setStatus()
-    setConsentError()
+    clearFieldErrors()
 
     const name = nameInput.value.trim()
     const content = contentInput.value.trim()
     const phone = phoneInput.value.trim()
 
     if (!consentInput.checked) {
-      setConsentError('Нужно согласие на обработку данных')
+      setFieldError('consent', i18n['form.consent_required'] || 'Нужно согласие на обработку данных')
       return
     }
 
@@ -161,12 +203,24 @@ const initFeedbackForm = (
       })
 
       if (!response.ok) {
-        console.log(response.headers.get('content-type'))
-        if (response.headers.get('Content-Type') === 'application/json') {
-          const error: ValidationError = await response.json()
-          console.log(error)
+        const contentType = response.headers.get('Content-Type')?.toLowerCase() || ''
+        if (contentType.includes('application/json')) {
+          let error: ValidationError
+          try {
+            error = await response.json() as ValidationError
+          } catch {
+            setStatus(config.submitErrorMessage, 'error')
+            return
+          }
+
+          if (setValidationErrors(error.errors)) {
+            return
+          }
+
+          setStatus(config.submitErrorMessage, 'error')
           return
         }
+
         const errorText = (await response.text()).trim()
         setStatus(errorText || config.submitErrorMessage, 'error')
         return
@@ -176,7 +230,7 @@ const initFeedbackForm = (
       form.reset()
       phoneMask.value = ''
     } catch {
-      setStatus('Ошибка сети. Попробуйте позже', 'error')
+      setStatus(i18n['form.network_error'] || 'Ошибка сети. Попробуйте позже', 'error')
     } finally {
       submitButton.disabled = false
     }
