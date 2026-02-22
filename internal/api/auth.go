@@ -4,7 +4,6 @@ import (
 	"encoding/json/v2"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -13,15 +12,17 @@ import (
 
 	"github.com/go-telegram/bot"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/zagvozdeen/ola/internal/api/core"
+	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type authRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Email    string `json:"username" mold:"trim,lcase" validate:"required,email,max=256"`
+	Password string `json:"password" mold:"trim" validate:"required"`
 }
 
 type authResponse struct {
@@ -32,26 +33,25 @@ func (s *Service) login(r *http.Request) core.Response {
 	req := &authRequest{}
 	err := json.UnmarshalRead(r.Body, req)
 	if err != nil {
-		s.log.Warn("Failed to decode auth request", slog.Any("err", err))
-		http.Error(w, "invalid json body", http.StatusBadRequest)
-		return
+		return core.Err(http.StatusBadRequest, err)
 	}
-	user, err := s.store.GetUserByUsername(r.Context(), req.Username)
+	err = s.validate.StructCtx(r.Context(), req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
+	user, err := s.store.GetUserByEmail(r.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			s.log.Warn("Invalid credentials", slog.String("username", req.Username))
-			http.Error(w, "invalid username or password", http.StatusUnauthorized)
-			return
+			return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
 		}
-		s.log.Error("Failed to load user", err, slog.String("username", req.Username))
-		http.Error(w, "failed to authenticate", http.StatusInternalServerError)
-		return
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
+	}
+	if user.Password == nil {
+		return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(req.Password))
 	if err != nil {
-		s.log.Warn("Invalid credentials", slog.String("username", req.Username))
-		http.Error(w, "invalid username or password", http.StatusUnauthorized)
-		return
+		return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
 	}
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		ID:        strconv.Itoa(user.ID),
@@ -59,23 +59,17 @@ func (s *Service) login(r *http.Request) core.Response {
 	})
 	token, err := t.SignedString([]byte(s.cfg.AppSecret))
 	if err != nil {
-		s.log.Error("Failed to sign auth token", err)
-		http.Error(w, "failed to create token", http.StatusInternalServerError)
-		return
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to sign auth token: %w", err))
 	}
-	w.Header().Set("Content-Type", "application/json")
-	err = json.MarshalWrite(w, authResponse{Token: token})
-	if err != nil {
-		s.log.Error("Failed to write response", err)
-	}
+	return core.JSON(http.StatusOK, authResponse{Token: token})
 }
 
 type registerRequest struct {
-	FirstName            string `json:"first_name"`
-	LastName             string `json:"last_name"`
-	Email                string `json:"email"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
+	FirstName            string `json:"first_name" mold:"trim" validate:"required,max=255"`
+	LastName             string `json:"last_name" mold:"trim" validate:"required,max=255"`
+	Email                string `json:"email" mold:"trim,lcase" validate:"required,email,max=256"`
+	Password             string `json:"password" mold:"trim" validate:"required,min=8,max=72"`
+	PasswordConfirmation string `json:"password_confirmation" mold:"trim" validate:"required,eqfield=Password"`
 }
 
 type registerResponse struct {
@@ -90,14 +84,40 @@ func (s *Service) register(r *http.Request) core.Response {
 	if err != nil {
 		return core.Err(http.StatusBadRequest, err)
 	}
+	err = s.conform.Struct(r.Context(), req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
 	err = s.validate.StructCtx(r.Context(), req)
 	if err != nil {
 		return core.Err(http.StatusBadRequest, err)
 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to hash password: %w", err))
+	}
+	uid, err := uuid.NewV7()
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to generate uuid v7: %w", err))
+	}
+	user := &models.User{
+		UUID:      uid,
+		FirstName: req.FirstName,
+		LastName:  new(req.LastName),
+		Email:     new(req.Email),
+		Password:  new(string(hashedPassword)),
+		Role:      enums.UserRoleUser,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err = s.store.CreateUser(r.Context(), user)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create user: %w", err))
+	}
 	return core.JSON(http.StatusCreated, registerResponse{
-		UUID:      "",
-		Email:     "",
-		CreatedAt: time.Time{},
+		UUID:      user.UUID.String(),
+		Email:     *user.Email,
+		CreatedAt: user.CreatedAt,
 	})
 }
 

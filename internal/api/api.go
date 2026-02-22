@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-playground/mold/v4"
+	"github.com/go-playground/mold/v4/modifiers"
 	"github.com/go-playground/validator/v10"
 	"github.com/zagvozdeen/ola/internal/config"
 	"github.com/zagvozdeen/ola/internal/logger"
@@ -21,6 +23,7 @@ type Service struct {
 	store     *store.Store
 	viteProxy *httputil.ReverseProxy
 	validate  *validator.Validate
+	conform   *mold.Transformer
 }
 
 func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
@@ -30,6 +33,7 @@ func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
 		store:     store,
 		viteProxy: newViteProxy(log),
 		validate:  validator.New(validator.WithRequiredStructEnabled()),
+		conform:   modifiers.New(),
 	}
 }
 
@@ -76,15 +80,20 @@ func (s *Service) getRoutes() *http.ServeMux {
 
 	mux.HandleFunc("POST /api/auth/login", s.guest(s.login))
 	mux.HandleFunc("POST /api/auth/register", s.guest(s.register))
-	//mux.HandleFunc("GET /api/test-sessions", s.auth(s.getTestSessions))
-	//mux.HandleFunc("GET /api/test-sessions/{uuid}", s.auth(s.getTestSession))
-	//mux.HandleFunc("POST /api/test-sessions", s.auth(s.createTestSession))
-	//mux.HandleFunc("PATCH /api/user-answers/{uuid}", s.auth(s.updateUserAnswer))
-	//mux.HandleFunc("GET /api/leaderboard", s.auth(s.getLeaderboard))
-	//mux.HandleFunc("GET /api/cards", s.auth(s.getCards))
-	//mux.HandleFunc("GET /api/courses", s.auth(s.getCourses))
-	//mux.HandleFunc("GET /api/modules", s.auth(s.getModules))
-	//mux.HandleFunc("GET /api/changes", s.auth(s.getChanges))
+
+	mux.HandleFunc("POST /api/guest/feedback", s.guest(s.createGuestFeedback))
+	mux.HandleFunc("POST /api/guest/orders", s.guest(s.createGuestOrder))
+
+	mux.HandleFunc("GET /api/me", s.auth(s.getMe))                 // for all
+	mux.HandleFunc("GET /api/products", s.auth(s.getProducts))     // for all
+	mux.HandleFunc("GET /api/services", s.auth(s.getServices))     // for all
+	mux.HandleFunc("GET /api/categories", s.auth(s.getCategories)) // for admin and moderator only
+	mux.HandleFunc("GET /api/feedback", s.auth(s.getFeedback))     // for admin and moderator only
+	mux.HandleFunc("POST /api/feedback", s.auth(s.createFeedback)) // for all
+	mux.HandleFunc("GET /api/reviews", s.auth(s.getReviews))       // for admin and moderator only
+	mux.HandleFunc("GET /api/orders", s.auth(s.getOrders))         // for admin and moderator only
+	mux.HandleFunc("POST /api/orders", s.auth(s.createOrder))      // for all
+	mux.HandleFunc("GET /api/users", s.auth(s.getUsers))           // for admin only
 
 	return mux
 }

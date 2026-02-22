@@ -8,8 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"path/filepath"
-	"slices"
+	"path"
 	"strconv"
 	"strings"
 
@@ -17,12 +16,11 @@ import (
 )
 
 type PageData struct {
-	InsertRootDiv bool
-	Head          template.HTML
-	Products      []models.Product
-	Services      []models.Service
-	Categories    []models.Category
-	Reviews       []models.Review
+	Head       template.HTML
+	Products   []models.Product
+	Services   []models.Service
+	Categories []models.Category
+	Reviews    []models.Review
 }
 
 type viteManifestEntry struct {
@@ -74,11 +72,12 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 		//"/spa/admin/src/",
 		//"/spa/tma/src/",
 	}
-	if !s.cfg.IsProduction && strings.HasPrefix(r.URL.Path, "/files/") {
+	if strings.HasPrefix(r.URL.Path, "/files/") {
 		http.ServeFile(w, r, ".data"+r.URL.Path)
 		return
 	}
-	if !s.cfg.IsProduction && slices.Contains([]string{".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg"}, filepath.Ext(r.URL.Path)) {
+	switch path.Ext(r.URL.Path) {
+	case ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg", "webp":
 		http.ServeFile(w, r, "web/public"+r.URL.Path)
 		return
 	}
@@ -114,10 +113,7 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	data := PageData{
-		InsertRootDiv: false,
-		Head:          head,
-	}
+	data := PageData{Head: head}
 	data.Products, err = s.store.GetAllProducts(r.Context())
 	if err != nil {
 		s.log.Error("Failed to get products", err)

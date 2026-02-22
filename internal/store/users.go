@@ -24,9 +24,13 @@ func (s *Store) GetUserByTID(ctx context.Context, tid int64) (*models.User, erro
 	return user, nil
 }
 
-func (s *Store) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (s *Store) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	user := &models.User{}
-	err := s.pool.QueryRow(ctx, "SELECT id, tid, uuid::text, first_name, last_name, username, email, password, role, created_at, updated_at FROM users WHERE username = $1", username).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at FROM users WHERE email = $1",
+		email,
+	).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +38,10 @@ func (s *Store) GetUserByUsername(ctx context.Context, username string) (*models
 }
 
 func (s *Store) CreateUser(ctx context.Context, user *models.User) error {
-	_, err := s.pool.Exec(ctx, "INSERT INTO users (id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)", user.ID, user.TID, user.UUID, user.FirstName, user.LastName, user.Username, user.Email, user.Password, user.Role, user.CreatedAt, user.UpdatedAt)
+	err := s.pool.QueryRow(
+		ctx,
+		"INSERT INTO users (tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
+		user.TID, user.UUID, user.FirstName, user.LastName, user.Username, user.Email, user.Password, user.Role, user.CreatedAt, user.UpdatedAt,
+	).Scan(&user.ID)
 	return err
 }

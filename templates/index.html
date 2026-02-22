@@ -13,9 +13,6 @@
     {{ .Head }}
 </head>
 <body class="antialiased font-gothic overflow-x-hidden">
-{{ if .InsertRootDiv }}
-<div id="app"></div>
-{{ else }}
 <header class="absolute w-full z-10">
     <div class="max-w-350 mx-auto px-4">
         <div class="flex justify-between items-center gap-2">
@@ -345,6 +342,5 @@
         <p class="text-white font-bold text-sm">© 2025-2026. Сбор и обработка персональных данных производится в соответствии с <a href="#" class="underline decoration-white underline-offset-2 hover:text-gray-200">политикой конфиденциальности</a>.</p>
     </div>
 </footer>
-{{ end }}
 </body>
 </html>
