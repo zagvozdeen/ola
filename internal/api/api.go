@@ -6,44 +6,34 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"sync"
 	"time"
 
-	"github.com/go-telegram/bot"
+	"github.com/go-playground/validator/v10"
 	"github.com/zagvozdeen/ola/internal/config"
 	"github.com/zagvozdeen/ola/internal/logger"
 	"github.com/zagvozdeen/ola/internal/store"
 )
 
 type Service struct {
-	cfg          *config.Config
-	log          *logger.Logger
-	store        *store.Store
-	processingTS sync.Map
-	bot          *bot.Bot
-	botStarted   chan struct{}
-	viteProxy    *httputil.ReverseProxy
+	cfg       *config.Config
+	log       *logger.Logger
+	store     *store.Store
+	viteProxy *httputil.ReverseProxy
+	validate  *validator.Validate
 }
 
 func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
 	return &Service{
-		cfg:          cfg,
-		log:          log,
-		store:        store,
-		processingTS: sync.Map{},
-		botStarted:   make(chan struct{}, 1),
+		cfg:       cfg,
+		log:       log,
+		store:     store,
+		viteProxy: newViteProxy(log),
+		validate:  validator.New(validator.WithRequiredStructEnabled()),
 	}
 }
 
 func (s *Service) Run(ctx context.Context) {
-	u, err := url.Parse("http://localhost:5173")
-	if err != nil {
-		s.log.Error("Failed to parse url", err)
-		return
-	}
-	s.viteProxy = newViteProxy(s.log, u)
-
 	server := &http.Server{
 		Addr:     net.JoinHostPort(s.cfg.APIHost, s.cfg.APIPort),
 		Handler:  s.getRoutes(),
@@ -61,7 +51,7 @@ func (s *Service) Run(ctx context.Context) {
 	select {
 	case <-ctx.Done():
 		s.log.Info("Context canceled")
-	case err = <-errCh:
+	case err := <-errCh:
 		if errors.Is(err, http.ErrServerClosed) {
 			s.log.Info("Server has been closed")
 			return
@@ -70,7 +60,7 @@ func (s *Service) Run(ctx context.Context) {
 		return
 	}
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	err = server.Shutdown(shutdownCtx)
+	err := server.Shutdown(shutdownCtx)
 	cancel()
 	if err != nil {
 		s.log.Error("Failed to shutdown server", err)
@@ -84,7 +74,8 @@ func (s *Service) getRoutes() *http.ServeMux {
 
 	mux.HandleFunc("GET /", s.index)
 
-	mux.HandleFunc("POST /api/auth", s.login)
+	mux.HandleFunc("POST /api/auth/login", s.guest(s.login))
+	mux.HandleFunc("POST /api/auth/register", s.guest(s.register))
 	//mux.HandleFunc("GET /api/test-sessions", s.auth(s.getTestSessions))
 	//mux.HandleFunc("GET /api/test-sessions/{uuid}", s.auth(s.getTestSession))
 	//mux.HandleFunc("POST /api/test-sessions", s.auth(s.createTestSession))

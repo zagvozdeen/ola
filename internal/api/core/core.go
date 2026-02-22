@@ -10,6 +10,7 @@ import (
 )
 
 type HandlerFunc func(*http.Request, *models.User) Response
+type GuestHandlerFunc func(*http.Request) Response
 
 type Response interface {
 	Response(w http.ResponseWriter, log *logger.Logger) int
@@ -25,15 +26,8 @@ type ResponseData struct {
 	data any
 }
 
-//type FlushData struct {
-//	ctx  context.Context
-//	data <-chan []byte
-//}
-
 var _ Response = (*ResponseError)(nil)
 var _ Response = (*ResponseData)(nil)
-
-//var _ Response = (*FlushData)(nil)
 
 func Err(code int, err error) *ResponseError {
 	return &ResponseError{code: code, err: err}
@@ -42,10 +36,6 @@ func Err(code int, err error) *ResponseError {
 func JSON(code int, d any) *ResponseData {
 	return &ResponseData{code: code, data: d}
 }
-
-//func Flush(ctx context.Context, data <-chan []byte) *FlushData {
-//	return &FlushData{ctx: ctx, data: data}
-//}
 
 func (r *ResponseError) Response(w http.ResponseWriter, log *logger.Logger) int {
 	log.Debug("Internal error", slog.Any("error", r.err), slog.Int("code", r.code))
@@ -65,31 +55,3 @@ func (r *ResponseData) Response(w http.ResponseWriter, log *logger.Logger) int {
 	}
 	return r.code
 }
-
-//func (r *FlushData) Response(w http.ResponseWriter, log *logger.Logger) int {
-//	flusher, ok := w.(http.Flusher)
-//	if !ok {
-//		return Err(http.StatusHTTPVersionNotSupported, errors.New("streaming not supported")).Response(w, log)
-//	}
-//
-//	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-//	w.Header().Set("Cache-Control", "no-cache")
-//	w.Header().Set("Connection", "keep-alive")
-//
-//	var b []byte
-//	for {
-//		select {
-//		case <-r.ctx.Done():
-//			return http.StatusGone
-//		case b, ok = <-r.data:
-//			if !ok {
-//				return http.StatusOK
-//			}
-//			if _, err := w.Write(b); err != nil {
-//				log.Error("Failed to write a piece of data", slog.Any("err", err))
-//				return http.StatusInternalServerError
-//			}
-//			flusher.Flush()
-//		}
-//	}
-//}

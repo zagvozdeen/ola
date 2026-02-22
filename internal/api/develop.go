@@ -4,22 +4,21 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"time"
 
 	"github.com/zagvozdeen/ola/internal/logger"
 )
 
-func newViteProxy(log *logger.Logger, viteBase *url.URL) *httputil.ReverseProxy {
+func newViteProxy(log *logger.Logger) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
-		Rewrite: func(preq *httputil.ProxyRequest) {
-			preq.Out.URL.Scheme = "http"
-			preq.Out.URL.Host = viteBase.Host
+		Rewrite: func(r *httputil.ProxyRequest) {
+			r.Out.URL.Scheme = "http"
+			r.Out.URL.Host = "localhost:5173"
 
-			preq.Out.Header.Set("X-Forwarded-Host", preq.In.Host)
-			preq.Out.Header.Set("X-Forwarded-Proto", "http")
+			r.Out.Header.Set("X-Forwarded-Host", r.In.Host)
+			r.Out.Header.Set("X-Forwarded-Proto", "http")
 
-			preq.SetXForwarded()
+			r.SetXForwarded()
 		},
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,

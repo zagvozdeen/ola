@@ -28,7 +28,7 @@ type authResponse struct {
 	Token string `json:"token"`
 }
 
-func (s *Service) login(w http.ResponseWriter, r *http.Request) {
+func (s *Service) login(r *http.Request) core.Response {
 	req := &authRequest{}
 	err := json.UnmarshalRead(r.Body, req)
 	if err != nil {
@@ -70,18 +70,50 @@ func (s *Service) login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type registerRequest struct {
+	FirstName            string `json:"first_name"`
+	LastName             string `json:"last_name"`
+	Email                string `json:"email"`
+	Password             string `json:"password"`
+	PasswordConfirmation string `json:"password_confirmation"`
+}
+
+type registerResponse struct {
+	UUID      string    `json:"uuid"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (s *Service) register(r *http.Request) core.Response {
+	req := &registerRequest{}
+	err := json.UnmarshalRead(r.Body, req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
+	err = s.validate.StructCtx(r.Context(), req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
+	return core.JSON(http.StatusCreated, registerResponse{
+		UUID:      "",
+		Email:     "",
+		CreatedAt: time.Time{},
+	})
+}
+
+func (s *Service) guest(fn core.GuestHandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fn(r).Response(w, s.log)
+	}
+}
+
 func (s *Service) auth(fn core.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, res := s.checkAuth(r, r.Header.Get("Authorization"))
-		if res != nil {
-			status := res.Response(w, s.log)
-			_ = status // TODO
-			return
+		if res == nil {
+			res = fn(r, user)
 		}
-		//log := s.log.With(slog.Int("user_id", user.ID))
-		status := fn(r, user).Response(w, s.log)
-		_ = status // TODO
-		//s.metrics.AppResponsesTotalInc(r.Pattern, status)
+		res.Response(w, s.log)
 	}
 }
 
