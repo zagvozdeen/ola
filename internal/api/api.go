@@ -32,7 +32,7 @@ func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
 		log:       log,
 		store:     store,
 		viteProxy: newViteProxy(log),
-		validate:  validator.New(validator.WithRequiredStructEnabled()),
+		validate:  newValidator(log),
 		conform:   modifiers.New(),
 	}
 }

@@ -5,7 +5,6 @@ type FeedbackFormConfig = {
   endpoint: string
   successMessage: string
   submitErrorMessage: string
-  messageRequiredText: string
 }
 
 const initReviewsSlider = (): void => {
@@ -80,7 +79,7 @@ const initFeedbackForm = (
 ): void => {
   const nameInput = form.elements.namedItem('name')
   const phoneInput = form.elements.namedItem('phone')
-  const textInput = form.elements.namedItem('message')
+  const contentInput = form.elements.namedItem('content')
   const consentInput = form.elements.namedItem('consent')
   const statusNode = form.querySelector<HTMLElement>('[data-form-status]')
   const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')
@@ -88,22 +87,12 @@ const initFeedbackForm = (
   if (
     !(nameInput instanceof HTMLInputElement) ||
     !(phoneInput instanceof HTMLInputElement) ||
-    !(textInput instanceof HTMLTextAreaElement) ||
+    !(contentInput instanceof HTMLTextAreaElement) ||
     !(consentInput instanceof HTMLInputElement) ||
     !(statusNode instanceof HTMLElement) ||
     !(submitButton instanceof HTMLButtonElement)
   ) {
     return
-  }
-
-  const setError = (field: string, message = ''): void => {
-    const errorNode = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`)
-    if (!(errorNode instanceof HTMLElement)) {
-      return
-    }
-
-    errorNode.textContent = message
-    errorNode.classList.toggle('invisible', message.length === 0)
   }
 
   const setStatus = (message = '', type: 'idle' | 'error' | 'success' = 'idle'): void => {
@@ -121,50 +110,37 @@ const initFeedbackForm = (
     statusNode.classList.toggle('invisible', message.length === 0)
   }
 
-  const clearErrors = (): void => {
-    setError('name')
-    setError('phone')
-    setError('message')
-    setError('consent')
+  const setConsentError = (message = ''): void => {
+    const errorNode = form.querySelector<HTMLElement>('[data-error-for="consent"]')
+    if (!(errorNode instanceof HTMLElement)) {
+      return
+    }
+
+    errorNode.textContent = message
+    errorNode.classList.toggle('invisible', message.length === 0)
   }
 
   const phoneMask = IMask(phoneInput, {
     mask: '+{7} (000) 000-00-00',
   })
 
+  consentInput.addEventListener('change', () => {
+    if (consentInput.checked) {
+      setConsentError()
+    }
+  })
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
-    clearErrors()
     setStatus()
+    setConsentError()
 
     const name = nameInput.value.trim()
-    const message = textInput.value.trim()
+    const content = contentInput.value.trim()
     const phone = phoneInput.value.trim()
-    const phoneDigits = phone.replace(/\D/g, '')
-
-    let hasError = false
-
-    if (!name) {
-      setError('name', 'Укажите ваше имя')
-      hasError = true
-    }
-
-    if (phoneDigits.length !== 11 || !phoneDigits.startsWith('7')) {
-      setError('phone', 'Введите номер в формате +7 (999) 123-45-67')
-      hasError = true
-    }
-
-    if (!message) {
-      setError('message', config.messageRequiredText)
-      hasError = true
-    }
 
     if (!consentInput.checked) {
-      setError('consent', 'Нужно согласие на обработку данных')
-      hasError = true
-    }
-
-    if (hasError) {
+      setConsentError('Нужно согласие на обработку данных')
       return
     }
 
@@ -179,8 +155,7 @@ const initFeedbackForm = (
         body: JSON.stringify({
           name,
           phone,
-          message,
-          consent: consentInput.checked,
+          content,
         }),
       })
 
@@ -190,8 +165,7 @@ const initFeedbackForm = (
         return
       }
 
-      const result = (await response.json()) as { message?: string }
-      setStatus(result.message ?? config.successMessage, 'success')
+      setStatus(config.successMessage, 'success')
       form.reset()
       phoneMask.value = ''
     } catch {
@@ -203,25 +177,21 @@ const initFeedbackForm = (
 }
 
 const initReviewForms = (): void => {
-  const forms = Array.from(document.querySelectorAll<HTMLFormElement>('form#review-form'))
-
-  const reviewForm = forms[0]
-  if (reviewForm) {
-    initFeedbackForm(reviewForm, {
-      endpoint: '/api/reviews/submit-placeholder',
+  const feedbackForm = document.querySelector<HTMLFormElement>('#feedback-form')
+  if (feedbackForm) {
+    initFeedbackForm(feedbackForm, {
+      endpoint: '/api/guest/feedback',
       successMessage: 'Спасибо! Отзыв отправлен',
       submitErrorMessage: 'Не удалось отправить отзыв',
-      messageRequiredText: 'Напишите отзыв',
     })
   }
 
-  const requestForm = forms[1]
-  if (requestForm) {
-    initFeedbackForm(requestForm, {
-      endpoint: '/api/requests/submit-placeholder',
+  const orderForm = document.querySelector<HTMLFormElement>('#order-form')
+  if (orderForm) {
+    initFeedbackForm(orderForm, {
+      endpoint: '/api/guest/orders',
       successMessage: 'Спасибо! Заявка отправлена',
       submitErrorMessage: 'Не удалось отправить заявку',
-      messageRequiredText: 'Укажите, что вас интересует',
     })
   }
 }

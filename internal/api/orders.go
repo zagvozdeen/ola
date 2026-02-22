@@ -13,7 +13,7 @@ import (
 
 type createOrderRequest struct {
 	Name    string `json:"name" mold:"trim" validate:"required,max=255"`
-	Phone   string `json:"phone" mold:"trim" validate:"required,max=255"`
+	Phone   string `json:"phone" mold:"trim" validate:"required,max=255,ru_phone"`
 	Content string `json:"content" mold:"trim" validate:"required,max=3000"`
 }
 
@@ -68,7 +68,7 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 
 type createGuestOrderRequest struct {
 	Name    string `json:"name" mold:"trim" validate:"required,max=255"`
-	Phone   string `json:"phone" mold:"trim" validate:"required,max=255"`
+	Phone   string `json:"phone" mold:"trim" validate:"required,max=255,ru_phone"`
 	Content string `json:"content" mold:"trim" validate:"required,max=3000"`
 }
 

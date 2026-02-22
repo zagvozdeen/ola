@@ -71,12 +71,6 @@ type registerRequest struct {
 	PasswordConfirmation string `json:"password_confirmation" mold:"trim" validate:"required,eqfield=Password"`
 }
 
-type registerResponse struct {
-	UUID      string    `json:"uuid"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
 func (s *Service) register(r *http.Request) core.Response {
 	req := &registerRequest{}
 	err := json.UnmarshalRead(r.Body, req)
@@ -113,11 +107,7 @@ func (s *Service) register(r *http.Request) core.Response {
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create user: %w", err))
 	}
-	return core.JSON(http.StatusCreated, registerResponse{
-		UUID:      user.UUID.String(),
-		Email:     *user.Email,
-		CreatedAt: user.CreatedAt,
-	})
+	return core.JSON(http.StatusCreated, user)
 }
 
 func (s *Service) guest(fn core.GuestHandlerFunc) http.HandlerFunc {
