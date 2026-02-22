@@ -139,6 +139,20 @@ export type CreateOrderRequest = {
   content: string
 }
 
+export type CreateGuestFeedbackRequest = {
+  name: string
+  phone: string
+  content: string
+  consent: boolean
+}
+
+export type CreateGuestOrderRequest = {
+  name: string
+  phone: string
+  content: string
+  consent: boolean
+}
+
 export type ValidationError = {
   message: string
   errors: Record<string, string>

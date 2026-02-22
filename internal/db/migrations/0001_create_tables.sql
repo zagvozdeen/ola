@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS files
     id          SERIAL PRIMARY KEY,
     uuid        UUID                          NOT NULL UNIQUE,
     content     VARCHAR(255)                  NOT NULL,
-    size        INTEGER                       NOT NULL,
+    size        BIGINT                        NOT NULL,
     mime_type   VARCHAR(255)                  NOT NULL,
     origin_name VARCHAR(255)                  NOT NULL,
     user_id     INTEGER REFERENCES users (id) NOT NULL,
@@ -132,29 +132,37 @@ VALUES (1, gen_random_uuid(), '/files/1.jpg', 0, 'image/jpeg', '1.jpg', 1, NOW()
        (9, gen_random_uuid(), '/files/9.jpg', 0, 'image/jpeg', '9.jpg', 1, NOW());
 
 INSERT INTO products (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at)
-VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события', 3500,
+VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
+        3500,
         NULL, 1, 1,
         NOW(), NOW()),
-       (2, gen_random_uuid(), 'Оформление помещения / фотозона', 'Декорирование любого помещения по индивидуальному дизайну',
+       (2, gen_random_uuid(), 'Оформление помещения / фотозона',
+        'Декорирование любого помещения по индивидуальному дизайну',
         7000, NULL,
         2, 1, NOW(), NOW()),
-       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000, NULL, 3, 1,
+       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000,
+        NULL, 3, 1,
         NOW(),
         NOW()),
-       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1, NOW(),
+       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1,
+        NOW(),
         NOW());
 
 INSERT INTO services (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at)
-VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события', 3500,
+VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
+        3500,
         NULL, 1, 1,
         NOW(), NOW()),
-       (2, gen_random_uuid(), 'Оформление помещения / фотозона', 'Декорирование любого помещения по индивидуальному дизайну',
+       (2, gen_random_uuid(), 'Оформление помещения / фотозона',
+        'Декорирование любого помещения по индивидуальному дизайну',
         7000, NULL,
         2, 1, NOW(), NOW()),
-       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000, NULL, 3, 1,
+       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000,
+        NULL, 3, 1,
         NOW(),
         NOW()),
-       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1, NOW(),
+       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1,
+        NOW(),
         NOW());
 
 INSERT INTO categories (uuid, name, created_at, updated_at)

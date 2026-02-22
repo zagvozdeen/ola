@@ -23,9 +23,9 @@ type User struct {
 
 type File struct {
 	ID         int       `json:"id"`
-	UUID       string    `json:"uuid"`
+	UUID       uuid.UUID `json:"uuid"`
 	Content    string    `json:"content"`
-	Size       int       `json:"size"`
+	Size       int64     `json:"size"`
 	MimeType   string    `json:"mime_type"`
 	OriginName string    `json:"origin_name"`
 	UserID     int       `json:"user_id"`

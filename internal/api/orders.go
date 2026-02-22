@@ -70,6 +70,7 @@ type createGuestOrderRequest struct {
 	Name    string `json:"name" mold:"trim" validate:"required,max=255"`
 	Phone   string `json:"phone" mold:"trim" validate:"required,max=255,ru_phone"`
 	Content string `json:"content" mold:"trim" validate:"required,max=3000"`
+	Consent bool   `json:"consent" validate:"required"`
 }
 
 func (s *Service) createGuestOrder(r *http.Request) core.Response {

@@ -12,6 +12,7 @@ export const i18n = {
   'validation.name.required': 'Введите имя',
   'validation.phone.required': 'Введите телефон',
   'validation.content.required': 'Введите текст',
+  'validation.consent.required': 'Подтвердите согласие на обработку данных',
 } as Readonly<Record<string, string>>
 
 const cases = [2, 0, 1, 1, 1, 2]

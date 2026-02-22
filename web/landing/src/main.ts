@@ -9,10 +9,10 @@ type FeedbackFormConfig = {
   submitErrorMessage: string
 }
 
-type ValidationField = 'name' | 'phone' | 'content'
-type FormField = ValidationField | 'consent'
+type ValidationField = 'name' | 'phone' | 'content' | 'consent'
+type FormField = ValidationField
 
-const validationFields: ValidationField[] = ['name', 'phone', 'content']
+const validationFields: ValidationField[] = ['name', 'phone', 'content', 'consent']
 
 const getValidationMessage = (field: string, tag: string): string => {
   const fieldMessage = i18n[`validation.${field}.${tag}`]
@@ -143,7 +143,6 @@ const initFeedbackForm = (
 
   const clearFieldErrors = (): void => {
     validationFields.forEach((field) => setFieldError(field))
-    setFieldError('consent')
   }
 
   const setValidationErrors = (errors: Record<string, string>): boolean => {
@@ -199,6 +198,7 @@ const initFeedbackForm = (
           name,
           phone,
           content,
+          consent: consentInput.checked,
         }),
       })
 

@@ -6,6 +6,8 @@ import type {
   AuthRegisterResponse,
   Category,
   CreateFeedbackRequest,
+  CreateGuestFeedbackRequest,
+  CreateGuestOrderRequest,
   CreateOrderRequest,
   Feedback,
   Order,
@@ -79,7 +81,7 @@ const register = async (state: State, payload: AuthRegisterRequest, onError?: On
   }, onError)
 }
 
-const createGuestFeedback = async (state: State, payload: CreateFeedbackRequest, onError?: OnError) => {
+const createGuestFeedback = async (state: State, payload: CreateGuestFeedbackRequest, onError?: OnError) => {
   return fetchJson<Feedback>(state, `${state.getApiUrl()}/api/guest/feedback`, {
     method: 'POST',
     headers: getJsonHeaders(),
@@ -87,7 +89,7 @@ const createGuestFeedback = async (state: State, payload: CreateFeedbackRequest,
   }, onError)
 }
 
-const createGuestOrder = async (state: State, payload: CreateOrderRequest, onError?: OnError) => {
+const createGuestOrder = async (state: State, payload: CreateGuestOrderRequest, onError?: OnError) => {
   return fetchJson<Order>(state, `${state.getApiUrl()}/api/guest/orders`, {
     method: 'POST',
     headers: getJsonHeaders(),
@@ -165,8 +167,8 @@ export const useFetch = () => {
   return {
     login: (username: string, password: string, onError?: OnError) => login(state, username, password, onError),
     register: (payload: AuthRegisterRequest, onError?: OnError) => register(state, payload, onError),
-    createGuestFeedback: (payload: CreateFeedbackRequest, onError?: OnError) => createGuestFeedback(state, payload, onError),
-    createGuestOrder: (payload: CreateOrderRequest, onError?: OnError) => createGuestOrder(state, payload, onError),
+    createGuestFeedback: (payload: CreateGuestFeedbackRequest, onError?: OnError) => createGuestFeedback(state, payload, onError),
+    createGuestOrder: (payload: CreateGuestOrderRequest, onError?: OnError) => createGuestOrder(state, payload, onError),
     getMe: (onError?: OnError) => getMe(state, onError),
     getProducts: (onError?: OnError) => getProducts(state, onError),
     getServices: (onError?: OnError) => getServices(state, onError),
