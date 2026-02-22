@@ -15,7 +15,7 @@ type User struct {
 	LastName  *string        `json:"last_name,omitempty"`
 	Username  *string        `json:"username,omitempty"`
 	Email     *string        `json:"email,omitempty"`
-	Password  *string        `json:"password,omitempty"`
+	Password  *string        `json:"-"`
 	Role      enums.UserRole `json:"role"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -86,7 +86,7 @@ type Order struct {
 
 type Feedback struct {
 	ID        int       `json:"id"`
-	UUID      string    `json:"uuid"`
+	UUID      uuid.UUID `json:"uuid"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
 	Content   string    `json:"content"`

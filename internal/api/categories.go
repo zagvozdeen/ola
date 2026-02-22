@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/zagvozdeen/ola/internal/api/core"
@@ -8,5 +9,14 @@ import (
 )
 
 func (s *Service) getCategories(r *http.Request, user *models.User) core.Response {
-	panic("implement")
+	res := allowForModeratorOrAdmin(user)
+	if res != nil {
+		return res
+	}
+
+	categories, err := s.store.GetAllCategories(r.Context())
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get categories: %w", err))
+	}
+	return core.JSON(http.StatusOK, categories)
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/zagvozdeen/ola/internal/api/core"
 	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
@@ -41,7 +40,7 @@ func (s *Service) login(r *http.Request) core.Response {
 	}
 	user, err := s.store.GetUserByEmail(r.Context(), req.Email)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, models.ErrNotFound) {
 			return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
 		}
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
@@ -161,7 +160,7 @@ func (s *Service) authTMA(r *http.Request, token string) (*models.User, core.Res
 	var user *models.User
 	user, err = s.store.GetUserByTID(r.Context(), u.ID)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, models.ErrNotFound) {
 			return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("tma user not found: %w", err))
 		}
 		return nil, core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
@@ -188,7 +187,7 @@ func (s *Service) authBearer(r *http.Request, token string) (*models.User, core.
 	var user *models.User
 	user, err = s.store.GetUserByID(r.Context(), id)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, models.ErrNotFound) {
 			return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("user not found: %w", err))
 		}
 		return nil, core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
