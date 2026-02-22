@@ -73,18 +73,9 @@ type createGuestOrderRequest struct {
 }
 
 func (s *Service) createGuestOrder(r *http.Request) core.Response {
-	req := &createGuestOrderRequest{}
-	err := json.UnmarshalRead(r.Body, req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.conform.Struct(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.validate.StructCtx(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	req, res := core.Validate[createGuestOrderRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
 	}
 
 	uid, err := uuid.NewV7()

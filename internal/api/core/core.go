@@ -44,11 +44,11 @@ func (r *ResponseError) Response(w http.ResponseWriter, log *logger.Logger) int 
 }
 
 func (r *ResponseData) Response(w http.ResponseWriter, log *logger.Logger) int {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(r.code)
 	if r.code == http.StatusNoContent && r.data == nil {
 		return r.code
 	}
-	w.Header().Set("Content-Type", "application/json")
 	err := json.MarshalWrite(w, r.data)
 	if err != nil {
 		log.Error("Failed to marshal response", err, slog.Int("code", r.code))

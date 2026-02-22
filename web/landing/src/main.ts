@@ -1,5 +1,6 @@
 import './styles.css'
 import IMask from 'imask'
+import type { ValidationError } from '@shared/types'
 
 type FeedbackFormConfig = {
   endpoint: string
@@ -160,6 +161,12 @@ const initFeedbackForm = (
       })
 
       if (!response.ok) {
+        console.log(response.headers.get('content-type'))
+        if (response.headers.get('Content-Type') === 'application/json') {
+          const error: ValidationError = await response.json()
+          console.log(error)
+          return
+        }
         const errorText = (await response.text()).trim()
         setStatus(errorText || config.submitErrorMessage, 'error')
         return
