@@ -1,6 +1,7 @@
 import { type State, useState } from './useState'
 import { i18n } from './useI18n'
 import type {
+  AuthLoginRequest,
   AuthLoginResponse,
   AuthRegisterRequest,
   AuthRegisterResponse,
@@ -13,7 +14,6 @@ import type {
   Order,
   Product,
   Review,
-  Service,
   User, ValidationError,
 } from '@shared/types'
 import { type Notify, useNotifications } from '@shared/composables/useNotifications'
@@ -83,7 +83,7 @@ const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, in
   return { ok: true, data: await res.json() as T }
 }
 
-const login = async (state: State, notify: Notify, payload: object) => {
+const login = async (state: State, notify: Notify, payload: AuthLoginRequest) => {
   return fetchJson<AuthLoginResponse>(state, notify, `${state.getApiUrl()}/api/auth/login`, {
     method: 'POST',
     headers: getJsonHeaders(),
@@ -123,12 +123,6 @@ const createGuestOrder = async (state: State, notify: Notify, payload: CreateGue
 
 const getProducts = async (state: State, notify: Notify) => {
   return fetchJson<Product[]>(state, notify, `${state.getApiUrl()}/api/products`, {
-    headers: getAuthHeaders(state),
-  })
-}
-
-const getServices = async (state: State, notify: Notify) => {
-  return fetchJson<Service[]>(state, notify, `${state.getApiUrl()}/api/services`, {
     headers: getAuthHeaders(state),
   })
 }
@@ -184,13 +178,12 @@ export const useFetch = () => {
   const notify = useNotifications()
 
   return {
-    login: (payload: object) => login(state, notify, payload),
+    login: (payload: AuthLoginRequest) => login(state, notify, payload),
     register: (payload: AuthRegisterRequest) => register(state, notify, payload),
     getMe: () => getMe(state, notify),
     createGuestFeedback: (payload: CreateGuestFeedbackRequest) => createGuestFeedback(state, notify, payload),
     createGuestOrder: (payload: CreateGuestOrderRequest) => createGuestOrder(state, notify, payload),
     getProducts: () => getProducts(state, notify),
-    getServices: () => getServices(state, notify),
     getCategories: () => getCategories(state, notify),
     getFeedback: () => getFeedback(state, notify),
     createFeedback: (payload: CreateFeedbackRequest) => createFeedback(state, notify, payload),

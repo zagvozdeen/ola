@@ -47,20 +47,6 @@ type Product struct {
 	UpdatedAt   time.Time         `json:"updated_at"`
 }
 
-//type Service struct {
-//	ID          int       `json:"id"`
-//	UUID        string    `json:"uuid"`
-//	Name        string    `json:"name"`
-//	Description string    `json:"description"`
-//	PriceFrom   int       `json:"price_from"`
-//	PriceTo     *int      `json:"price_to,omitempty"`
-//	FileID      int       `json:"file_id"`
-//	FileContent *string   `json:"file_content,omitempty"`
-//	UserID      int       `json:"user_id"`
-//	CreatedAt   time.Time `json:"created_at"`
-//	UpdatedAt   time.Time `json:"updated_at"`
-//}
-
 type Review struct {
 	ID          int       `json:"id"`
 	UUID        uuid.UUID `json:"uuid"`
@@ -107,9 +93,4 @@ type Category struct {
 type CategoryProduct struct {
 	CategoryID int `json:"category_id"`
 	ProductID  int `json:"product_id"`
-}
-
-type CategoryService struct {
-	CategoryID int `json:"category_id"`
-	ServiceID  int `json:"service_id"`
 }

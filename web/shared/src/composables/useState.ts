@@ -10,7 +10,6 @@ const state = {
 export const me = ref<User>()
 export const cart = reactive<Cart>({
   product_ids: [],
-  service_ids: [],
 })
 
 export type State = ReturnType<typeof useState>

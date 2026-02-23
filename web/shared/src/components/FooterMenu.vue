@@ -48,5 +48,5 @@ import { computed } from 'vue'
 import { cart } from '@shared/composables/useState'
 
 const route = useRoute()
-const items = computed(() => cart.product_ids.length + cart.service_ids.length)
+const items = computed(() => cart.product_ids.length)
 </script>

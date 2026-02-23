@@ -66,19 +66,18 @@ import { useRouter } from 'vue-router'
 import { reactive, useTemplateRef } from 'vue'
 import { useState } from '@shared/composables/useState'
 import { useFetch } from '@shared/composables/useFetch'
+import type { AuthLoginRequest } from '@shared/types'
 import { type FormRules, type FormInst, NForm, NFormItem, NButton, NInput } from 'naive-ui'
 import { useSender } from '@shared/composables/useSender'
-import { useNotifications } from '@shared/composables/useNotifications'
 
 const router = useRouter()
 const state = useState()
 const fetcher = useFetch()
 const sender = useSender()
-const notify = useNotifications()
 const formRef = useTemplateRef<FormInst>('formRef')
-const form = reactive({
-  email: null as string | null,
-  password: null as string | null,
+const form = reactive<AuthLoginRequest>({
+  email: '',
+  password: '',
 })
 const rules: FormRules = {
   email: {

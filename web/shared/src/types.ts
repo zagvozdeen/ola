@@ -2,6 +2,7 @@ export type UUID = string
 export type DateTime = string
 
 export type UserRole = 'user' | 'moderator' | 'admin'
+export type ProductType = 'product' | 'service'
 
 export type User = {
   id: number
@@ -34,20 +35,7 @@ export type Product = {
   description: string
   price_from: number
   price_to?: number
-  file_id: number
-  file_content?: string
-  user_id: number
-  created_at: DateTime
-  updated_at: DateTime
-}
-
-export type Service = {
-  id: number
-  uuid: UUID
-  name: string
-  description: string
-  price_from: number
-  price_to?: number
+  type: ProductType
   file_id: number
   file_content?: string
   user_id: number
@@ -103,13 +91,8 @@ export type CategoryProduct = {
   product_id: number
 }
 
-export type CategoryService = {
-  category_id: number
-  service_id: number
-}
-
 export type AuthLoginRequest = {
-  username: string
+  email: string
   password: string
 }
 
@@ -171,5 +154,4 @@ export type PusherFunc = (level: Levels, msg: string, date: number) => void
 
 export type Cart = {
   product_ids: number[],
-  service_ids: number[],
 }

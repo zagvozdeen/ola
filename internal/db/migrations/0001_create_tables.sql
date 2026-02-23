@@ -61,27 +61,6 @@ CREATE TABLE IF NOT EXISTS category_product
     PRIMARY KEY (category_id, product_id)
 );
 
--- CREATE TABLE IF NOT EXISTS services
--- (
---     id          SERIAL PRIMARY KEY,
---     uuid        UUID                          NOT NULL UNIQUE,
---     name        VARCHAR(255)                  NOT NULL,
---     description TEXT                          NOT NULL,
---     price_from  INTEGER                       NOT NULL,
---     price_to    INTEGER                       NULL,
---     file_id     INTEGER REFERENCES files (id) NOT NULL,
---     user_id     INTEGER REFERENCES users (id) NOT NULL,
---     created_at  TIMESTAMPTZ                   NOT NULL,
---     updated_at  TIMESTAMPTZ                   NOT NULL
--- );
---
--- CREATE TABLE IF NOT EXISTS category_service
--- (
---     category_id INTEGER REFERENCES categories (id) NOT NULL,
---     service_id  INTEGER REFERENCES services (id)   NOT NULL,
---     PRIMARY KEY (category_id, service_id)
--- );
-
 CREATE TABLE IF NOT EXISTS reviews
 (
     id           SERIAL PRIMARY KEY,
@@ -150,19 +129,19 @@ VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров',
        (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 'product', 4, 1,
         NOW(),
         NOW()),
-       (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
+       (5, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
         3500,
         NULL, 'service', 1, 1,
         NOW(), NOW()),
-       (2, gen_random_uuid(), 'Оформление помещения / фотозона',
+       (6, gen_random_uuid(), 'Оформление помещения / фотозона',
         'Декорирование любого помещения по индивидуальному дизайну',
         7000, NULL, 'service',
         2, 1, NOW(), NOW()),
-       (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000,
+       (7, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000,
         NULL, 'service', 3, 1,
         NOW(),
         NOW()),
-       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 'service', 4, 1,
+       (8, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 'service', 4, 1,
         NOW(),
         NOW());
 
@@ -198,8 +177,6 @@ VALUES (1, gen_random_uuid(), 'Елена',
 DROP TABLE IF EXISTS feedback;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS reviews;
--- DROP TABLE IF EXISTS category_service;
--- DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS category_product;
 DROP TABLE IF EXISTS products;
 DROP TYPE IF EXISTS product_type;
