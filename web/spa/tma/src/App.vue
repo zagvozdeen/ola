@@ -1,5 +1,8 @@
 <template>
-  <n-config-provider :theme="darkTheme">
+  <n-config-provider
+    :theme="darkTheme"
+    preflight-style-disabled
+  >
     <n-loading-bar-provider>
       <NotificationProvider>
         <main class="max-w-md mx-auto px-4">

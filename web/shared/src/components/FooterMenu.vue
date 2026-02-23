@@ -1,0 +1,45 @@
+<template>
+  <div class="fixed flex flex-col gap-2 w-full max-w-md px-4 bottom-4 left-1/2 -translate-x-1/2">
+    <div class="grid grid-cols-3 grid-cвols-[1fr_min-content_1fr_min-content_1fr] gap-1 p-1 bg-gray-500/20 backdrop-blur-lg border border-gray-500/20 rounded-full shadow-lg">
+      <router-link
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
+        :class="{
+          'bg-gray-500/25': route.name === 'main',
+        }"
+        :to="{ name: 'main' }"
+        type="button"
+      >
+        <i class="bi bi-balloon-fill text-sm" />
+        <span>Ассортимент</span>
+      </router-link>
+      <router-link
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
+        :class="{
+          'bg-gray-500/25': route.name === 'cart',
+        }"
+        :to="{ name: 'cart' }"
+        type="button"
+      >
+        <i class="bi bi-basket2-fill text-sm" />
+        <span>Корзина</span>
+      </router-link>
+      <router-link
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
+        :class="{
+          'bg-gray-500/25': route.name === 'settings',
+        }"
+        :to="{ name: 'settings' }"
+        type="button"
+      >
+        <i class="bi bi-gear-fill text-sm" />
+        <span>Настройки</span>
+      </router-link>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+</script>

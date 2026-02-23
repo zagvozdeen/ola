@@ -1,73 +1,55 @@
 <template>
   <div class="min-h-dvh w-full flex flex-col gap-4 items-center justify-center py-6">
-    <ul class="flex flex-col gap-px w-full rounded-2xl border border-gray-500/30 overflow-hidden">
-      <li class="w-full">
-        <router-link
-          class="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 cursor-pointer bg-gray-500/20 hover:bg-gray-500/30"
-          type="button"
-          :to="{ name: 'main' }"
+    <ul class="grid grid-cols-2 gap-4 mt-8 mb-16">
+      <li
+        v-for="product in products"
+        :key="product.id"
+        class="bg-gray-500/20 border border-gray-500/20 rounded-xl overflow-hidden flex flex-col"
+      >
+        <img
+          class="h-50 w-full object-cover"
+          :src="product.file_content"
+          alt=""
         >
-          <span class="size-6 flex items-center justify-center rounded-lg bg-gray-400">
-            <i class="bi bi-list-check text-sm flex" />
-          </span>
-          <span class="text-left text-sm font-medium">Все карточки</span>
-          <span class="text-gray-400">
-            <i class="bi bi-chevron-right text-sm flex" />
-          </span>
-        </router-link>
-      </li>
-      <li class="w-full">
-        <router-link
-          class="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 cursor-pointer bg-gray-500/20 hover:bg-gray-500/30"
-          type="button"
-          :to="{ name: 'main' }"
-        >
-          <span class="size-6 flex items-center justify-center rounded-lg bg-orange-400">
-            <i class="bi bi-graph-up-arrow text-sm flex" />
-          </span>
-          <span class="text-left text-sm font-medium">Статистика</span>
-          <span class="text-gray-400">
-            <i class="bi bi-chevron-right text-sm flex" />
-          </span>
-        </router-link>
-      </li>
-      <li class="w-full">
-        <router-link
-          class="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 cursor-pointer bg-gray-500/20 hover:bg-gray-500/30"
-          type="button"
-          :to="{ name: 'main' }"
-        >
-          <span class="size-6 flex items-center justify-center rounded-lg bg-purple-400">
-            <i class="bi bi-bookmark-star-fill text-sm flex" />
-          </span>
-          <span class="text-left text-sm font-medium">Начать тест</span>
-          <span class="text-gray-400">
-            <i class="bi bi-chevron-right text-sm flex" />
-          </span>
-        </router-link>
-      </li>
-      <li class="w-full">
-        <a
-          class="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 cursor-pointer bg-gray-500/20 hover:bg-gray-500/30"
-          type="button"
-          href="/admin/"
-        >
-          <span class="size-6 flex items-center justify-center rounded-lg bg-purple-400">
-            <i class="bi bi-bookmark-star-fill text-sm flex" />
-          </span>
-          <span class="text-left text-sm font-medium">Перейти в панель администратора</span>
-          <span class="text-gray-400">
-            <i class="bi bi-chevron-right text-sm flex" />
-          </span>
-        </a>
+        <div class="p-2 flex flex-col gap-1 h-full">
+          <span class="text-xs font-semibold">{{ product.name }}</span>
+          <span class="font-bold text-xs mt-auto">от {{ product.price_from }} ₽</span>
+        </div>
+        <button class="w-full bg-green-700 hover:bg-green-800 px-2 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center">
+          Добавить
+        </button>
       </li>
     </ul>
+
+    <FooterMenu />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import FooterMenu from '@shared/components/FooterMenu.vue'
+import { useFetch } from '@shared/composables/useFetch'
+import type { Product, Service } from '@shared/types'
+
+const fetcher = useFetch()
+const products = ref<Product[]>([])
+const services = ref<Service[]>([])
 
 onMounted(() => {
+  fetcher
+    .getProducts()
+    .then(data => {
+      if (data.ok) {
+        products.value = data.data
+      }
+    })
+
+  fetcher
+    .getServices()
+    .then(data => {
+      if (data.ok) {
+        services.value = data.data
+      }
+    })
 })
 </script>

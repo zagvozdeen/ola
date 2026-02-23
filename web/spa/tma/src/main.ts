@@ -6,6 +6,8 @@ import MainPage from './pages/MainPage.vue'
 import LoginPage from './pages/LoginPage.vue'
 import RegisterPage from './pages/RegisterPage.vue'
 import { useState } from '@shared/composables/useState'
+import CartPage from './pages/CartPage.vue'
+import SettingsPage from './pages/SettingsPage.vue'
 
 const router = createRouter({
   history: createWebHistory('/tma/'),
@@ -13,6 +15,8 @@ const router = createRouter({
     { path: '/', name: 'main', component: MainPage },
     { path: '/login', name: 'login', component: LoginPage },
     { path: '/register', name: 'register', component: RegisterPage },
+    { path: '/cart', name: 'cart', component: CartPage },
+    { path: '/settings', name: 'settings', component: SettingsPage },
   ],
 })
 
@@ -29,5 +33,9 @@ router.beforeEach((to, _, next) => {
     next()
   }
 })
+
+// const meta = document.createElement('meta')
+// meta.name = 'naive-ui-style'
+// document.head.appendChild(meta)
 
 createApp(App).use(router).mount('#app')
