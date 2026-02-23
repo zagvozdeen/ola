@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"net/http"
@@ -29,15 +28,6 @@ type authResponse struct {
 }
 
 func (s *Service) login(r *http.Request) core.Response {
-	//req := &{}
-	//err := json.UnmarshalRead(r.Body, req)
-	//if err != nil {
-	//	return core.Err(http.StatusBadRequest, err)
-	//}
-	//err = s.validate.StructCtx(r.Context(), req)
-	//if err != nil {
-	//	return core.Err(http.StatusBadRequest, err)
-	//}
 	req, res := core.Validate[authRequest](r, s.conform, s.validate)
 	if res != nil {
 		return res
@@ -76,18 +66,16 @@ type registerRequest struct {
 }
 
 func (s *Service) register(r *http.Request) core.Response {
-	req := &registerRequest{}
-	err := json.UnmarshalRead(r.Body, req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	req, res := core.Validate[registerRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
 	}
-	err = s.conform.Struct(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	_, err := s.store.GetUserByEmail(r.Context(), req.Email)
+	if err == nil {
+		return core.Err(http.StatusConflict, fmt.Errorf("user already exists"))
 	}
-	err = s.validate.StructCtx(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	if !errors.Is(err, models.ErrNotFound) {
+		return core.Err(http.StatusInternalServerError, err)
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {

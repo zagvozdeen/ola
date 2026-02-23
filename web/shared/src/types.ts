@@ -118,11 +118,11 @@ export type AuthLoginResponse = {
 }
 
 export type AuthRegisterRequest = {
-  first_name: string
-  last_name: string
-  email: string
-  password: string
-  password_confirmation: string
+  first_name: string | null
+  last_name: string | null
+  email: string | null
+  password: string | null
+  password_confirmation: string | null
 }
 
 export type AuthRegisterResponse = User

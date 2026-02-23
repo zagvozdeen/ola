@@ -1,8 +1,13 @@
+import { ref } from 'vue'
+import type { User } from '@shared/types'
+
 const state = {
   tma: window.Telegram?.WebApp?.initData || null,
   token: localStorage.getItem('token'),
   apiUrl: import.meta.env['VITE_API_URL'],
 }
+
+export const me = ref<User>()
 
 export type State = ReturnType<typeof useState>
 

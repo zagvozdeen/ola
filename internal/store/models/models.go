@@ -9,12 +9,12 @@ import (
 
 type User struct {
 	ID        int            `json:"id"`
-	TID       *int64         `json:"tid,omitempty"`
+	TID       *int64         `json:"tid"`
 	UUID      uuid.UUID      `json:"uuid"`
 	FirstName string         `json:"first_name"`
-	LastName  *string        `json:"last_name,omitempty"`
-	Username  *string        `json:"username,omitempty"`
-	Email     *string        `json:"email,omitempty"`
+	LastName  *string        `json:"last_name"`
+	Username  *string        `json:"username"`
+	Email     *string        `json:"email"`
 	Password  *string        `json:"-"`
 	Role      enums.UserRole `json:"role"`
 	CreatedAt time.Time      `json:"created_at"`

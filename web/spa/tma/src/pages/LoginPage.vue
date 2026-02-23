@@ -2,7 +2,7 @@
   <div class="min-h-dvh w-full flex items-center justify-center">
     <n-form
       ref="formRef"
-      class="w-full bg-gray-500/20 px-4 py-4 rounded-2xl"
+      class="w-full bg-gray-500/20 p-4 my-8 rounded-2xl"
       :rules="rules"
       :model="form"
       @submit.prevent="onSubmitForm"
@@ -44,14 +44,14 @@
           type="success"
           class="flex-1"
         >
-          Отправить
+          Войти
         </n-button>
       </n-form-item>
 
 
       <p class="text-center mt-4">
         Ещё нет аккаунта? <router-link
-          :to="{ name: 'login' }"
+          :to="{ name: 'register' }"
           class="underline"
         >
           Зарегистрироваться
