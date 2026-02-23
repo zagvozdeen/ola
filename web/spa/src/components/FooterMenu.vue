@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
-import { cart } from '@shared/composables/useState'
+import { cart } from '@/composables/useState'
 
 const route = useRoute()
 const items = computed(() => cart.product_ids.length)

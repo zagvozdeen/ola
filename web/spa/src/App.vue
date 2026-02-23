@@ -15,10 +15,10 @@
 
 <script setup lang="ts">
 import { darkTheme, NConfigProvider, NLoadingBarProvider } from 'naive-ui'
-import NotificationProvider from '@shared/components/NotificationProvider.vue'
-import { useFetch } from '@shared/composables/useFetch'
+import NotificationProvider from '@/components/NotificationProvider.vue'
+import { useFetch } from '@/composables/useFetch'
 import { onMounted } from 'vue'
-import { me } from '@shared/composables/useState'
+import { me } from '@/composables/useState'
 
 const fetcher = useFetch()
 

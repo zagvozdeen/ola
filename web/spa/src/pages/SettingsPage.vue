@@ -46,6 +46,24 @@
           </span>
         </router-link>
       </li>
+      <li
+        v-if="canManageProducts"
+        class="w-full"
+      >
+        <router-link
+          class="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 cursor-pointer bg-gray-500/20 hover:bg-gray-500/30"
+          type="button"
+          :to="{ name: 'products' }"
+        >
+          <span class="size-6 flex items-center justify-center rounded-lg bg-blue-500">
+            <i class="bi bi-box-seam text-sm flex" />
+          </span>
+          <span class="text-left text-sm font-medium">Управление продуктами</span>
+          <span class="text-gray-400">
+            <i class="bi bi-chevron-right text-sm flex" />
+          </span>
+        </router-link>
+      </li>
       <li class="w-full">
         <a
           class="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 cursor-pointer bg-gray-500/20 hover:bg-gray-500/30"
@@ -68,9 +86,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import FooterMenu from '@shared/components/FooterMenu.vue'
+import { computed } from 'vue'
+import FooterMenu from '@/components/FooterMenu.vue'
+import { me } from '@/composables/useState'
 
-onMounted(() => {
-})
+const canManageProducts = computed(() => me.value?.role === 'admin' || me.value?.role === 'moderator')
 </script>

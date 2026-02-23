@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  root: resolve(__dirname, 'web'),
+  // root: resolve(__dirname, 'web'),
   appType: 'mpa',
   plugins: [
     vue(),
@@ -12,10 +12,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@shared': resolve(__dirname, 'web/shared/src'),
+      '@': resolve(__dirname, 'web/spa/src'),
     },
   },
-  envDir: resolve(__dirname),
+  // envDir: resolve(__dirname),
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
@@ -24,8 +24,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         landing: resolve(__dirname, 'web/landing/index.html'),
-        admin: resolve(__dirname, 'web/spa/admin/index.html'),
-        tma: resolve(__dirname, 'web/spa/tma/index.html'),
+        spa: resolve(__dirname, 'web/spa/index.html'),
       },
     },
   },

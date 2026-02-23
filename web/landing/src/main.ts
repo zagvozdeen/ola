@@ -1,7 +1,7 @@
 import './styles.css'
 import IMask from 'imask'
-import { i18n } from '@shared/composables/useI18n'
-import type { ValidationError } from '@shared/types'
+import { i18n } from '../../spa/src/composables/useI18n'
+import type { ValidationError } from '../../spa/src/types'
 
 type FeedbackFormConfig = {
   endpoint: string

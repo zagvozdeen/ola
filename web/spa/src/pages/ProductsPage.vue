@@ -84,11 +84,11 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import FooterMenu from '@shared/components/FooterMenu.vue'
-import { useFetch } from '@shared/composables/useFetch'
-import { me } from '@shared/composables/useState'
-import { useNotifications } from '@shared/composables/useNotifications'
-import type { Product } from '@shared/types'
+import FooterMenu from '@/components/FooterMenu.vue'
+import { useFetch } from '@/composables/useFetch'
+import { me } from '@/composables/useState'
+import { useNotifications } from '@/composables/useNotifications'
+import type { Product } from '@/types'
 
 const fetcher = useFetch()
 const notify = useNotifications()

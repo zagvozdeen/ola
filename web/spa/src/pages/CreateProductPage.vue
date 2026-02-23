@@ -126,12 +126,12 @@
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { type FormRules, type FormInst, NButton, NForm, NFormItem, NInput, NInputNumber, NSelect } from 'naive-ui'
-import FooterMenu from '@shared/components/FooterMenu.vue'
-import { useFetch } from '@shared/composables/useFetch'
-import { me } from '@shared/composables/useState'
-import { useNotifications } from '@shared/composables/useNotifications'
-import { useSender } from '@shared/composables/useSender'
-import type { CreateProductRequest, ProductType } from '@shared/types'
+import FooterMenu from '@/components/FooterMenu.vue'
+import { useFetch } from '@/composables/useFetch'
+import { me } from '@/composables/useState'
+import { useNotifications } from '@/composables/useNotifications'
+import { useSender } from '@/composables/useSender'
+import type { CreateProductRequest, ProductType } from '@/types'
 
 type ProductForm = {
   name: string | null

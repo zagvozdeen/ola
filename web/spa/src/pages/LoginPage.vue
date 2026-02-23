@@ -64,11 +64,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { reactive, useTemplateRef } from 'vue'
-import { useState } from '@shared/composables/useState'
-import { useFetch } from '@shared/composables/useFetch'
-import type { AuthLoginRequest } from '@shared/types'
+import { useState } from '@/composables/useState'
+import { useFetch } from '@/composables/useFetch'
+import { useSender } from '@/composables/useSender'
+import type { AuthLoginRequest } from '@/types'
 import { type FormRules, type FormInst, NForm, NFormItem, NButton, NInput } from 'naive-ui'
-import { useSender } from '@shared/composables/useSender'
 
 const router = useRouter()
 const state = useState()
@@ -105,9 +105,6 @@ const onSubmitForm = () => {
           state.setToken(data.data.token)
           router.push({ name: 'main' })
         }
-        // } else {
-        //   notify.error(data.data.message)
-        // }
       })
   })
 }

@@ -18,8 +18,8 @@ import type {
   Review,
   UpdateProductRequest,
   User, ValidationError,
-} from '@shared/types'
-import { type Notify, useNotifications } from '@shared/composables/useNotifications'
+} from '../types'
+import { type Notify, useNotifications } from './useNotifications'
 
 type ApiResult<T> = { ok: true; data: T } | { ok: false, data: ValidationError }
 

@@ -45,10 +45,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import FooterMenu from '@shared/components/FooterMenu.vue'
-import { useFetch } from '@shared/composables/useFetch'
-import type { Product } from '@shared/types'
-import { cart } from '@shared/composables/useState'
+import FooterMenu from '../components/FooterMenu.vue'
+import { useFetch } from '../composables/useFetch'
+import type { Product } from '../types'
+import { cart } from '../composables/useState'
 
 const fetcher = useFetch()
 const products = ref<Product[]>([])

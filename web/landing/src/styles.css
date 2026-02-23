@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@source "../../../templates/index.html";
+@source "/web/landing/templates/index.html";
 
 @theme {
     --font-gothic: "Gothic A1", sans-serif;

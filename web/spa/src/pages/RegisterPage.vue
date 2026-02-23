@@ -92,11 +92,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { reactive, useTemplateRef } from 'vue'
-import { useFetch } from '@shared/composables/useFetch'
-import type { AuthRegisterRequest } from '@shared/types'
+import { useFetch } from '../composables/useFetch'
+import type { AuthRegisterRequest } from '../types'
 import { type FormRules, type FormInst, NForm, NFormItem, NButton, NInput } from 'naive-ui'
-import { useSender } from '@shared/composables/useSender'
-import { useNotifications } from '@shared/composables/useNotifications'
+import { useSender } from '../composables/useSender'
+import { useNotifications } from '../composables/useNotifications'
 
 const router = useRouter()
 const fetcher = useFetch()

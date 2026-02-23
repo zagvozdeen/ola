@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { provide, ref } from 'vue'
-import type { Levels, PusherFunc, Notification } from '@shared/types'
+import type { Levels, PusherFunc, Notification } from '@/types'
 
 const notifications = ref<Notification[]>([])
 

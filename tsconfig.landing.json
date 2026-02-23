@@ -8,6 +8,5 @@
   },
   "include": [
     "web/landing/src/**/*",
-    "web/shared/src/**/*"
   ]
 }

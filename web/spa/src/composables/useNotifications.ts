@@ -1,5 +1,5 @@
 import { inject } from 'vue'
-import type { PusherFunc } from '@shared/types'
+import type { PusherFunc } from '../types'
 
 export interface Notify {
   info: (n: string) => void,

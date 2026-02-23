@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.spa.tsbuildinfo",
+    "types": [
+      "vite/client"
+    ],
+    "paths": {
+      "@/*": [
+        "web/spa/src/*"
+      ]
+    }
+  },
+  "include": [
+    "web/spa/src/**/*",
+    "web/spa/src/**/*.vue",
+    "web/spa/env.d.ts",
+  ]
+}

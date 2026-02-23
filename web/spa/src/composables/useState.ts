@@ -1,5 +1,5 @@
 import { reactive, ref } from 'vue'
-import type { Cart, User } from '@shared/types'
+import type { Cart, User } from '../types'
 
 const state = {
   tma: window.Telegram?.WebApp?.initData || null,

@@ -1,5 +1,5 @@
 import { type FormInst, type LoadingBarApi, useLoadingBar } from 'naive-ui'
-import { type Notify, useNotifications } from '@shared/composables/useNotifications'
+import { type Notify, useNotifications } from './useNotifications'
 // import type { ValidateError } from 'async-validator'
 
 type cb = () => Promise<void>

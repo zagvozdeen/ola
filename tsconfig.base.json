@@ -20,11 +20,6 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "@shared/*": [
-        "web/shared/src/*"
-      ]
-    }
+    "baseUrl": "."
   }
 }
