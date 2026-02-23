@@ -61,16 +61,16 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vitePassThroughPrefixes := []string{
-		//"/@vite/",
-		//"/@id/",
-		//"/@fs/",
+		"/@vite/",
+		"/@id/",
+		"/@fs/",
 		//"/__vite_ping",
 		"/shared/",
 		//"/src/",         // if you ever reference /src directly
 		//"/assets/",      // dev assets
 		//"/landing/src/", // landing entry/modules
-		//"/spa/admin/src/",
-		//"/spa/tma/src/",
+		"/spa/admin/src/",
+		"/spa/tma/src/",
 	}
 	if strings.HasPrefix(r.URL.Path, "/files/") {
 		http.ServeFile(w, r, ".data"+r.URL.Path)

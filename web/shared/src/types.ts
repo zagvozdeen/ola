@@ -157,3 +157,14 @@ export type ValidationError = {
   message: string
   errors: Record<string, string>
 }
+
+export type Levels = 'error'| 'warn' | 'info'
+
+export interface Notification {
+  id: number
+  level: Levels
+  msg: string
+  date: number
+}
+
+export type PusherFunc = (level: Levels, msg: string, date: number) => void

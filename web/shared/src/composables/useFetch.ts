@@ -14,10 +14,11 @@ import type {
   Product,
   Review,
   Service,
-  User,
+  User, ValidationError,
 } from '../types'
+import { type Notify, useNotifications } from '@shared/composables/useNotifications'
 
-type ApiResult<T> = { ok: true; data: T } | { ok: false }
+type ApiResult<T> = { ok: true; data: T } | { ok: false, data: ValidationError }
 type OnError = (text: string) => void
 
 const getJsonHeaders = (headers?: HeadersInit): Headers => {
@@ -36,16 +37,22 @@ const getAuthJsonHeaders = (state: State): Headers => {
   return getAuthHeaders(state, getJsonHeaders())
 }
 
-const fetchJson = async <T>(state: State, input: RequestInfo, init?: RequestInit, onError?: OnError): Promise<ApiResult<T>> => {
+const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, init?: RequestInit): Promise<ApiResult<T>> => {
   let res: Response
 
   try {
     res = await fetch(input, init)
   } catch {
-    if (onError !== undefined) {
-      onError('Network error')
+    // if (onError !== undefined) {
+    //   onError('Network error')
+    // }
+    return {
+      ok: false,
+      data: {
+        message: 'Network error',
+        errors: {},
+      },
     }
-    return { ok: false }
   }
 
   if (!res.ok) {
@@ -55,22 +62,36 @@ const fetchJson = async <T>(state: State, input: RequestInfo, init?: RequestInit
       //   location.reload()
       // }
     }
-    const text = (await res.text()).trim()
-    if (onError !== undefined) {
-      onError(i18n[text] || text)
+    if (res.headers.get('Content-Type') === 'application/json') {
+      return {
+        ok: false,
+        data: await res.json(),
+      }
     }
-    return { ok: false }
+    const text = (await res.text()).trim()
+
+    notify.error(i18n[text] || text)
+    // if (onError !== undefined) {
+    //   onError()
+    // }
+    return {
+      ok: false,
+      data: {
+        message: i18n[text] || text,
+        errors: {},
+      },
+    }
   }
 
   return { ok: true, data: await res.json() as T }
 }
 
-const login = async (state: State, username: string, password: string, onError?: OnError) => {
-  return fetchJson<AuthLoginResponse>(state, `${state.getApiUrl()}/api/auth/login`, {
+const login = async (state: State, notify: Notify, payload: object) => {
+  return fetchJson<AuthLoginResponse>(state, notify, `${state.getApiUrl()}/api/auth/login`, {
     method: 'POST',
     headers: getJsonHeaders(),
-    body: JSON.stringify({ username, password }),
-  }, onError)
+    body: JSON.stringify(payload),
+  })
 }
 
 const register = async (state: State, payload: AuthRegisterRequest, onError?: OnError) => {
@@ -163,9 +184,10 @@ const getUsers = async (state: State, onError?: OnError) => {
 
 export const useFetch = () => {
   const state = useState()
+  const notify = useNotifications()
 
   return {
-    login: (username: string, password: string, onError?: OnError) => login(state, username, password, onError),
+    login: (payload: object) => login(state, notify, payload),
     register: (payload: AuthRegisterRequest, onError?: OnError) => register(state, payload, onError),
     createGuestFeedback: (payload: CreateGuestFeedbackRequest, onError?: OnError) => createGuestFeedback(state, payload, onError),
     createGuestOrder: (payload: CreateGuestOrderRequest, onError?: OnError) => createGuestOrder(state, payload, onError),

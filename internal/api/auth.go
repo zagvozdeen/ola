@@ -20,7 +20,7 @@ import (
 )
 
 type authRequest struct {
-	Email    string `json:"username" mold:"trim,lcase" validate:"required,email,max=256"`
+	Email    string `json:"email" mold:"trim,lcase" validate:"required,email,max=256"`
 	Password string `json:"password" mold:"trim" validate:"required"`
 }
 
@@ -29,28 +29,32 @@ type authResponse struct {
 }
 
 func (s *Service) login(r *http.Request) core.Response {
-	req := &authRequest{}
-	err := json.UnmarshalRead(r.Body, req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.validate.StructCtx(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	//req := &{}
+	//err := json.UnmarshalRead(r.Body, req)
+	//if err != nil {
+	//	return core.Err(http.StatusBadRequest, err)
+	//}
+	//err = s.validate.StructCtx(r.Context(), req)
+	//if err != nil {
+	//	return core.Err(http.StatusBadRequest, err)
+	//}
+	req, res := core.Validate[authRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
 	}
 	user, err := s.store.GetUserByEmail(r.Context(), req.Email)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
-			return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
+			return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
 		}
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
 	}
 	if user.Password == nil {
-		return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
+		return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(req.Password))
 	if err != nil {
-		return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid username or password"))
+		return core.Err(http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
 	}
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		ID:        strconv.Itoa(user.ID),
