@@ -32,12 +32,14 @@ func (s *Store) GetAllProducts(ctx context.Context) ([]models.Product, error) {
 
 func (s *Store) GetProductByUUID(ctx context.Context, uuid uuid.UUID) (*models.Product, error) {
 	product := &models.Product{}
-	fileContent := ""
-	err := s.pool.QueryRow(ctx, "SELECT p.id, p.uuid, p.name, p.description, p.price_from, p.price_to, p.type, p.file_id, f.content, p.user_id, p.created_at, p.updated_at FROM products p JOIN files f ON f.id = p.file_id WHERE p.uuid = $1", uuid).Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.Type, &product.FileID, &fileContent, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT p.id, p.uuid, p.name, p.description, p.price_from, p.price_to, p.type, p.file_id, f.content, p.user_id, p.created_at, p.updated_at FROM products p JOIN files f ON f.id = p.file_id WHERE p.uuid = $1",
+		uuid,
+	).Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.Type, &product.FileID, &product.FileContent, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
-	product.FileContent = &fileContent
 	return product, nil
 }
 

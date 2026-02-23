@@ -2,7 +2,22 @@ export type UUID = string
 export type DateTime = string
 
 export type UserRole = 'user' | 'moderator' | 'admin'
-export type ProductType = 'product' | 'service'
+// export type ProductType = 'product' | 'service'
+
+export enum ProductType {
+  Product = 'product',
+  Service = 'service',
+}
+
+export const ProductTypeTranslates: Record<ProductType, string> = {
+  [ProductType.Product]: 'Товар',
+  [ProductType.Service]: 'Услуга',
+}
+
+export const ProductTypeOptions = Object.values(ProductType).map((key) => ({
+  value: key,
+  label: ProductTypeTranslates[key],
+}))
 
 export type User = {
   id: number
@@ -37,7 +52,7 @@ export type Product = {
   price_to?: number
   type: ProductType
   file_id: number
-  file_content?: string
+  file_content: string
   user_id: number
   created_at: DateTime
   updated_at: DateTime
@@ -137,12 +152,12 @@ export type CreateGuestOrderRequest = {
 }
 
 export type CreateProductRequest = {
-  name: string
-  description: string
-  price_from: number
+  name: string | null
+  description: string | null
+  price_from: number | null
   price_to: number | null
-  type: ProductType
-  file_id: number
+  type: ProductType | null
+  file_id: number | null
 }
 
 export type UpdateProductRequest = CreateProductRequest
@@ -152,7 +167,7 @@ export type ValidationError = {
   errors: Record<string, string>
 }
 
-export type Levels = 'error'| 'warn' | 'info'
+export type Levels = 'error' | 'warn' | 'info'
 
 export interface Notification {
   id: number

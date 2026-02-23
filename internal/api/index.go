@@ -12,12 +12,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
 type PageData struct {
 	Head       template.HTML
 	Products   []models.Product
+	Services   []models.Product
 	Categories []models.Category
 	Reviews    []models.Review
 }
@@ -49,13 +51,8 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 		s.viteProxy.ServeHTTP(w, r)
 		return
 	}
-	if strings.HasPrefix(r.URL.Path, "/admin") {
-		r.URL.Path = "/spa/admin/"
-		s.viteProxy.ServeHTTP(w, r)
-		return
-	}
-	if strings.HasPrefix(r.URL.Path, "/tma") {
-		r.URL.Path = "/spa/tma/"
+	if strings.HasPrefix(r.URL.Path, "/spa") {
+		r.URL.Path = "/web/spa/"
 		s.viteProxy.ServeHTTP(w, r)
 		return
 	}
@@ -63,13 +60,10 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 		"/@vite/",
 		"/@id/",
 		"/@fs/",
-		//"/__vite_ping",
 		"/shared/",
-		//"/src/",         // if you ever reference /src directly
-		//"/assets/",      // dev assets
-		//"/landing/src/", // landing entry/modules
-		"/spa/admin/src/",
-		"/spa/tma/src/",
+		"/node_modules/",
+		"/web/spa/src/",
+		"/web/spa/src/",
 	}
 	if strings.HasPrefix(r.URL.Path, "/files/") {
 		http.ServeFile(w, r, ".data"+r.URL.Path)
@@ -77,7 +71,7 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 	}
 	switch path.Ext(r.URL.Path) {
 	case ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg", "webp":
-		http.ServeFile(w, r, "web/public"+r.URL.Path)
+		http.ServeFile(w, r, "public"+r.URL.Path)
 		return
 	}
 	for _, pref := range vitePassThroughPrefixes {
@@ -97,7 +91,7 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	head := template.HTML(`<script type="module" src="http://localhost:5173/@vite/client"></script>
-<script type="module" src="http://localhost:5173/landing/src/main.ts"></script>`)
+<script type="module" src="http://localhost:5173/web/landing/src/main.ts"></script>`)
 	if s.cfg.IsProduction {
 		head, err = s.renderViteHead(viteHeadParams{
 			ManifestPath:         "public/.vite/manifest.json",
@@ -112,11 +106,25 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	data := PageData{Head: head}
-	data.Products, err = s.store.GetAllProducts(r.Context())
+	allProducts, err := s.store.GetAllProducts(r.Context())
 	if err != nil {
 		s.log.Error("Failed to get products", err)
 		return
+	}
+	products := make([]models.Product, 0, len(allProducts))
+	services := make([]models.Product, 0, len(allProducts))
+	for _, product := range allProducts {
+		switch product.Type {
+		case enums.ProductTypeProduct:
+			products = append(products, product)
+		case enums.ProductTypeService:
+			services = append(services, product)
+		}
+	}
+	data := PageData{
+		Head:     head,
+		Products: products,
+		Services: services,
 	}
 	data.Categories, err = s.store.GetAllCategories(r.Context())
 	if err != nil {

@@ -44,7 +44,7 @@ const isJsonResponse = (res: Response): boolean => {
   return contentType !== null && contentType.includes('application/json')
 }
 
-const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, init?: RequestInit): Promise<ApiResult<T>> => {
+const fetchJson = async <T>(state: State, notify: Notify | null, input: RequestInfo, init?: RequestInit, disable401 = false): Promise<ApiResult<T>> => {
   let res: Response
 
   try {
@@ -60,7 +60,7 @@ const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, in
   }
 
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 401 && !disable401) {
       if (!state.isTelegramEnv()) {
         state.unsetToken()
         location.reload()
@@ -77,7 +77,9 @@ const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, in
     const rawText = (await res.text()).trim()
     const text=  i18n[rawText] || rawText
 
-    notify.error(text)
+    if (notify) {
+      notify.error(text)
+    }
 
     return {
       ok: false,
@@ -100,7 +102,7 @@ const login = async (state: State, notify: Notify, payload: AuthLoginRequest) =>
     method: 'POST',
     headers: getJsonHeaders(),
     body: JSON.stringify(payload),
-  })
+  }, true)
 }
 
 const register = async (state: State, notify: Notify, payload: AuthRegisterRequest) => {
@@ -111,8 +113,8 @@ const register = async (state: State, notify: Notify, payload: AuthRegisterReque
   })
 }
 
-const getMe = async (state: State, notify: Notify) => {
-  return fetchJson<User>(state, notify, `${state.getApiUrl()}/api/me`, {
+export const getMe = async (state: State) => {
+  return fetchJson<User>(state, null, `${state.getApiUrl()}/api/me`, {
     headers: getAuthHeaders(state),
   })
 }
@@ -232,7 +234,6 @@ export const useFetch = () => {
   return {
     login: (payload: AuthLoginRequest) => login(state, notify, payload),
     register: (payload: AuthRegisterRequest) => register(state, notify, payload),
-    getMe: () => getMe(state, notify),
     createGuestFeedback: (payload: CreateGuestFeedbackRequest) => createGuestFeedback(state, notify, payload),
     createGuestOrder: (payload: CreateGuestOrderRequest) => createGuestOrder(state, notify, payload),
     getProducts: () => getProducts(state, notify),

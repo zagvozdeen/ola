@@ -4,25 +4,25 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import MainPage from '@/pages/MainPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
-import RegisterPage from '@/pages/RegisterPage.vue'
-import { useState } from '@/composables/useState'
+import PageRegister from '@/pages/PageRegister.vue'
+import { me, useState } from '@/composables/useState'
 import CartPage from '@/pages/CartPage.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
-import ProductsPage from '@/pages/ProductsPage.vue'
-import CreateProductPage from '@/pages/CreateProductPage.vue'
-import EditProductPage from '@/pages/EditProductPage.vue'
+import PageProducts from '@/pages/PageProducts.vue'
+import PageProductEdit from '@/pages/PageProductEdit.vue'
+import { getMe } from '@/composables/useFetch'
 
 const router = createRouter({
-  history: createWebHistory('/tma/'),
+  history: createWebHistory('/spa/'),
   routes: [
     { path: '/', name: 'main', component: MainPage },
     { path: '/login', name: 'login', component: LoginPage },
-    { path: '/register', name: 'register', component: RegisterPage },
+    { path: '/register', name: 'register', component: PageRegister },
     { path: '/cart', name: 'cart', component: CartPage },
     { path: '/settings', name: 'settings', component: SettingsPage },
-    { path: '/products', name: 'products', component: ProductsPage },
-    { path: '/products/create', name: 'product-create', component: CreateProductPage },
-    { path: '/products/:uuid/edit', name: 'product-edit', component: EditProductPage },
+    { path: '/products', name: 'products', component: PageProducts },
+    { path: '/products/create', name: 'products.create', component: PageProductEdit },
+    { path: '/products/:uuid/edit', name: 'products.edit', component: PageProductEdit },
   ],
 })
 
@@ -39,6 +39,15 @@ router.beforeEach((to, _, next) => {
     next()
   }
 })
+
+if (state.isLoggedIn() || state.isTelegramEnv()) {
+  getMe(state)
+    .then(data => {
+      if (data.ok) {
+        me.value = data.data
+      }
+    })
+}
 
 // const meta = document.createElement('meta')
 // meta.name = 'naive-ui-style'

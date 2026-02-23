@@ -7,6 +7,7 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/google/uuid"
@@ -42,13 +43,14 @@ func (s *Service) UploadFile(r *http.Request, user *models.User) core.Response {
 	if err != nil && !errors.Is(err, os.ErrExist) {
 		return core.Err(http.StatusInternalServerError, err)
 	}
-	err = os.WriteFile(fmt.Sprintf(".data/files/%s", uid.String()), b, os.ModePerm)
+	content := fmt.Sprintf("/files/%s%s", uid.String(), path.Ext(header.Filename))
+	err = os.WriteFile(".data"+content, b, os.ModePerm)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, err)
 	}
 	f := &models.File{
 		UUID:       uid,
-		Content:    fmt.Sprintf("/files/%s", uid.String()),
+		Content:    content,
 		Size:       header.Size,
 		MimeType:   mt,
 		OriginName: header.Filename,
@@ -57,6 +59,7 @@ func (s *Service) UploadFile(r *http.Request, user *models.User) core.Response {
 	}
 	err = s.store.CreateFile(r.Context(), f)
 	if err != nil {
+		fmt.Println(f)
 		return core.Err(http.StatusInternalServerError, err)
 	}
 	return core.JSON(http.StatusCreated, f)

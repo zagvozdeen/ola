@@ -92,11 +92,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { reactive, useTemplateRef } from 'vue'
-import { useFetch } from '../composables/useFetch'
-import type { AuthRegisterRequest } from '../types'
+import { useFetch } from '@/composables/useFetch'
+import type { AuthRegisterRequest } from '@/types'
 import { type FormRules, type FormInst, NForm, NFormItem, NButton, NInput } from 'naive-ui'
-import { useSender } from '../composables/useSender'
-import { useNotifications } from '../composables/useNotifications'
+import { useSender } from '@/composables/useSender'
+import { useNotifications } from '@/composables/useNotifications'
 
 const router = useRouter()
 const fetcher = useFetch()
@@ -164,10 +164,10 @@ const onSubmitForm = () => {
     if (data.ok) {
       notify.info('Аккаунт создан, теперь войдите в систему!')
       await router.push({ name: 'login' })
-      return
+      // return
     }
 
-    notify.error(data.data.message)
+    // notify.error(data.data.message)
   })
 }
 </script>

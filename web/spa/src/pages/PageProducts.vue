@@ -1,0 +1,149 @@
+<template>
+  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
+    <HeaderMenu
+      title="Все продукты"
+      :edit="false"
+      back="settings"
+      create="products.create"
+    />
+
+    <!--    <div class="flex items-center justify-between">-->
+
+    <!--      <h1 class="text-lg font-bold">-->
+    <!--        Все продукты-->
+    <!--      </h1>-->
+    <!--      <router-link-->
+    <!--        v-if="canManageProducts"-->
+    <!--        class="bg-blue-600 hover:bg-blue-700 rounded px-3 py-1 text-xs uppercase font-bold"-->
+    <!--        :to="{ name: 'products.create' }"-->
+    <!--      >-->
+    <!--        Создать-->
+    <!--      </router-link>-->
+    <!--    </div>-->
+
+    <div
+      v-if="!permissionChecked && false"
+      class="text-sm text-gray-300"
+    >
+      Проверяем доступ...
+    </div>
+
+    <div
+      v-else-if="!canManageProducts && false"
+      class="text-sm text-red-300"
+    >
+      Недостаточно прав для управления продуктами.
+    </div>
+
+    <ul
+      v-else
+      class="grid grid-cols-1 gap-2"
+    >
+      <li
+        v-for="product in products"
+        :key="product.id"
+        class="bg-gray-500/20 border border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
+      >
+        <img
+          class="size-20 object-cover rounded-lg"
+          :src="product.file_content"
+          alt=""
+        >
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between gap-2">
+            <span class="font-bold text-sm truncate">{{ product.name }}</span>
+            <span class="text-xs uppercase bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ ProductTypeTranslates[product.type] }}</span>
+          </div>
+          <p class="text-xs text-gray-300 line-clamp-2 mt-1">
+            {{ product.description }}
+          </p>
+          <p class="text-xs mt-1 font-medium">
+            от {{ product.price_from }} ₽{{ product.price_to ? ` до ${product.price_to} ₽` : '' }}
+          </p>
+          <div class="flex gap-2 mt-2">
+            <router-link
+              class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
+              :to="{ name: 'products.edit', params: { uuid: product.uuid } }"
+            >
+              Редактировать
+            </router-link>
+            <NPopconfirm
+              negative-text="Отмена"
+              positive-text="Удалить"
+              @positive-click="() => handleDeleteProduct(product.uuid)"
+            >
+              <template #trigger>
+                <button
+                  class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                  :disabled="deleting === product.uuid"
+                >
+                  {{ deleting === product.uuid ? 'Удаляем...' : 'Удалить' }}
+                </button>
+              </template>
+
+              Вы уверены, что хотите удалить продукт?
+            </NPopconfirm>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div
+      v-if="canManageProducts && !isLoading && products.length === 0"
+      class="text-sm text-gray-300"
+    >
+      Список продуктов пуст.
+    </div>
+
+    <FooterMenu />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import FooterMenu from '@/components/FooterMenu.vue'
+import { useFetch } from '@/composables/useFetch'
+import { me } from '@/composables/useState'
+import { useNotifications } from '@/composables/useNotifications'
+import { type Product, ProductTypeTranslates } from '@/types'
+import { NPopconfirm } from 'naive-ui'
+import HeaderMenu from '@/components/HeaderMenu.vue'
+
+const fetcher = useFetch()
+const notify = useNotifications()
+const products = ref<Product[]>([])
+const isLoading = ref(false)
+const deleting = ref<string | null>(null)
+const permissionChecked = ref(false)
+const canManageProducts = computed(() => me.value?.role === 'admin' || me.value?.role === 'moderator')
+
+const handleDeleteProduct = (uuid: string) => {
+  deleting.value = uuid
+
+  fetcher
+    .deleteProduct(uuid)
+    .then(data => {
+      if (data.ok) {
+        products.value = products.value.filter(product => product.uuid !== uuid)
+        notify.info('Продукт удалён')
+      }
+    })
+    .finally(() => {
+      deleting.value = null
+    })
+}
+
+onMounted(async () => {
+  isLoading.value = true
+  fetcher
+    .getProducts()
+    .then(data => {
+      if (data.ok) {
+        products.value = data.data
+      }
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+})
+</script>

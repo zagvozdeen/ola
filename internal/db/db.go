@@ -73,6 +73,11 @@ func migrate(ctx context.Context, log goose.Logger, pool *pgxpool.Pool) (err err
 		return err
 	}
 
+	//err = goose.DownContext(ctx, db, "migrations")
+	//if err != nil {
+	//	return fmt.Errorf("failed to down migrations: %w", err)
+	//}
+
 	err = goose.UpContext(ctx, db, "migrations")
 	if err != nil {
 		return err

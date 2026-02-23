@@ -3,7 +3,7 @@
     <transition-group
       name="notification"
       tag="div"
-      class="max-w-md w-full flex flex-col gap-2 px-4 pt-2 fixed left-1/2 -translate-x-1/2"
+      class="max-w-md w-full flex flex-col gap-2 px-4 pt-2 fixed z-20 left-1/2 -translate-x-1/2"
       style="top: calc(var(--tg-content-safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px))"
       appear
     >
