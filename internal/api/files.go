@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -14,13 +15,18 @@ import (
 )
 
 func (s *Service) UploadFile(r *http.Request, user *models.User) core.Response {
+	res := allowForModeratorOrAdmin(user)
+	if res != nil {
+		return res
+	}
+
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, err)
 	}
 	file, header, err := r.FormFile("file")
 	if err != nil {
-		return core.Err(http.StatusInternalServerError, err)
+		return core.Err(http.StatusBadRequest, err)
 	}
 	defer file.Close()
 	b, err := io.ReadAll(file)
@@ -32,10 +38,10 @@ func (s *Service) UploadFile(r *http.Request, user *models.User) core.Response {
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, err)
 	}
-	//err = os.Mkdir(".data/files", os.ModePerm)
-	//if err != nil && !errors.Is(err, os.ErrExist) {
-	//	return core.Err(http.StatusInternalServerError, err)
-	//}
+	err = os.MkdirAll(".data/files", os.ModePerm)
+	if err != nil && !errors.Is(err, os.ErrExist) {
+		return core.Err(http.StatusInternalServerError, err)
+	}
 	err = os.WriteFile(fmt.Sprintf(".data/files/%s", uid.String()), b, os.ModePerm)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, err)

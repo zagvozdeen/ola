@@ -6,14 +6,17 @@ import type {
   AuthRegisterRequest,
   AuthRegisterResponse,
   Category,
+  CreateProductRequest,
   CreateFeedbackRequest,
   CreateGuestFeedbackRequest,
   CreateGuestOrderRequest,
   CreateOrderRequest,
   Feedback,
+  File as UploadedFile,
   Order,
   Product,
   Review,
+  UpdateProductRequest,
   User, ValidationError,
 } from '@shared/types'
 import { type Notify, useNotifications } from '@shared/composables/useNotifications'
@@ -34,6 +37,11 @@ const getAuthHeaders = (state: State, headers?: HeadersInit): Headers => {
 
 const getAuthJsonHeaders = (state: State): Headers => {
   return getAuthHeaders(state, getJsonHeaders())
+}
+
+const isJsonResponse = (res: Response): boolean => {
+  const contentType = res.headers.get('Content-Type')
+  return contentType !== null && contentType.includes('application/json')
 }
 
 const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, init?: RequestInit): Promise<ApiResult<T>> => {
@@ -59,7 +67,7 @@ const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, in
       }
     }
 
-    if (res.headers.get('Content-Type') === 'application/json') {
+    if (isJsonResponse(res)) {
       return {
         ok: false,
         data: await res.json(),
@@ -78,6 +86,10 @@ const fetchJson = async <T>(state: State, notify: Notify, input: RequestInfo, in
         errors: {},
       },
     }
+  }
+
+  if (res.status === 204) {
+    return { ok: true, data: null as T }
   }
 
   return { ok: true, data: await res.json() as T }
@@ -124,6 +136,46 @@ const createGuestOrder = async (state: State, notify: Notify, payload: CreateGue
 const getProducts = async (state: State, notify: Notify) => {
   return fetchJson<Product[]>(state, notify, `${state.getApiUrl()}/api/products`, {
     headers: getAuthHeaders(state),
+  })
+}
+
+const getProduct = async (state: State, notify: Notify, uuid: string) => {
+  return fetchJson<Product>(state, notify, `${state.getApiUrl()}/api/products/${uuid}`, {
+    headers: getAuthHeaders(state),
+  })
+}
+
+const createProduct = async (state: State, notify: Notify, payload: CreateProductRequest) => {
+  return fetchJson<Product>(state, notify, `${state.getApiUrl()}/api/products`, {
+    method: 'POST',
+    headers: getAuthJsonHeaders(state),
+    body: JSON.stringify(payload),
+  })
+}
+
+const updateProduct = async (state: State, notify: Notify, uuid: string, payload: UpdateProductRequest) => {
+  return fetchJson<Product>(state, notify, `${state.getApiUrl()}/api/products/${uuid}`, {
+    method: 'PATCH',
+    headers: getAuthJsonHeaders(state),
+    body: JSON.stringify(payload),
+  })
+}
+
+const deleteProduct = async (state: State, notify: Notify, uuid: string) => {
+  return fetchJson<null>(state, notify, `${state.getApiUrl()}/api/products/${uuid}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(state),
+  })
+}
+
+const uploadFile = async (state: State, notify: Notify, file: globalThis.File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return fetchJson<UploadedFile>(state, notify, `${state.getApiUrl()}/api/files`, {
+    method: 'POST',
+    headers: getAuthHeaders(state),
+    body: formData,
   })
 }
 
@@ -184,6 +236,11 @@ export const useFetch = () => {
     createGuestFeedback: (payload: CreateGuestFeedbackRequest) => createGuestFeedback(state, notify, payload),
     createGuestOrder: (payload: CreateGuestOrderRequest) => createGuestOrder(state, notify, payload),
     getProducts: () => getProducts(state, notify),
+    getProduct: (uuid: string) => getProduct(state, notify, uuid),
+    createProduct: (payload: CreateProductRequest) => createProduct(state, notify, payload),
+    updateProduct: (uuid: string, payload: UpdateProductRequest) => updateProduct(state, notify, uuid, payload),
+    deleteProduct: (uuid: string) => deleteProduct(state, notify, uuid),
+    uploadFile: (file: globalThis.File) => uploadFile(state, notify, file),
     getCategories: () => getCategories(state, notify),
     getFeedback: () => getFeedback(state, notify),
     createFeedback: (payload: CreateFeedbackRequest) => createFeedback(state, notify, payload),

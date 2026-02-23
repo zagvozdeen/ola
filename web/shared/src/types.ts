@@ -136,6 +136,17 @@ export type CreateGuestOrderRequest = {
   consent: boolean
 }
 
+export type CreateProductRequest = {
+  name: string
+  description: string
+  price_from: number
+  price_to: number | null
+  type: ProductType
+  file_id: number
+}
+
+export type UpdateProductRequest = CreateProductRequest
+
 export type ValidationError = {
   message: string
   errors: Record<string, string>

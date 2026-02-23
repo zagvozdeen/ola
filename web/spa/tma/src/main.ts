@@ -8,6 +8,9 @@ import RegisterPage from './pages/RegisterPage.vue'
 import { useState } from '@shared/composables/useState'
 import CartPage from './pages/CartPage.vue'
 import SettingsPage from './pages/SettingsPage.vue'
+import ProductsPage from './pages/ProductsPage.vue'
+import CreateProductPage from './pages/CreateProductPage.vue'
+import EditProductPage from './pages/EditProductPage.vue'
 
 const router = createRouter({
   history: createWebHistory('/tma/'),
@@ -17,6 +20,9 @@ const router = createRouter({
     { path: '/register', name: 'register', component: RegisterPage },
     { path: '/cart', name: 'cart', component: CartPage },
     { path: '/settings', name: 'settings', component: SettingsPage },
+    { path: '/products', name: 'products', component: ProductsPage },
+    { path: '/products/create', name: 'product-create', component: CreateProductPage },
+    { path: '/products/:uuid/edit', name: 'product-edit', component: EditProductPage },
   ],
 })
 
