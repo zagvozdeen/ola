@@ -7,32 +7,11 @@
       create="products.create"
     />
 
-    <!--    <div class="flex items-center justify-between">-->
-
-    <!--      <h1 class="text-lg font-bold">-->
-    <!--        Все продукты-->
-    <!--      </h1>-->
-    <!--      <router-link-->
-    <!--        v-if="canManageProducts"-->
-    <!--        class="bg-blue-600 hover:bg-blue-700 rounded px-3 py-1 text-xs uppercase font-bold"-->
-    <!--        :to="{ name: 'products.create' }"-->
-    <!--      >-->
-    <!--        Создать-->
-    <!--      </router-link>-->
-    <!--    </div>-->
-
     <div
-      v-if="!permissionChecked && false"
-      class="text-sm text-gray-300"
+      v-if="isLoading"
+      class="flex justify-center my-4"
     >
-      Проверяем доступ...
-    </div>
-
-    <div
-      v-else-if="!canManageProducts && false"
-      class="text-sm text-red-300"
-    >
-      Недостаточно прав для управления продуктами.
+      <n-spin size="small" />
     </div>
 
     <ul
@@ -89,33 +68,30 @@
     </ul>
 
     <div
-      v-if="canManageProducts && !isLoading && products.length === 0"
+      v-if="!isLoading && products.length === 0"
       class="text-sm text-gray-300"
     >
       Список продуктов пуст.
     </div>
-
-    <FooterMenu />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import FooterMenu from '@/components/FooterMenu.vue'
+import { ref } from 'vue'
 import { useFetch } from '@/composables/useFetch'
-import { me } from '@/composables/useState'
+import { isUserModerator, onUserLoaded } from '@/composables/useState'
 import { useNotifications } from '@/composables/useNotifications'
 import { type Product, ProductTypeTranslates } from '@/types'
-import { NPopconfirm } from 'naive-ui'
+import { NPopconfirm, NSpin } from 'naive-ui'
 import HeaderMenu from '@/components/HeaderMenu.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const fetcher = useFetch()
 const notify = useNotifications()
 const products = ref<Product[]>([])
-const isLoading = ref(false)
+const isLoading = ref(true)
 const deleting = ref<string | null>(null)
-const permissionChecked = ref(false)
-const canManageProducts = computed(() => me.value?.role === 'admin' || me.value?.role === 'moderator')
 
 const handleDeleteProduct = (uuid: string) => {
   deleting.value = uuid
@@ -133,17 +109,21 @@ const handleDeleteProduct = (uuid: string) => {
     })
 }
 
-onMounted(async () => {
-  isLoading.value = true
-  fetcher
-    .getProducts()
-    .then(data => {
-      if (data.ok) {
-        products.value = data.data
-      }
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+onUserLoaded((user) => {
+  if (isUserModerator(user)) {
+    fetcher
+      .getProducts()
+      .then(data => {
+        if (data.ok) {
+          products.value = data.data
+        }
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  } else {
+    notify.error('У вас нет прав просматривать эту страницу!')
+    router.push({ name: 'main' })
+  }
 })
 </script>

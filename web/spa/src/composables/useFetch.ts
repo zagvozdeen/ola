@@ -67,6 +67,19 @@ const fetchJson = async <T>(state: State, notify: Notify | null, input: RequestI
       }
     }
 
+    if (res.status === 403) {
+      if (notify) {
+        notify.error('У вас нет прав выполнять это действие!')
+        return {
+          ok: false,
+          data: {
+            message: 'Insufficient permissions',
+            errors: {},
+          },
+        }
+      }
+    }
+
     if (isJsonResponse(res)) {
       return {
         ok: false,

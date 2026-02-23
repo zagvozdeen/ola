@@ -1,8 +1,11 @@
 export type UUID = string
 export type DateTime = string
 
-export type UserRole = 'user' | 'moderator' | 'admin'
-// export type ProductType = 'product' | 'service'
+export enum UserRole {
+  User = 'user',
+  Moderator = 'moderator',
+  Admin = 'admin',
+}
 
 export enum ProductType {
   Product = 'product',
