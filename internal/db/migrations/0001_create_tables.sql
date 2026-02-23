@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS categories
     updated_at TIMESTAMPTZ  NOT NULL
 );
 
+CREATE TYPE product_type AS ENUM ('product', 'service');
+
 CREATE TABLE IF NOT EXISTS products
 (
     id          SERIAL PRIMARY KEY,
@@ -45,6 +47,7 @@ CREATE TABLE IF NOT EXISTS products
     description TEXT                          NOT NULL,
     price_from  INTEGER                       NOT NULL,
     price_to    INTEGER                       NULL,
+    type        product_type                  NOT NULL,
     file_id     INTEGER REFERENCES files (id) NOT NULL,
     user_id     INTEGER REFERENCES users (id) NOT NULL,
     created_at  TIMESTAMPTZ                   NOT NULL,
@@ -58,26 +61,26 @@ CREATE TABLE IF NOT EXISTS category_product
     PRIMARY KEY (category_id, product_id)
 );
 
-CREATE TABLE IF NOT EXISTS services
-(
-    id          SERIAL PRIMARY KEY,
-    uuid        UUID                          NOT NULL UNIQUE,
-    name        VARCHAR(255)                  NOT NULL,
-    description TEXT                          NOT NULL,
-    price_from  INTEGER                       NOT NULL,
-    price_to    INTEGER                       NULL,
-    file_id     INTEGER REFERENCES files (id) NOT NULL,
-    user_id     INTEGER REFERENCES users (id) NOT NULL,
-    created_at  TIMESTAMPTZ                   NOT NULL,
-    updated_at  TIMESTAMPTZ                   NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS category_service
-(
-    category_id INTEGER REFERENCES categories (id) NOT NULL,
-    service_id  INTEGER REFERENCES services (id)   NOT NULL,
-    PRIMARY KEY (category_id, service_id)
-);
+-- CREATE TABLE IF NOT EXISTS services
+-- (
+--     id          SERIAL PRIMARY KEY,
+--     uuid        UUID                          NOT NULL UNIQUE,
+--     name        VARCHAR(255)                  NOT NULL,
+--     description TEXT                          NOT NULL,
+--     price_from  INTEGER                       NOT NULL,
+--     price_to    INTEGER                       NULL,
+--     file_id     INTEGER REFERENCES files (id) NOT NULL,
+--     user_id     INTEGER REFERENCES users (id) NOT NULL,
+--     created_at  TIMESTAMPTZ                   NOT NULL,
+--     updated_at  TIMESTAMPTZ                   NOT NULL
+-- );
+--
+-- CREATE TABLE IF NOT EXISTS category_service
+-- (
+--     category_id INTEGER REFERENCES categories (id) NOT NULL,
+--     service_id  INTEGER REFERENCES services (id)   NOT NULL,
+--     PRIMARY KEY (category_id, service_id)
+-- );
 
 CREATE TABLE IF NOT EXISTS reviews
 (
@@ -118,7 +121,7 @@ CREATE TABLE IF NOT EXISTS feedback
 
 -- DEV ONLY (DELETE IN PRODUCTION)
 INSERT INTO users (id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at)
-VALUES (1, NULL, gen_random_uuid(), 'Ivan', 'Ivanov', 'ivan', 'ivan@mail.ru', NULL, 'admin', NOW(), NOW());
+VALUES (1, NULL, gen_random_uuid(), 'Ivan', 'Ivanov', 'ivan', 'ivan@mail.ru', '$2a$10$5IGmMleZEgX8azGohTVBaeAlSnONTuRLVT0YxtP6HXzsQOrabJvbu', 'admin', NOW(), NOW());
 
 INSERT INTO files (id, uuid, content, size, mime_type, origin_name, user_id, created_at)
 VALUES (1, gen_random_uuid(), '/files/1.jpg', 0, 'image/jpeg', '1.jpg', 1, NOW()),
@@ -131,37 +134,35 @@ VALUES (1, gen_random_uuid(), '/files/1.jpg', 0, 'image/jpeg', '1.jpg', 1, NOW()
        (8, gen_random_uuid(), '/files/8.jpg', 0, 'image/jpeg', '8.jpg', 1, NOW()),
        (9, gen_random_uuid(), '/files/9.jpg', 0, 'image/jpeg', '9.jpg', 1, NOW());
 
-INSERT INTO products (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at)
+INSERT INTO products (id, uuid, name, description, price_from, price_to, type, file_id, user_id, created_at, updated_at)
 VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
         3500,
-        NULL, 1, 1,
+        NULL, 'product', 1, 1,
         NOW(), NOW()),
        (2, gen_random_uuid(), 'Оформление помещения / фотозона',
         'Декорирование любого помещения по индивидуальному дизайну',
-        7000, NULL,
+        7000, NULL, 'product',
         2, 1, NOW(), NOW()),
        (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000,
-        NULL, 3, 1,
+        NULL, 'product', 3, 1,
         NOW(),
         NOW()),
-       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1,
+       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 'product', 4, 1,
         NOW(),
-        NOW());
-
-INSERT INTO services (id, uuid, name, description, price_from, price_to, file_id, user_id, created_at, updated_at)
-VALUES (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
+        NOW()),
+       (1, gen_random_uuid(), 'Фонтан из воздушных шаров', 'Композиция по индивидуальному дизайну для любого события',
         3500,
-        NULL, 1, 1,
+        NULL, 'service', 1, 1,
         NOW(), NOW()),
        (2, gen_random_uuid(), 'Оформление помещения / фотозона',
         'Декорирование любого помещения по индивидуальному дизайну',
-        7000, NULL,
+        7000, NULL, 'service',
         2, 1, NOW(), NOW()),
        (3, gen_random_uuid(), 'Коробка - сюрприз', 'Подарочный бокс с композицией из шаров для любого события', 5000,
-        NULL, 3, 1,
+        NULL, 'service', 3, 1,
         NOW(),
         NOW()),
-       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 4, 1,
+       (4, gen_random_uuid(), 'Бабл бокс', 'Креативная упаковка для небольшого подарка с шаром баблс', 3000, NULL, 'service', 4, 1,
         NOW(),
         NOW());
 
@@ -197,10 +198,11 @@ VALUES (1, gen_random_uuid(), 'Елена',
 DROP TABLE IF EXISTS feedback;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS reviews;
-DROP TABLE IF EXISTS category_service;
-DROP TABLE IF EXISTS services;
+-- DROP TABLE IF EXISTS category_service;
+-- DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS category_product;
 DROP TABLE IF EXISTS products;
+DROP TYPE IF EXISTS product_type;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS files;
 DROP TABLE IF EXISTS users;

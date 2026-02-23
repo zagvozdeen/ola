@@ -1,5 +1,5 @@
-import { ref } from 'vue'
-import type { User } from '@shared/types'
+import { reactive, ref } from 'vue'
+import type { Cart, User } from '@shared/types'
 
 const state = {
   tma: window.Telegram?.WebApp?.initData || null,
@@ -8,6 +8,10 @@ const state = {
 }
 
 export const me = ref<User>()
+export const cart = reactive<Cart>({
+  product_ids: [],
+  service_ids: [],
+})
 
 export type State = ReturnType<typeof useState>
 

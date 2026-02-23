@@ -86,7 +86,6 @@ func (s *Service) getRoutes() *http.ServeMux {
 
 	mux.HandleFunc("GET /api/me", s.auth(s.getMe))                 // for all
 	mux.HandleFunc("GET /api/products", s.auth(s.getProducts))     // for all
-	mux.HandleFunc("GET /api/services", s.auth(s.getServices))     // for all
 	mux.HandleFunc("GET /api/categories", s.auth(s.getCategories)) // for admin and moderator only
 	mux.HandleFunc("GET /api/feedback", s.auth(s.getFeedback))     // for admin and moderator only
 	mux.HandleFunc("POST /api/feedback", s.auth(s.createFeedback)) // for all

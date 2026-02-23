@@ -18,7 +18,6 @@ import (
 type PageData struct {
 	Head       template.HTML
 	Products   []models.Product
-	Services   []models.Service
 	Categories []models.Category
 	Reviews    []models.Review
 }
@@ -117,11 +116,6 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 	data.Products, err = s.store.GetAllProducts(r.Context())
 	if err != nil {
 		s.log.Error("Failed to get products", err)
-		return
-	}
-	data.Services, err = s.store.GetAllServices(r.Context())
-	if err != nil {
-		s.log.Error("Failed to get services", err)
 		return
 	}
 	data.Categories, err = s.store.GetAllCategories(r.Context())

@@ -168,3 +168,8 @@ export interface Notification {
 }
 
 export type PusherFunc = (level: Levels, msg: string, date: number) => void
+
+export type Cart = {
+  product_ids: number[],
+  service_ids: number[],
+}

@@ -13,7 +13,7 @@
         <span>Ассортимент</span>
       </router-link>
       <router-link
-        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center relative"
         :class="{
           'bg-gray-500/25': route.name === 'cart',
         }"
@@ -21,6 +21,10 @@
         type="button"
       >
         <i class="bi bi-basket2-fill text-sm" />
+        <small
+          v-show="items"
+          class="absolute left-17 top-0.5 text-xs bg-green-700 rounded-full font-bold px-1"
+        >{{ items }}</small>
         <span>Корзина</span>
       </router-link>
       <router-link
@@ -40,6 +44,9 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { cart } from '@shared/composables/useState'
 
 const route = useRoute()
+const items = computed(() => cart.product_ids.length + cart.service_ids.length)
 </script>
