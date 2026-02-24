@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
-	rows, err := s.pool.Query(ctx, "SELECT id, uuid, status, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback ORDER BY created_at DESC")
+	rows, err := s.querier(ctx).Query(ctx, "SELECT id, uuid, status, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback ORDER BY created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -33,7 +33,7 @@ func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
 
 func (s *Store) GetFeedbackByUUID(ctx context.Context, feedbackUUID uuid.UUID) (*models.Feedback, error) {
 	feedback := &models.Feedback{}
-	err := s.pool.QueryRow(
+	err := s.querier(ctx).QueryRow(
 		ctx,
 		"SELECT id, uuid, status, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback WHERE uuid = $1",
 		feedbackUUID,
@@ -48,7 +48,7 @@ func (s *Store) GetFeedbackByUUID(ctx context.Context, feedbackUUID uuid.UUID) (
 }
 
 func (s *Store) CreateFeedback(ctx context.Context, feedback *models.Feedback) error {
-	err := s.pool.QueryRow(
+	err := s.querier(ctx).QueryRow(
 		ctx,
 		"INSERT INTO feedback (uuid, status, source, type, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
 		feedback.UUID, feedback.Status, feedback.Source, feedback.Type, feedback.Name, feedback.Phone, feedback.Content, feedback.UserID, feedback.CreatedAt, feedback.UpdatedAt,
@@ -57,7 +57,7 @@ func (s *Store) CreateFeedback(ctx context.Context, feedback *models.Feedback) e
 }
 
 func (s *Store) UpdateFeedbackStatus(ctx context.Context, feedbackID int, status enums.RequestStatus) error {
-	tag, err := s.pool.Exec(ctx, "UPDATE feedback SET status = $1, updated_at = NOW() WHERE id = $2", status, feedbackID)
+	tag, err := s.querier(ctx).Exec(ctx, "UPDATE feedback SET status = $1, updated_at = NOW() WHERE id = $2", status, feedbackID)
 	if err != nil {
 		return wrapDBError(err)
 	}

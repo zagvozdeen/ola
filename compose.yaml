@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:latest
     environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ola
+      POSTGRES_USER: ola
+      POSTGRES_PASSWORD: ola
     volumes:
       - ./.data/postgres:/var/lib/postgresql/18/docker
     ports:

@@ -12,7 +12,7 @@ import (
 func (s *Store) getUserCartByUserID(ctx context.Context, userID int) (*models.Cart, error) {
 	cart := &models.Cart{}
 
-	err := s.pool.QueryRow(
+	err := s.querier(ctx).QueryRow(
 		ctx,
 		"SELECT id, uuid, user_id, session_id::text, created_at, updated_at FROM carts WHERE user_id = $1",
 		userID,
@@ -47,7 +47,7 @@ func (s *Store) getOrCreateUserCartByUserID(ctx context.Context, userID int) (*m
 		UpdatedAt: now,
 	}
 
-	err = s.pool.QueryRow(
+	err = s.querier(ctx).QueryRow(
 		ctx,
 		"INSERT INTO carts (uuid, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id",
 		cart.UUID,
@@ -77,7 +77,7 @@ func (s *Store) GetUserCartItems(ctx context.Context, userID int) ([]models.Cart
 		return nil, err
 	}
 
-	rows, err := s.pool.Query(
+	rows, err := s.querier(ctx).Query(
 		ctx,
 		"SELECT ci.product_id, p.uuid, p.name, p.price_from, p.price_to, p.type, f.content, ci.qty FROM cart_items ci JOIN products p ON p.id = ci.product_id JOIN files f ON f.id = p.file_id WHERE ci.cart_id = $1 ORDER BY p.created_at DESC",
 		cart.ID,
@@ -119,7 +119,7 @@ func (s *Store) UpsertUserCartItem(ctx context.Context, userID, productID, qty i
 		return err
 	}
 
-	_, err = s.pool.Exec(
+	_, err = s.querier(ctx).Exec(
 		ctx,
 		"INSERT INTO cart_items (cart_id, product_id, qty) VALUES ($1, $2, $3) ON CONFLICT (cart_id, product_id) DO UPDATE SET qty = EXCLUDED.qty",
 		cart.ID,
@@ -139,7 +139,7 @@ func (s *Store) DeleteUserCartItem(ctx context.Context, userID int, productUUID 
 		return err
 	}
 
-	_, err = s.pool.Exec(
+	_, err = s.querier(ctx).Exec(
 		ctx,
 		"DELETE FROM cart_items ci USING products p WHERE ci.cart_id = $1 AND ci.product_id = p.id AND p.uuid = $2",
 		cart.ID,

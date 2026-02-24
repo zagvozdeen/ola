@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Store) GetAllOrders(ctx context.Context) ([]models.Order, error) {
-	rows, err := s.pool.Query(ctx, "SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders ORDER BY created_at DESC")
+	rows, err := s.querier(ctx).Query(ctx, "SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders ORDER BY created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -34,7 +34,7 @@ func (s *Store) GetAllOrders(ctx context.Context) ([]models.Order, error) {
 
 func (s *Store) GetOrderByUUID(ctx context.Context, orderUUID uuid.UUID) (*models.Order, error) {
 	order := &models.Order{}
-	err := s.pool.QueryRow(
+	err := s.querier(ctx).QueryRow(
 		ctx,
 		"SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders WHERE uuid = $1",
 		orderUUID,
@@ -49,7 +49,7 @@ func (s *Store) GetOrderByUUID(ctx context.Context, orderUUID uuid.UUID) (*model
 }
 
 func (s *Store) CreateOrder(ctx context.Context, order *models.Order) error {
-	err := s.pool.QueryRow(
+	err := s.querier(ctx).QueryRow(
 		ctx,
 		"INSERT INTO orders (uuid, status, source, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
 		order.UUID, order.Status, order.Source, order.Name, order.Phone, order.Content, order.UserID, order.CreatedAt, order.UpdatedAt,
@@ -58,7 +58,7 @@ func (s *Store) CreateOrder(ctx context.Context, order *models.Order) error {
 }
 
 func (s *Store) UpdateOrderStatus(ctx context.Context, orderID int, status enums.RequestStatus) error {
-	tag, err := s.pool.Exec(ctx, "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", status, orderID)
+	tag, err := s.querier(ctx).Exec(ctx, "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", status, orderID)
 	if err != nil {
 		return wrapDBError(err)
 	}
@@ -74,7 +74,7 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 		return nil, err
 	}
 
-	tx, err := s.pool.Begin(ctx)
+	tx, err := s.querier(ctx).Begin(ctx)
 	if err != nil {
 		return nil, err
 	}

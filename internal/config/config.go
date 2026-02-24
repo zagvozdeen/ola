@@ -53,7 +53,7 @@ type RootConfig struct {
 func New(path string) *Config {
 	cfg, err := newConfig(path)
 	if err != nil {
-		slog.Warn("Failed to load .env file", slog.Any("err", err))
+		slog.Warn("Failed to load config", slog.Any("err", err))
 		os.Exit(1)
 	}
 	return cfg
