@@ -110,7 +110,12 @@
           >
             <n-input
               v-model:value="form.phone"
+              v-maska
+              class="w-full"
               placeholder="+7 (___) ___-__-__"
+              :input-props="{
+                'data-maska': '+7 (###) ###-##-##',
+              }"
             />
           </n-form-item>
 
@@ -143,7 +148,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+// import IMask from 'imask'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import FooterMenu from '@/components/FooterMenu.vue'
 import { cart, useAuthState } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
@@ -151,6 +166,7 @@ import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type CreateOrderRequest, ProductTypeTranslates } from '@/types'
 import { type FormInst, NButton, NForm, NFormItem, NInput, NSpin, type FormRules } from 'naive-ui'
+import { vMaska } from 'maska/vue'
 
 const auth = useAuthState()
 const fetcher = useFetch()
@@ -158,9 +174,11 @@ const notify = useNotifications()
 const sender = useSender()
 
 const formRef = useTemplateRef<FormInst>('formRef')
+// const phoneInputWrapperRef = ref<HTMLDivElement | null>(null)
 const isLoading = ref(true)
 const updatingProductID = ref<number | null>(null)
 const isOrdering = ref(false)
+// let phoneMask: ReturnType<typeof IMask> | null = null
 
 const form = reactive<CreateOrderRequest>({
   name: '',
@@ -284,6 +302,43 @@ const onSubmitOrder = () => {
     }
   })
 }
+
+// const initPhoneMask = () => {
+//   if (phoneMask || !phoneInputWrapperRef.value) {
+//     return
+//   }
+//
+//   const phoneInput = phoneInputWrapperRef.value.querySelector('input')
+//   if (!(phoneInput instanceof HTMLInputElement)) {
+//     return
+//   }
+//
+//   phoneMask = IMask(phoneInput, {
+//     mask: '+{7} (000) 000-00-00',
+//   })
+// }
+
+// const destroyPhoneMask = () => {
+//   phoneMask?.destroy()
+//   phoneMask = null
+// }
+
+// watch(
+//   () => !isLoading.value && cart.items.length > 0,
+//   async (isOrderFormVisible) => {
+//     if (isOrderFormVisible) {
+//       await nextTick()
+//       initPhoneMask()
+//       return
+//     }
+//
+//     destroyPhoneMask()
+//   },
+// )
+
+// onBeforeUnmount(() => {
+//   destroyPhoneMask()
+// })
 
 onMounted(async () => {
   await auth.ensureUserLoaded()

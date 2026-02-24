@@ -6,7 +6,7 @@ import { configureHttp } from '@/composables/httpCore'
 import { isUserModerator, useAuthState } from '@/composables/useAuthState'
 import PageCart from '@/pages/PageCart.vue'
 import PageLogin from '@/pages/PageLogin.vue'
-import MainPage from '@/pages/MainPage.vue'
+import PageMain from '@/pages/PageMain.vue'
 import PageProductEdit from '@/pages/PageProductEdit.vue'
 import PageProducts from '@/pages/PageProducts.vue'
 import PageRegister from '@/pages/PageRegister.vue'
@@ -15,7 +15,7 @@ import PageSettings from '@/pages/PageSettings.vue'
 const router = createRouter({
   history: createWebHistory('/spa/'),
   routes: [
-    { path: '/', name: 'main', component: MainPage },
+    { path: '/', name: 'main', component: PageMain },
     { path: '/login', name: 'login', component: PageLogin },
     { path: '/register', name: 'register', component: PageRegister },
     { path: '/cart', name: 'cart', component: PageCart },

@@ -1,5 +1,6 @@
 export const i18n = {
   'invalid email or password': 'Неверный логин или пароль',
+  'user already exists': 'Пользователь с такой электронной почтой уже существует',
   'user answer status must be null': 'Вы уже ответили на этот вопрос, если хотите ответить на вопрос повторно, то начните новый тест',
   'test session is not active': 'Этот тест устарел и закрыт, начните новый тест',
   'tma user not found: no rows in result set': 'Чтобы использовать мини-приложение, необходимо зарегистрироваться: введите команду /start в боте',

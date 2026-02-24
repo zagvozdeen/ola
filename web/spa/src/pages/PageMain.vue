@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 items-center justify-center py-6 pb-22">
+  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
+    <h1 class="text-lg font-bold">
+      Каталог товаров и услуг
+    </h1>
+
     <ul class="grid grid-cols-2 gap-2">
       <li
         v-for="product in products"
