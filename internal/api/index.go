@@ -95,7 +95,7 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 	if s.cfg.App.IsProduction {
 		head, err = s.renderViteHead(viteHeadParams{
 			ManifestPath:         "public/.vite/manifest.json",
-			EntryKey:             "landing/index.html",
+			EntryKey:             "web/landing/index.html",
 			AssetsURLPrefix:      "/",
 			IncludeCSS:           true,
 			IncludeModulePreload: true,

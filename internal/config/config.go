@@ -17,11 +17,12 @@ type Config struct {
 }
 
 type AppConfig struct {
-	Host         string `yaml:"host"`
-	Port         int    `yaml:"port"`
-	Secret       string `yaml:"secret"`
-	IsProduction bool   `yaml:"is_production"`
-	RunSeeder    bool   `yaml:"run_seeder"`
+	Host           string `yaml:"host"`
+	Port           int    `yaml:"port"`
+	Secret         string `yaml:"secret"`
+	IsProduction   bool   `yaml:"is_production"`
+	RunSeeder      bool   `yaml:"run_seeder"`
+	DownMigrations bool   `yaml:"down_migrations"`
 }
 
 type DBConfig struct {

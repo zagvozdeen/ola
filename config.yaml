@@ -4,6 +4,7 @@ app:
   secret: <SECRET>
   is_production: false
   run_seeder: true
+  down_migrations: false
 
 database:
   host: 127.0.0.1

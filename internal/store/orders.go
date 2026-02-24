@@ -74,14 +74,6 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 		return nil, err
 	}
 
-	tx, err := s.querier(ctx).Begin(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = tx.Rollback(ctx)
-	}()
-
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -100,7 +92,7 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 		UpdatedAt: now,
 	}
 
-	err = tx.QueryRow(
+	err = s.querier(ctx).QueryRow(
 		ctx,
 		"INSERT INTO orders (uuid, status, source, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
 		order.UUID, order.Status, order.Source, order.Name, order.Phone, order.Content, order.UserID, order.CreatedAt, order.UpdatedAt,
@@ -109,7 +101,7 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 		return nil, wrapDBError(err)
 	}
 
-	tag, err := tx.Exec(
+	tag, err := s.querier(ctx).Exec(
 		ctx,
 		"INSERT INTO order_items (order_id, product_id, product_name, price_from, price_to, qty) SELECT $1, p.id, p.name, p.price_from, p.price_to, ci.qty FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.cart_id = $2",
 		order.ID,
@@ -122,12 +114,7 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 		return nil, models.ErrCartEmpty
 	}
 
-	_, err = tx.Exec(ctx, "DELETE FROM cart_items WHERE cart_id = $1", cart.ID)
-	if err != nil {
-		return nil, wrapDBError(err)
-	}
-
-	err = tx.Commit(ctx)
+	_, err = s.querier(ctx).Exec(ctx, "DELETE FROM cart_items WHERE cart_id = $1", cart.ID)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}

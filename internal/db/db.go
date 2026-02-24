@@ -45,14 +45,14 @@ func connect(ctx context.Context, cfg *config.Config, log *logger.Logger) (*pgxp
 	if err != nil {
 		return nil, fmt.Errorf("ping postgres: %w", err)
 	}
-	err = migrate(ctx, log, pool)
+	err = migrate(ctx, cfg, log, pool)
 	if err != nil {
 		return nil, fmt.Errorf("run postgres migrations: %w", err)
 	}
 	return pool, nil
 }
 
-func migrate(ctx context.Context, log goose.Logger, pool *pgxpool.Pool) (err error) {
+func migrate(ctx context.Context, cfg *config.Config, log goose.Logger, pool *pgxpool.Pool) (err error) {
 	db := stdlib.OpenDBFromPool(pool)
 	defer func() {
 		if closeErr := db.Close(); closeErr != nil && err == nil {
@@ -73,10 +73,12 @@ func migrate(ctx context.Context, log goose.Logger, pool *pgxpool.Pool) (err err
 		return err
 	}
 
-	//err = goose.DownContext(ctx, db, "migrations")
-	//if err != nil {
-	//	return fmt.Errorf("failed to down migrations: %w", err)
-	//}
+	if cfg.App.DownMigrations {
+		err = goose.DownContext(ctx, db, "migrations")
+		if err != nil {
+			return fmt.Errorf("failed to down migrations: %w", err)
+		}
+	}
 
 	err = goose.UpContext(ctx, db, "migrations")
 	if err != nil {

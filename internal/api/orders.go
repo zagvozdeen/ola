@@ -107,15 +107,21 @@ func (s *Service) createOrderFromCart(r *http.Request, user *models.User) core.R
 		return res
 	}
 
+	ctx, err := s.store.Begin(r.Context())
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to begin transaction: %w", err))
+	}
+	defer s.store.Rollback(ctx)
+
 	user.Phone = new(req.Phone)
 	user.UpdatedAt = time.Now()
-	err := s.store.UpdateUserPhone(r.Context(), user)
+	err = s.store.UpdateUserPhone(ctx, user)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
 	}
 
 	order, err := s.store.CreateOrderFromUserCart(
-		r.Context(),
+		ctx,
 		user.ID,
 		sourceFromAuthHeader(r.Header.Get("Authorization")),
 		req.Name,
@@ -126,9 +132,10 @@ func (s *Service) createOrderFromCart(r *http.Request, user *models.User) core.R
 		if errors.Is(err, models.ErrCartEmpty) {
 			return core.Err(http.StatusBadRequest, fmt.Errorf("cart is empty"))
 		}
-
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create order from cart: %w", err))
 	}
+
+	s.store.Commit(ctx)
 
 	return core.JSON(http.StatusCreated, order)
 }
