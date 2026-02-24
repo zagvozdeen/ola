@@ -12,6 +12,12 @@ export enum ProductType {
   Service = 'service',
 }
 
+export enum OrderSource {
+  Landing = 'landing',
+  Spa = 'spa',
+  Tma = 'tma',
+}
+
 export const ProductTypeTranslates: Record<ProductType, string> = {
   [ProductType.Product]: 'Товар',
   [ProductType.Service]: 'Услуга',
@@ -77,6 +83,7 @@ export type Review = {
 export type Order = {
   id: number
   uuid: UUID
+  source: OrderSource
   name: string
   phone: string
   content: string
@@ -152,6 +159,7 @@ export type CreateGuestOrderRequest = {
   phone: string
   content: string
   consent: boolean
+  source?: OrderSource
 }
 
 export type CreateProductRequest = {

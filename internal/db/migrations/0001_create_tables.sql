@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS categories
 );
 
 CREATE TYPE product_type AS ENUM ('product', 'service');
+CREATE TYPE order_source AS ENUM ('landing', 'spa', 'tma');
 
 CREATE TABLE IF NOT EXISTS products
 (
@@ -74,16 +75,47 @@ CREATE TABLE IF NOT EXISTS reviews
     updated_at   TIMESTAMPTZ                   NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS carts
+(
+    id         SERIAL PRIMARY KEY,
+    uuid       UUID                          NOT NULL UNIQUE,
+    user_id    INTEGER REFERENCES users (id) NULL UNIQUE,
+    session_id UUID                          NULL UNIQUE,
+    created_at TIMESTAMPTZ                   NOT NULL,
+    updated_at TIMESTAMPTZ                   NOT NULL,
+    CHECK (user_id IS NOT NULL OR session_id IS NOT NULL)
+);
+
+CREATE TABLE IF NOT EXISTS cart_items
+(
+    cart_id    INTEGER REFERENCES carts (id) ON DELETE CASCADE NOT NULL,
+    product_id INTEGER REFERENCES products (id)                 NOT NULL,
+    qty        INTEGER                                          NOT NULL CHECK (qty > 0),
+    PRIMARY KEY (cart_id, product_id)
+);
+
 CREATE TABLE IF NOT EXISTS orders
 (
     id         SERIAL PRIMARY KEY,
     uuid       UUID                          NOT NULL UNIQUE,
+    source     order_source                  NOT NULL,
     name       VARCHAR(255)                  NOT NULL,
     phone      VARCHAR(255)                  NOT NULL,
     content    TEXT                          NOT NULL,
     user_id    INTEGER REFERENCES users (id) NULL,
     created_at TIMESTAMPTZ                   NOT NULL,
     updated_at TIMESTAMPTZ                   NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS order_items
+(
+    order_id      INTEGER REFERENCES orders (id) ON DELETE CASCADE NOT NULL,
+    product_id    INTEGER REFERENCES products (id)                 NOT NULL,
+    product_name  VARCHAR(255)                                     NOT NULL,
+    price_from    INTEGER                                          NOT NULL,
+    price_to      INTEGER                                          NULL,
+    qty           INTEGER                                          NOT NULL CHECK (qty > 0),
+    PRIMARY KEY (order_id, product_id)
 );
 
 CREATE TABLE IF NOT EXISTS feedback
@@ -175,11 +207,15 @@ VALUES (gen_random_uuid(), 'Елена',
 
 -- +goose down
 DROP TABLE IF EXISTS feedback;
+DROP TABLE IF EXISTS cart_items;
+DROP TABLE IF EXISTS carts;
+DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS category_product;
 DROP TABLE IF EXISTS products;
 DROP TYPE IF EXISTS product_type;
+DROP TYPE IF EXISTS order_source;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS files;
 DROP TABLE IF EXISTS users;

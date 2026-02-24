@@ -61,14 +61,15 @@ type Review struct {
 }
 
 type Order struct {
-	ID        int       `json:"id"`
-	UUID      string    `json:"uuid"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Content   string    `json:"content"`
-	UserID    *int      `json:"user_id,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int               `json:"id"`
+	UUID      string            `json:"uuid"`
+	Source    enums.OrderSource `json:"source"`
+	Name      string            `json:"name"`
+	Phone     string            `json:"phone"`
+	Content   string            `json:"content"`
+	UserID    *int              `json:"user_id,omitempty"`
+	CreatedAt time.Time         `json:"created_at"`
+	UpdatedAt time.Time         `json:"updated_at"`
 }
 
 type Feedback struct {
