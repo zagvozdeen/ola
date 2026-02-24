@@ -43,7 +43,7 @@ func isWebSocketUpgrade(r *http.Request) bool {
 }
 
 func (s *Service) index(w http.ResponseWriter, r *http.Request) {
-	if s.cfg.IsProduction {
+	if s.cfg.App.IsProduction {
 		s.renderMainPage(w, r)
 		return
 	}
@@ -92,7 +92,7 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 
 	head := template.HTML(`<script type="module" src="http://localhost:5173/@vite/client"></script>
 <script type="module" src="http://localhost:5173/web/landing/src/main.ts"></script>`)
-	if s.cfg.IsProduction {
+	if s.cfg.App.IsProduction {
 		head, err = s.renderViteHead(viteHeadParams{
 			ManifestPath:         "public/.vite/manifest.json",
 			EntryKey:             "landing/index.html",

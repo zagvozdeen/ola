@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"net/http"
@@ -56,18 +55,9 @@ func (s *Service) getFeedbackByUUID(r *http.Request, user *models.User) core.Res
 }
 
 func (s *Service) createFeedback(r *http.Request, user *models.User) core.Response {
-	req := &createFeedbackRequest{}
-	err := json.UnmarshalRead(r.Body, req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.conform.Struct(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.validate.StructCtx(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	req, res := core.Validate[createFeedbackRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
 	}
 
 	feedbackType, err := enums.NewFeedbackType(req.Type)
@@ -75,11 +65,17 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback type: %w", err))
 	}
 
-	err = s.store.UpdateUserPhone(r.Context(), user.ID, req.Phone)
+	src, ok := r.Context().Value("source").(enums.OrderSource)
+	if !ok {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("source must be an enums.OrderSource"))
+	}
+
+	user.Phone = new(req.Phone)
+	user.UpdatedAt = time.Now()
+	err = s.store.UpdateUserPhone(r.Context(), user)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
 	}
-	user.Phone = &req.Phone
 
 	uid, err := uuid.NewV7()
 	if err != nil {
@@ -88,7 +84,7 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 	feedback := &models.Feedback{
 		UUID:      uid,
 		Status:    enums.RequestStatusCreated,
-		Source:    sourceFromAuthHeader(r.Header.Get("Authorization")),
+		Source:    src,
 		Type:      feedbackType,
 		Name:      req.Name,
 		Phone:     req.Phone,
@@ -101,6 +97,8 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create feedback: %w", err))
 	}
+
+	s.eventBus.FeedbackCreated.Publish(r.Context(), feedback)
 
 	return core.JSON(http.StatusCreated, feedback)
 }
@@ -137,6 +135,8 @@ func (s *Service) createGuestFeedback(r *http.Request) core.Response {
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create guest feedback: %w", err))
 	}
+
+	s.eventBus.FeedbackCreated.Publish(r.Context(), feedback)
 
 	return core.JSON(http.StatusCreated, feedback)
 }

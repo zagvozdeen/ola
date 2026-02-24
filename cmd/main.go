@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"os/signal"
 	"syscall"
 
@@ -13,10 +14,13 @@ import (
 )
 
 func main() {
+	cfgPath := flag.String("config", "config.yaml", "config file path")
+	flag.Parse()
+
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	cfg := config.New()
+	cfg := config.New(*cfgPath)
 	log := logger.New(cfg)
 	defer log.Close()
 	pool := db.New(ctx, cfg, log)

@@ -120,3 +120,6 @@ type CategoryProduct struct {
 	CategoryID int `json:"category_id"`
 	ProductID  int `json:"product_id"`
 }
+
+type OrderCreated struct {
+}

@@ -1,7 +1,7 @@
 .PHONY: dev build deploy
 
 dev:
-	GOEXPERIMENT=jsonv2 go run cmd/main.go
+	GOEXPERIMENT=jsonv2 go run cmd/main.go -config=config.local.yaml
 
 build:
 	GOEXPERIMENT=jsonv2 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ola cmd/main.go
@@ -10,7 +10,7 @@ build:
 deploy: build
 	ssh root@185.221.214.4 "service ola stop && cd /var/www/ola.creavo.ru && rm -rf public && rm ola || true"
 	scp ola root@185.221.214.4:/var/www/ola.creavo.ru
-	scp .env.production root@185.221.214.4:/var/www/ola.creavo.ru/.env
+	scp config.production.yaml root@185.221.214.4:/var/www/ola.creavo.ru/config.yaml
 	tar -czf /tmp/ola-public.tar.gz -C dist .
 	scp /tmp/ola-public.tar.gz root@185.221.214.4:/tmp/ola-public.tar.gz
 	ssh root@185.221.214.4 "mkdir -p /var/www/ola.creavo.ru/public && tar -xzf /tmp/ola-public.tar.gz -C /var/www/ola.creavo.ru/public && rm -f /tmp/ola-public.tar.gz"

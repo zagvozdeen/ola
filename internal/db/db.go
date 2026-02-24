@@ -27,12 +27,12 @@ func New(ctx context.Context, cfg *config.Config, log *logger.Logger) *pgxpool.P
 
 func connect(ctx context.Context, cfg *config.Config, log *logger.Logger) (*pgxpool.Pool, error) {
 	connCfg, err := pgxpool.ParseConfig(fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.DBUsername,
-		cfg.DBPassword,
-		cfg.DBHost,
-		cfg.DBPort,
-		cfg.DBDatabase,
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.DB.Username,
+		cfg.DB.Password,
+		cfg.DB.Host,
+		cfg.DB.Port,
+		cfg.DB.Database,
 	))
 	if err != nil {
 		return nil, fmt.Errorf("parse postgres config: %w", err)

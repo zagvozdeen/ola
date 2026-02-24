@@ -30,6 +30,19 @@ func (s *Store) GetAllProducts(ctx context.Context) ([]models.Product, error) {
 	return products, nil
 }
 
+func (s *Store) GetProductByID(ctx context.Context, id int) (*models.Product, error) {
+	product := &models.Product{}
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, uuid, name, description, price_from, price_to, type, file_id, user_id, created_at, updated_at FROM products p WHERE id = $1",
+		id,
+	).Scan(&product.ID, &product.UUID, &product.Name, &product.Description, &product.PriceFrom, &product.PriceTo, &product.Type, &product.FileID, &product.UserID, &product.CreatedAt, &product.UpdatedAt)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+	return product, nil
+}
+
 func (s *Store) GetProductByUUID(ctx context.Context, uuid uuid.UUID) (*models.Product, error) {
 	product := &models.Product{}
 	err := s.pool.QueryRow(

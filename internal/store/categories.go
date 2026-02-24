@@ -30,6 +30,19 @@ func (s *Store) GetAllCategories(ctx context.Context) ([]models.Category, error)
 	return categories, nil
 }
 
+func (s *Store) GetCategoryByName(ctx context.Context, name string) (*models.Category, error) {
+	category := &models.Category{}
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, uuid, name, created_at, updated_at FROM categories WHERE name = $1",
+		name,
+	).Scan(&category.ID, &category.UUID, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+	return category, nil
+}
+
 func (s *Store) GetCategoryByUUID(ctx context.Context, categoryUUID uuid.UUID) (*models.Category, error) {
 	category := &models.Category{}
 	err := s.pool.QueryRow(

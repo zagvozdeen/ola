@@ -57,30 +57,6 @@ const register = async (notify: Notify, payload: AuthRegisterRequest) => {
   )
 }
 
-const createGuestFeedback = async (notify: Notify, payload: CreateGuestFeedbackRequest) => {
-  return fetchJson<Feedback>(
-    '/api/guest/feedback',
-    {
-      method: 'POST',
-      headers: getJsonHeaders(),
-      body: JSON.stringify(payload),
-    },
-    { notify },
-  )
-}
-
-const createGuestOrder = async (notify: Notify, payload: CreateGuestOrderRequest) => {
-  return fetchJson<Order>(
-    '/api/guest/orders',
-    {
-      method: 'POST',
-      headers: getJsonHeaders(),
-      body: JSON.stringify(payload),
-    },
-    { notify },
-  )
-}
-
 const getProducts = async (notify: Notify) => {
   return fetchJson<Product[]>('/api/products', {
     headers: getAuthHeaders(),
@@ -383,8 +359,6 @@ export const useFetch = () => {
   return {
     login: (payload: AuthLoginRequest) => login(notify, payload),
     register: (payload: AuthRegisterRequest) => register(notify, payload),
-    createGuestFeedback: (payload: CreateGuestFeedbackRequest) => createGuestFeedback(notify, payload),
-    createGuestOrder: (payload: CreateGuestOrderRequest) => createGuestOrder(notify, payload),
     getProducts: () => getProducts(notify),
     getProduct: (uuid: string) => getProduct(notify, uuid),
     createProduct: (payload: CreateProductRequest) => createProduct(notify, payload),

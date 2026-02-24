@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"errors"
-	"net"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"sync"
@@ -13,49 +13,69 @@ import (
 	"github.com/go-playground/mold/v4/modifiers"
 	"github.com/go-playground/validator/v10"
 	"github.com/zagvozdeen/ola/internal/config"
+	"github.com/zagvozdeen/ola/internal/event_bus"
 	"github.com/zagvozdeen/ola/internal/logger"
+	"github.com/zagvozdeen/ola/internal/seeder"
 	"github.com/zagvozdeen/ola/internal/store"
+	"github.com/zagvozdeen/ola/internal/worker_pool"
 )
 
 type Service struct {
-	cfg       *config.Config
-	log       *logger.Logger
-	store     *store.Store
-	viteProxy *httputil.ReverseProxy
-	validate  *validator.Validate
-	conform   *mold.Transformer
+	cfg        *config.Config
+	log        *logger.Logger
+	store      *store.Store
+	viteProxy  *httputil.ReverseProxy
+	validate   *validator.Validate
+	conform    *mold.Transformer
+	workerPool *worker_pool.WorkerPool
+	eventBus   *event_bus.EventBus
 }
 
 func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
+	workerPool := worker_pool.New(log, 4, 100)
 	return &Service{
-		cfg:       cfg,
-		log:       log,
-		store:     store,
-		viteProxy: newViteProxy(log),
-		validate:  newValidator(log),
-		conform:   modifiers.New(),
+		cfg:        cfg,
+		log:        log,
+		store:      store,
+		viteProxy:  newViteProxy(log),
+		validate:   newValidator(log),
+		conform:    modifiers.New(),
+		workerPool: workerPool,
+		eventBus:   event_bus.New(workerPool),
 	}
 }
 
 func (s *Service) Run(ctx context.Context) {
+	addr := fmt.Sprintf("%s:%d", s.cfg.App.Host, s.cfg.App.Port)
 	server := &http.Server{
-		Addr:     net.JoinHostPort(s.cfg.APIHost, s.cfg.APIPort),
+		Addr:     addr,
 		Handler:  s.getRoutes(),
 		ErrorLog: s.log.GetLog(),
 	}
 
-	errCh := make(chan error, 1)
+	err := seeder.New(s.cfg, s.log, s.store).Run(ctx)
+	if err != nil {
+		s.log.Error("Failed to run seeder", err)
+		return
+	}
+
+	errCh := make(chan error, 2)
 	wg := &sync.WaitGroup{}
 	wg.Go(func() {
 		errCh <- server.ListenAndServe()
-		close(errCh)
 	})
-	s.log.Infof("Server started on %s", net.JoinHostPort(s.cfg.APIHost, s.cfg.APIPort))
+	wg.Go(func() {
+		errCh <- s.startBot(ctx)
+	})
+	wg.Go(func() {
+		s.workerPool.Run(ctx)
+	})
+	s.log.Infof("Server started on %s", addr)
 
 	select {
 	case <-ctx.Done():
 		s.log.Info("Context canceled")
-	case err := <-errCh:
+	case err = <-errCh:
 		if errors.Is(err, http.ErrServerClosed) {
 			s.log.Info("Server has been closed")
 			return
@@ -64,12 +84,13 @@ func (s *Service) Run(ctx context.Context) {
 		return
 	}
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	err := server.Shutdown(shutdownCtx)
+	err = server.Shutdown(shutdownCtx)
 	cancel()
 	if err != nil {
 		s.log.Error("Failed to shutdown server", err)
 	}
 	wg.Wait()
+	close(errCh)
 	s.log.Info("Service has been stopped")
 }
 
@@ -96,24 +117,24 @@ func (s *Service) getRoutes() *http.ServeMux {
 	mux.HandleFunc("POST /api/categories", s.auth(s.createCategory))
 	mux.HandleFunc("PATCH /api/categories/{uuid}", s.auth(s.updateCategory))
 	mux.HandleFunc("DELETE /api/categories/{uuid}", s.auth(s.deleteCategory))
-	mux.HandleFunc("GET /api/feedback", s.auth(s.getFeedback)) // for admin and moderator only
+	mux.HandleFunc("GET /api/feedback", s.auth(s.getFeedback))
 	mux.HandleFunc("GET /api/feedback/{uuid}", s.auth(s.getFeedbackByUUID))
 	mux.HandleFunc("PATCH /api/feedback/{uuid}/status", s.auth(s.updateFeedbackStatus))
-	mux.HandleFunc("POST /api/feedback", s.auth(s.createFeedback)) // for all
-	mux.HandleFunc("GET /api/reviews", s.auth(s.getReviews))       // for admin and moderator only
+	mux.HandleFunc("POST /api/feedback", s.auth(s.createFeedback))
+	mux.HandleFunc("GET /api/reviews", s.auth(s.getReviews))
 	mux.HandleFunc("GET /api/reviews/{uuid}", s.auth(s.getReview))
 	mux.HandleFunc("POST /api/reviews", s.auth(s.createReview))
 	mux.HandleFunc("PATCH /api/reviews/{uuid}", s.auth(s.updateReview))
 	mux.HandleFunc("DELETE /api/reviews/{uuid}", s.auth(s.deleteReview))
-	mux.HandleFunc("GET /api/orders", s.auth(s.getOrders)) // for admin and moderator only
+	mux.HandleFunc("GET /api/orders", s.auth(s.getOrders))
 	mux.HandleFunc("GET /api/orders/{uuid}", s.auth(s.getOrder))
 	mux.HandleFunc("PATCH /api/orders/{uuid}/status", s.auth(s.updateOrderStatus))
-	mux.HandleFunc("POST /api/orders", s.auth(s.createOrder)) // for all
+	mux.HandleFunc("POST /api/orders", s.auth(s.createOrder))
 	mux.HandleFunc("POST /api/orders/from-cart", s.auth(s.createOrderFromCart))
 	mux.HandleFunc("GET /api/cart", s.auth(s.getCart))
 	mux.HandleFunc("POST /api/cart/items", s.auth(s.upsertCartItem))
 	mux.HandleFunc("DELETE /api/cart/items/{product_uuid}", s.auth(s.deleteCartItem))
-	mux.HandleFunc("GET /api/users", s.auth(s.getUsers)) // for admin only
+	mux.HandleFunc("GET /api/users", s.auth(s.getUsers))
 	mux.HandleFunc("GET /api/users/{uuid}", s.auth(s.getUser))
 	mux.HandleFunc("PATCH /api/users/{uuid}/role", s.auth(s.updateUserRole))
 

@@ -17,7 +17,7 @@ type Logger struct {
 }
 
 func New(cfg *config.Config) *Logger {
-	if cfg.IsProduction {
+	if cfg.App.IsProduction {
 		file, err := os.OpenFile("ola.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			slog.Error("Failed to open log file", slog.Any("error", err))

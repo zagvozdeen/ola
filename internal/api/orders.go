@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"net/http"
@@ -19,8 +18,6 @@ type createOrderRequest struct {
 	Phone   string `json:"phone" mold:"trim" validate:"required,max=255,ru_phone"`
 	Content string `json:"content" mold:"trim" validate:"required,max=3000"`
 }
-
-const orderSourceHeader = "X-App-Source"
 
 func sourceFromAuthHeader(authorization string) enums.OrderSource {
 	if strings.HasPrefix(authorization, "tma ") {
@@ -67,25 +64,17 @@ func (s *Service) getOrder(r *http.Request, user *models.User) core.Response {
 }
 
 func (s *Service) createOrder(r *http.Request, user *models.User) core.Response {
-	req := &createOrderRequest{}
-	err := json.UnmarshalRead(r.Body, req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.conform.Struct(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.validate.StructCtx(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	req, res := core.Validate[createOrderRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
 	}
 
-	err = s.store.UpdateUserPhone(r.Context(), user.ID, req.Phone)
+	user.Phone = new(req.Phone)
+	user.UpdatedAt = time.Now()
+	err := s.store.UpdateUserPhone(r.Context(), user)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
 	}
-	user.Phone = &req.Phone
 
 	uid, err := uuid.NewV7()
 	if err != nil {
@@ -113,25 +102,17 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 }
 
 func (s *Service) createOrderFromCart(r *http.Request, user *models.User) core.Response {
-	req := &createOrderRequest{}
-	err := json.UnmarshalRead(r.Body, req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.conform.Struct(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
-	}
-	err = s.validate.StructCtx(r.Context(), req)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, err)
+	req, res := core.Validate[createOrderRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
 	}
 
-	err = s.store.UpdateUserPhone(r.Context(), user.ID, req.Phone)
+	user.Phone = new(req.Phone)
+	user.UpdatedAt = time.Now()
+	err := s.store.UpdateUserPhone(r.Context(), user)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
 	}
-	user.Phone = &req.Phone
 
 	order, err := s.store.CreateOrderFromUserCart(
 		r.Context(),
@@ -157,7 +138,6 @@ type createGuestOrderRequest struct {
 	Phone   string `json:"phone" mold:"trim" validate:"required,max=255,ru_phone"`
 	Content string `json:"content" mold:"trim" validate:"required,max=3000"`
 	Consent bool   `json:"consent" validate:"required"`
-	Source  string `json:"source" mold:"trim,lcase" validate:"omitempty,oneof=landing spa tma"`
 }
 
 func (s *Service) createGuestOrder(r *http.Request) core.Response {
@@ -166,31 +146,14 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 		return res
 	}
 
-	source := enums.OrderSourceLanding
-
-	if req.Source != "" {
-		parsedSource, err := enums.NewOrderSource(req.Source)
-		if err != nil {
-			return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order source: %w", err))
-		}
-		source = parsedSource
-	} else if headerSource := strings.TrimSpace(strings.ToLower(r.Header.Get(orderSourceHeader))); headerSource != "" {
-		parsedSource, err := enums.NewOrderSource(headerSource)
-		if err != nil {
-			return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order source header: %w", err))
-		}
-		source = parsedSource
-	}
-
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to generate uuid v7: %w", err))
 	}
-
 	order := &models.Order{
 		UUID:      uid,
 		Status:    enums.RequestStatusCreated,
-		Source:    source,
+		Source:    enums.OrderSourceLanding,
 		Name:      req.Name,
 		Phone:     req.Phone,
 		Content:   req.Content,
@@ -202,6 +165,8 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create guest order: %w", err))
 	}
+
+	s.eventBus.OrderCreated.Publish(r.Context(), order)
 
 	return core.JSON(http.StatusCreated, order)
 }

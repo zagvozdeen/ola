@@ -1,65 +1,73 @@
 package config
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
-	"strconv"
 
-	"github.com/joho/godotenv"
+	"github.com/google/uuid"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	AppSecret          string
-	IsProduction       bool
-	DBHost             string
-	DBPort             string
-	DBDatabase         string
-	DBUsername         string
-	DBPassword         string
-	DBDownMigrations   bool
-	APIHost            string
-	APIPort            string
-	TelegramBotToken   string
-	TelegramBotEnabled bool
-	TelegramBotGroup   int
-	RootUserName       string
-	RootUserPassword   string
-	NeuroAPI           string
-	NeuroToken         string
-	NeuroDebug         bool
+	App      AppConfig      `yaml:"app"`
+	DB       DBConfig       `yaml:"database"`
+	Telegram TelegramConfig `yaml:"telegram"`
+	Root     RootConfig     `yaml:"root"`
 }
 
-func New() *Config {
-	if err := godotenv.Load(); err != nil {
+type AppConfig struct {
+	Host         string `yaml:"host"`
+	Port         int    `yaml:"port"`
+	Secret       string `yaml:"secret"`
+	IsProduction bool   `yaml:"is_production"`
+	RunSeeder    bool   `yaml:"run_seeder"`
+}
+
+type DBConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Database string `yaml:"database"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
+type TelegramConfig struct {
+	BotToken   string `yaml:"bot_token"`
+	BotEnabled bool   `yaml:"bot_enabled"`
+	GroupID    int    `yaml:"group_id"`
+	MiniAppURL string `yaml:"mini_app_url"`
+}
+
+type RootConfig struct {
+	TID       int64     `yaml:"tid"`
+	UUID      uuid.UUID `yaml:"uuid"`
+	FirstName string    `yaml:"first_name"`
+	LastName  string    `yaml:"last_name"`
+	Username  string    `yaml:"username"`
+	Email     string    `yaml:"email"`
+	Phone     string    `yaml:"phone"`
+	Password  string    `yaml:"password"`
+}
+
+func New(path string) *Config {
+	cfg, err := newConfig(path)
+	if err != nil {
 		slog.Warn("Failed to load .env file", slog.Any("err", err))
+		os.Exit(1)
 	}
-	return &Config{
-		AppSecret:          os.Getenv("APP_SECRET"),
-		IsProduction:       os.Getenv("IS_PRODUCTION") == "true",
-		DBHost:             os.Getenv("DB_HOST"),
-		DBPort:             os.Getenv("DB_PORT"),
-		DBDatabase:         os.Getenv("DB_DATABASE"),
-		DBUsername:         os.Getenv("DB_USERNAME"),
-		DBPassword:         os.Getenv("DB_PASSWORD"),
-		DBDownMigrations:   false,
-		APIHost:            "127.0.0.1",
-		APIPort:            "8079",
-		TelegramBotToken:   os.Getenv("TG_BOT_TOKEN"),
-		TelegramBotEnabled: os.Getenv("TG_BOT_ENABLED") == "true",
-		TelegramBotGroup:   parseInt("TG_BOT_GROUP", 0),
-		RootUserName:       os.Getenv("ROOT_USER_NAME"),
-		RootUserPassword:   os.Getenv("ROOT_USER_PASSWORD"),
-		NeuroAPI:           os.Getenv("NEURO_API"),
-		NeuroToken:         os.Getenv("NEURO_TOKEN"),
-		NeuroDebug:         false,
-	}
+	return cfg
 }
 
-func parseInt(key string, fallback int) int {
-	if v, ok := os.LookupEnv(key); ok {
-		if i, err := strconv.Atoi(v); err == nil {
-			return i
-		}
+func newConfig(path string) (*Config, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config.yaml: %w", err)
 	}
-	return fallback
+	var cfg Config
+	err = yaml.Unmarshal(b, &cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal config.yaml: %w", err)
+	}
+	return &cfg, nil
 }

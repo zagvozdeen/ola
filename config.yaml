@@ -1,0 +1,29 @@
+app:
+  host: 127.0.0.1
+  port: 8079
+  secret: <SECRET>
+  is_production: false
+  run_seeder: true
+
+database:
+  host: 127.0.0.1
+  port: 5432
+  database: ola
+  username: ola
+  password: ola
+
+telegram:
+  bot_token: <TOKEN>
+  bot_enabled: true
+  group_id: <GROUP>
+  mini_app_url: <URL>
+
+root:
+  tid: <TID>
+  uuid: <UUID>
+  first_name: <NAME>
+  last_name: <SURNAME>
+  username: <USERNAME>
+  email: <EMAIL>
+  phone: <PHONE>
+  password: <PASSWORD>

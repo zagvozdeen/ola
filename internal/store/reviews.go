@@ -30,6 +30,19 @@ func (s *Store) GetAllReviews(ctx context.Context) ([]models.Review, error) {
 	return reviews, nil
 }
 
+func (s *Store) GetReviewByID(ctx context.Context, id int) (*models.Review, error) {
+	review := &models.Review{}
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, uuid, name, content, file_id, user_id, published_at, created_at, updated_at FROM reviews r WHERE id = $1",
+		id,
+	).Scan(&review.ID, &review.UUID, &review.Name, &review.Content, &review.FileID, &review.UserID, &review.PublishedAt, &review.CreatedAt, &review.UpdatedAt)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+	return review, nil
+}
+
 func (s *Store) GetReviewByUUID(ctx context.Context, uuid uuid.UUID) (*models.Review, error) {
 	review := &models.Review{}
 	fileContent := ""

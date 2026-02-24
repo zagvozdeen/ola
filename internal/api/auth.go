@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -50,7 +51,7 @@ func (s *Service) login(r *http.Request) core.Response {
 		ID:        strconv.Itoa(user.ID),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 365)),
 	})
-	token, err := t.SignedString([]byte(s.cfg.AppSecret))
+	token, err := t.SignedString([]byte(s.cfg.App.Secret))
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to sign auth token: %w", err))
 	}
@@ -110,69 +111,69 @@ func (s *Service) guest(fn core.GuestHandlerFunc) http.HandlerFunc {
 
 func (s *Service) auth(fn core.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, res := s.checkAuth(r, r.Header.Get("Authorization"))
+		req, user, res := s.checkAuth(r, r.Header.Get("Authorization"))
 		if res == nil {
-			res = fn(r, user)
+			res = fn(req, user)
 		}
 		res.Response(w, s.log)
 	}
 }
 
-func (s *Service) checkAuth(r *http.Request, token string) (*models.User, core.Response) {
+func (s *Service) checkAuth(r *http.Request, token string) (*http.Request, *models.User, core.Response) {
 	switch {
 	case strings.HasPrefix(token, "tma "):
 		return s.authTMA(r, token)
 	case strings.HasPrefix(token, "Bearer "):
 		return s.authBearer(r, token)
 	default:
-		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("missing authorization header"))
+		return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("missing authorization header"))
 	}
 }
 
-func (s *Service) authTMA(r *http.Request, token string) (*models.User, core.Response) {
+func (s *Service) authTMA(r *http.Request, token string) (*http.Request, *models.User, core.Response) {
 	token = strings.TrimPrefix(token, "tma ")
 	values, err := url.ParseQuery(token)
 	if err != nil {
-		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("failed to parse tma token: %w", err))
+		return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("failed to parse tma token: %w", err))
 	}
-	u, ok := bot.ValidateWebappRequest(values, s.cfg.TelegramBotToken)
+	u, ok := bot.ValidateWebappRequest(values, s.cfg.Telegram.BotToken)
 	if !ok {
-		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid tma token"))
+		return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid tma token"))
 	}
 	var user *models.User
 	user, err = s.store.GetUserByTID(r.Context(), u.ID)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
-			return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("tma user not found: %w", err))
+			return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("tma user not found: %w", err))
 		}
-		return nil, core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
+		return nil, nil, core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
 	}
-	return user, nil
+	return r.WithContext(context.WithValue(r.Context(), "source", enums.OrderSourceTMA)), user, nil
 }
 
-func (s *Service) authBearer(r *http.Request, token string) (*models.User, core.Response) {
+func (s *Service) authBearer(r *http.Request, token string) (*http.Request, *models.User, core.Response) {
 	token = strings.TrimPrefix(token, "Bearer ")
 	var claims jwt.RegisteredClaims
 	t, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (any, error) {
-		return []byte(s.cfg.AppSecret), nil
+		return []byte(s.cfg.App.Secret), nil
 	})
 	if err != nil {
-		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("failed to parse token: %w", err))
+		return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("failed to parse token: %w", err))
 	}
 	if !t.Valid {
-		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid token"))
+		return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid token"))
 	}
 	id, err := strconv.Atoi(claims.ID)
 	if err != nil {
-		return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid token: %w, id=%s", err, claims.ID))
+		return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("invalid token: %w, id=%s", err, claims.ID))
 	}
 	var user *models.User
 	user, err = s.store.GetUserByID(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
-			return nil, core.Err(http.StatusUnauthorized, fmt.Errorf("user not found: %w", err))
+			return nil, nil, core.Err(http.StatusUnauthorized, fmt.Errorf("user not found: %w", err))
 		}
-		return nil, core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
+		return nil, nil, core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load user: %w", err))
 	}
-	return user, nil
+	return r.WithContext(context.WithValue(r.Context(), "source", enums.OrderSourceSPA)), user, nil
 }

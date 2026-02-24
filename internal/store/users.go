@@ -84,11 +84,11 @@ func (s *Store) CreateUser(ctx context.Context, user *models.User) error {
 	return wrapDBError(err)
 }
 
-func (s *Store) UpdateUserPhone(ctx context.Context, userID int, phone string) error {
+func (s *Store) UpdateUserPhone(ctx context.Context, user *models.User) error {
 	_, err := s.pool.Exec(
 		ctx,
-		"UPDATE users SET phone = $1, updated_at = NOW() WHERE id = $2",
-		phone, userID,
+		"UPDATE users SET phone = $1, updated_at = $2 WHERE id = $3",
+		user.Phone, user.UpdatedAt, user.ID,
 	)
 	return wrapDBError(err)
 }
