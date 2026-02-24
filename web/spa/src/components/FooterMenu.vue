@@ -43,9 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
 import { computed } from 'vue'
-import { cart } from '@/composables/useState'
+import { useRoute } from 'vue-router'
+import { cart } from '@/composables/useAuthState'
 
 const route = useRoute()
 const items = computed(() => cart.product_ids.length)

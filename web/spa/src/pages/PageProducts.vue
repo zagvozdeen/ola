@@ -77,16 +77,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
-import { isUserModerator, onUserLoaded } from '@/composables/useState'
 import { useNotifications } from '@/composables/useNotifications'
 import { type Product, ProductTypeTranslates } from '@/types'
 import { NPopconfirm, NSpin } from 'naive-ui'
-import HeaderMenu from '@/components/HeaderMenu.vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const fetcher = useFetch()
 const notify = useNotifications()
 const products = ref<Product[]>([])
@@ -109,21 +106,19 @@ const handleDeleteProduct = (uuid: string) => {
     })
 }
 
-onUserLoaded((user) => {
-  if (isUserModerator(user)) {
-    fetcher
-      .getProducts()
-      .then(data => {
-        if (data.ok) {
-          products.value = data.data
-        }
-      })
-      .finally(() => {
-        isLoading.value = false
-      })
-  } else {
-    notify.error('У вас нет прав просматривать эту страницу!')
-    router.push({ name: 'main' })
+const initPage = async () => {
+  isLoading.value = true
+
+  const data = await fetcher.getProducts()
+
+  if (data.ok) {
+    products.value = data.data
   }
+
+  isLoading.value = false
+}
+
+onMounted(() => {
+  void initPage()
 })
 </script>

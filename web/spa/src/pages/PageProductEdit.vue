@@ -95,16 +95,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { type FormRules, type FormInst, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpin } from 'naive-ui'
+import HeaderMenu from '@/components/HeaderMenu.vue'
+import AppUploadFile from '@/components/AppUploadFile.vue'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type CreateProductRequest, ProductTypeOptions } from '@/types'
-import HeaderMenu from '@/components/HeaderMenu.vue'
-import AppUploadFile from '@/components/AppUploadFile.vue'
-import { isUserModerator, onUserLoaded } from '@/composables/useState'
+import { type FormInst, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpin, type FormRules } from 'naive-ui'
 
 const route = useRoute()
 const router = useRouter()
@@ -195,55 +194,53 @@ const onSubmit = () => {
         notify.info('Продукт создан')
         await router.push({ name: 'products' })
       }
-    } else {
-      const uuid = route.params['uuid']
-      if (typeof uuid !== 'string' || !uuid) {
-        notify.error('Некорректный ID продукта')
-        await router.push({ name: 'products' })
-        return
-      }
-      const data = await fetcher.updateProduct(uuid, payload)
-      if (data.ok) {
-        notify.info('Продукт обновлён')
-        await router.push({ name: 'products' })
-      }
+      return
+    }
+
+    const uuid = route.params['uuid']
+    if (typeof uuid !== 'string' || !uuid) {
+      notify.error('Некорректный ID продукта')
+      await router.push({ name: 'products' })
+      return
+    }
+
+    const data = await fetcher.updateProduct(uuid, payload)
+    if (data.ok) {
+      notify.info('Продукт обновлён')
+      await router.push({ name: 'products' })
     }
   })
 }
 
-onUserLoaded((user) => {
-  if (isUserModerator(user)) {
-    if (!isCreating) {
-      const uuid = route.params['uuid']
-      if (typeof uuid !== 'string' || !uuid) {
-        notify.error('Некорректный ID продукта')
-        router.push({ name: 'products' })
-        return
-      }
-
-      isLoading.value = true
-      fetcher
-        .getProduct(uuid)
-        .then(data => {
-          if (data.ok) {
-            form.name = data.data.name
-            form.description = data.data.description
-            form.price_from = data.data.price_from
-            form.price_to = data.data.price_to ?? null
-            form.type = data.data.type
-            form.file_id = data.data.file_id
-            form.file_content = data.data.file_content
-          }
-        })
-        .finally(() => {
-          isLoading.value = false
-        })
-    } else {
-      isLoading.value = false
-    }
-  } else {
-    notify.error('У вас нет прав просматривать эту страницу!')
-    router.push({ name: 'main' })
+onMounted(() => {
+  if (isCreating) {
+    isLoading.value = false
+    return
   }
+
+  const uuid = route.params['uuid']
+  if (typeof uuid !== 'string' || !uuid) {
+    notify.error('Некорректный ID продукта')
+    router.push({ name: 'products' })
+    isLoading.value = false
+    return
+  }
+
+  fetcher
+    .getProduct(uuid)
+    .then(data => {
+      if (data.ok) {
+        form.name = data.data.name
+        form.description = data.data.description
+        form.price_from = data.data.price_from
+        form.price_to = data.data.price_to ?? null
+        form.type = data.data.type
+        form.file_id = data.data.file_id
+        form.file_content = data.data.file_content
+      }
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
 })
 </script>

@@ -46,9 +46,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import FooterMenu from '@/components/FooterMenu.vue'
+import { cart } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
 import type { Product } from '@/types'
-import { cart } from '@/composables/useState'
 
 const fetcher = useFetch()
 const products = ref<Product[]>([])

@@ -1,16 +1,16 @@
 import '@/styles.css'
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { useState } from '@/composables/useState'
-import { getMe } from '@/composables/useFetch'
 import App from '@/App.vue'
-import MainPage from '@/pages/MainPage.vue'
-import PageLogin from '@/pages/PageLogin.vue'
-import PageRegister from '@/pages/PageRegister.vue'
+import { configureHttp } from '@/composables/httpCore'
+import { isUserModerator, useAuthState } from '@/composables/useAuthState'
 import PageCart from '@/pages/PageCart.vue'
-import PageSettings from '@/pages/PageSettings.vue'
-import PageProducts from '@/pages/PageProducts.vue'
+import PageLogin from '@/pages/PageLogin.vue'
+import MainPage from '@/pages/MainPage.vue'
 import PageProductEdit from '@/pages/PageProductEdit.vue'
+import PageProducts from '@/pages/PageProducts.vue'
+import PageRegister from '@/pages/PageRegister.vue'
+import PageSettings from '@/pages/PageSettings.vue'
 
 const router = createRouter({
   history: createWebHistory('/spa/'),
@@ -20,32 +20,55 @@ const router = createRouter({
     { path: '/register', name: 'register', component: PageRegister },
     { path: '/cart', name: 'cart', component: PageCart },
     { path: '/settings', name: 'settings', component: PageSettings },
-    { path: '/products', name: 'products', component: PageProducts },
-    { path: '/products/create', name: 'products.create', component: PageProductEdit },
-    { path: '/products/:uuid/edit', name: 'products.edit', component: PageProductEdit },
+    { path: '/products', name: 'products', component: PageProducts, meta: { requiresModerator: true } },
+    { path: '/products/create', name: 'products.create', component: PageProductEdit, meta: { requiresModerator: true } },
+    { path: '/products/:uuid/edit', name: 'products.edit', component: PageProductEdit, meta: { requiresModerator: true } },
   ],
 })
 
-const state = useState()
+const auth = useAuthState()
+auth.initAuthSource()
 
-router.beforeEach((to, _, next) => {
-  if (state.isTelegramEnv()) {
-    next()
-  } else if ((to.name !== 'login' && to.name !== 'register') && !state.isLoggedIn()) {
-    next({ name: 'login' })
-  } else if ((to.name === 'login' || to.name === 'register') && state.isLoggedIn()) {
-    next({ name: 'main' })
-  } else {
-    next()
-  }
+configureHttp({
+  getAuthorizationHeader: () => auth.authorizationHeader.value,
+  onUnauthorized: () => {
+    if (!auth.isTelegramEnv.value) {
+      auth.unsetToken()
+      location.reload()
+      return
+    }
+
+    auth.clearMe()
+  },
 })
 
-if (state.isLoggedIn() || state.isTelegramEnv()) {
-  getMe(state).then(data => {
-    if (data.ok) {
-      state.setMe(data.data)
+router.beforeEach(async (to) => {
+  const isAuthPage = to.name === 'login' || to.name === 'register'
+  const requiresModerator = Boolean(to.meta['requiresModerator'])
+
+  if (!isAuthPage && !auth.hasAuthCredentials.value) {
+    return { name: 'login' }
+  }
+
+  if (isAuthPage && auth.hasAuthCredentials.value) {
+    return { name: 'main' }
+  }
+
+  if (requiresModerator) {
+    await auth.ensureUserLoaded()
+
+    const user = auth.currentUser.value
+
+    if (!user || !isUserModerator(user)) {
+      return { name: 'main' }
     }
-  })
+  }
+
+  return true
+})
+
+if (auth.hasAuthCredentials.value) {
+  void auth.fetchMe()
 }
 
 createApp(App).use(router).mount('#app')

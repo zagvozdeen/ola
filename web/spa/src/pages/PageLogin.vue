@@ -62,16 +62,16 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import { reactive, useTemplateRef } from 'vue'
-import { useState } from '@/composables/useState'
+import { useRouter } from 'vue-router'
+import { useAuthState } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
 import { useSender } from '@/composables/useSender'
 import type { AuthLoginRequest } from '@/types'
-import { type FormRules, type FormInst, NForm, NFormItem, NButton, NInput } from 'naive-ui'
+import { type FormInst, NButton, NForm, NFormItem, NInput, type FormRules } from 'naive-ui'
 
 const router = useRouter()
-const state = useState()
+const auth = useAuthState()
 const fetcher = useFetch()
 const sender = useSender()
 const formRef = useTemplateRef<FormInst>('formRef')
@@ -98,14 +98,13 @@ const rules: FormRules = {
 
 const onSubmitForm = () => {
   sender.submit(formRef.value, async () => {
-    fetcher
-      .login(form)
-      .then(data => {
-        if (data.ok) {
-          state.setToken(data.data.token)
-          router.push({ name: 'main' })
-        }
-      })
+    const data = await fetcher.login(form)
+
+    if (data.ok) {
+      auth.setToken(data.data.token)
+      await auth.fetchMe()
+      await router.push({ name: 'main' })
+    }
   })
 }
 </script>

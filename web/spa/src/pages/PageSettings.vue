@@ -26,14 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import FooterMenu from '@/components/FooterMenu.vue'
-import { isUserModerator, onUserLoaded } from '@/composables/useState'
-import type { User } from '@/types'
+import { isUserModerator, useAuthState } from '@/composables/useAuthState'
 
-const me = ref<User>()
+const auth = useAuthState()
+const me = computed(() => auth.currentUser.value)
 
-onUserLoaded((user: User) => {
-  me.value = user
+onMounted(() => {
+  void auth.ensureUserLoaded()
 })
 </script>
