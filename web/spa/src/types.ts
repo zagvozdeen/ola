@@ -18,6 +18,12 @@ export enum OrderSource {
   Tma = 'tma',
 }
 
+export enum RequestStatus {
+  Created = 'created',
+  InProgress = 'in_progress',
+  Reviewed = 'reviewed',
+}
+
 export enum FeedbackType {
   ManagerContact = 'manager_contact',
   PartnershipOffer = 'partnership_offer',
@@ -29,9 +35,31 @@ export const ProductTypeTranslates: Record<ProductType, string> = {
   [ProductType.Service]: 'Услуга',
 }
 
+export const RequestStatusTranslates: Record<RequestStatus, string> = {
+  [RequestStatus.Created]: 'Создана',
+  [RequestStatus.InProgress]: 'В процессе',
+  [RequestStatus.Reviewed]: 'Рассмотрена',
+}
+
 export const ProductTypeOptions = Object.values(ProductType).map((key) => ({
   value: key,
   label: ProductTypeTranslates[key],
+}))
+
+export const RequestStatusOptions = Object.values(RequestStatus).map((key) => ({
+  value: key,
+  label: RequestStatusTranslates[key],
+}))
+
+export const UserRoleTranslates: Record<UserRole, string> = {
+  [UserRole.User]: 'Пользователь',
+  [UserRole.Moderator]: 'Модератор',
+  [UserRole.Admin]: 'Администратор',
+}
+
+export const UserRoleOptions = Object.values(UserRole).map((key) => ({
+  value: key,
+  label: UserRoleTranslates[key],
 }))
 
 export type User = {
@@ -101,6 +129,7 @@ export type Review = {
 export type Order = {
   id: number
   uuid: UUID
+  status: RequestStatus
   source: OrderSource
   name: string
   phone: string
@@ -113,6 +142,7 @@ export type Order = {
 export type Feedback = {
   id: number
   uuid: UUID
+  status: RequestStatus
   source: OrderSource
   type: FeedbackType
   name: string
@@ -166,6 +196,25 @@ export type CreateOrderRequest = {
   name: string
   phone: string
   content: string
+}
+
+export type UpdateRequestStatusRequest = {
+  status: RequestStatus | null
+}
+
+export type UpsertCategoryRequest = {
+  name: string | null
+}
+
+export type UpsertReviewRequest = {
+  name: string | null
+  content: string | null
+  file_id: number | null
+  published_at: DateTime | null
+}
+
+export type UpdateUserRoleRequest = {
+  role: UserRole | null
 }
 
 export type CreateGuestFeedbackRequest = {

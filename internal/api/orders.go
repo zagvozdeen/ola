@@ -43,6 +43,29 @@ func (s *Service) getOrders(r *http.Request, user *models.User) core.Response {
 	return core.JSON(http.StatusOK, orders)
 }
 
+func (s *Service) getOrder(r *http.Request, user *models.User) core.Response {
+	res := allowForModeratorOrAdmin(user)
+	if res != nil {
+		return res
+	}
+
+	uid, err := uuid.Parse(r.PathValue("uuid"))
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order uuid: %w", err))
+	}
+
+	order, err := s.store.GetOrderByUUID(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return core.Err(http.StatusNotFound, fmt.Errorf("order not found"))
+		}
+
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get order: %w", err))
+	}
+
+	return core.JSON(http.StatusOK, order)
+}
+
 func (s *Service) createOrder(r *http.Request, user *models.User) core.Response {
 	req := &createOrderRequest{}
 	err := json.UnmarshalRead(r.Body, req)
@@ -71,6 +94,7 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 
 	order := &models.Order{
 		UUID:      uid,
+		Status:    enums.RequestStatusCreated,
 		Source:    sourceFromAuthHeader(r.Header.Get("Authorization")),
 		Name:      req.Name,
 		Phone:     req.Phone,
@@ -165,6 +189,7 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 
 	order := &models.Order{
 		UUID:      uid,
+		Status:    enums.RequestStatusCreated,
 		Source:    source,
 		Name:      req.Name,
 		Phone:     req.Phone,
@@ -179,4 +204,50 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 	}
 
 	return core.JSON(http.StatusCreated, order)
+}
+
+type updateOrderStatusRequest struct {
+	Status string `json:"status" mold:"trim,lcase" validate:"required,oneof=created in_progress reviewed"`
+}
+
+func (s *Service) updateOrderStatus(r *http.Request, user *models.User) core.Response {
+	res := allowForModeratorOrAdmin(user)
+	if res != nil {
+		return res
+	}
+
+	uid, err := uuid.Parse(r.PathValue("uuid"))
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order uuid: %w", err))
+	}
+
+	req, res := core.Validate[updateOrderStatusRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
+	}
+
+	status, err := enums.NewRequestStatus(req.Status)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order status: %w", err))
+	}
+
+	order, err := s.store.GetOrderByUUID(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return core.Err(http.StatusNotFound, fmt.Errorf("order not found"))
+		}
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get order: %w", err))
+	}
+
+	err = s.store.UpdateOrderStatus(r.Context(), order.ID, status)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update order status: %w", err))
+	}
+
+	updated, err := s.store.GetOrderByUUID(r.Context(), uid)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated order: %w", err))
+	}
+
+	return core.JSON(http.StatusOK, updated)
 }

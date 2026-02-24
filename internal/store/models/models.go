@@ -82,28 +82,30 @@ type CartItem struct {
 }
 
 type Order struct {
-	ID        int               `json:"id"`
-	UUID      uuid.UUID         `json:"uuid"`
-	Source    enums.OrderSource `json:"source"`
-	Name      string            `json:"name"`
-	Phone     string            `json:"phone"`
-	Content   string            `json:"content"`
-	UserID    *int              `json:"user_id,omitempty"`
-	CreatedAt time.Time         `json:"created_at"`
-	UpdatedAt time.Time         `json:"updated_at"`
+	ID        int                 `json:"id"`
+	UUID      uuid.UUID           `json:"uuid"`
+	Status    enums.RequestStatus `json:"status"`
+	Source    enums.OrderSource   `json:"source"`
+	Name      string              `json:"name"`
+	Phone     string              `json:"phone"`
+	Content   string              `json:"content"`
+	UserID    *int                `json:"user_id,omitempty"`
+	CreatedAt time.Time           `json:"created_at"`
+	UpdatedAt time.Time           `json:"updated_at"`
 }
 
 type Feedback struct {
-	ID        int                `json:"id"`
-	UUID      uuid.UUID          `json:"uuid"`
-	Source    enums.OrderSource  `json:"source"`
-	Type      enums.FeedbackType `json:"type"`
-	Name      string             `json:"name"`
-	Phone     string             `json:"phone"`
-	Content   string             `json:"content"`
-	UserID    *int               `json:"user_id,omitempty"`
-	CreatedAt time.Time          `json:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at"`
+	ID        int                 `json:"id"`
+	UUID      uuid.UUID           `json:"uuid"`
+	Status    enums.RequestStatus `json:"status"`
+	Source    enums.OrderSource   `json:"source"`
+	Type      enums.FeedbackType  `json:"type"`
+	Name      string              `json:"name"`
+	Phone     string              `json:"phone"`
+	Content   string              `json:"content"`
+	UserID    *int                `json:"user_id,omitempty"`
+	CreatedAt time.Time           `json:"created_at"`
+	UpdatedAt time.Time           `json:"updated_at"`
 }
 
 type Category struct {

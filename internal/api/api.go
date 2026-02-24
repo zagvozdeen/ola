@@ -84,24 +84,38 @@ func (s *Service) getRoutes() *http.ServeMux {
 	mux.HandleFunc("POST /api/guest/feedback", s.guest(s.createGuestFeedback))
 	mux.HandleFunc("POST /api/guest/orders", s.guest(s.createGuestOrder))
 
-	mux.HandleFunc("GET /api/me", s.auth(s.getMe))                // for all
-	mux.HandleFunc("GET /api/products", s.auth(s.getProducts))    // for all
-	mux.HandleFunc("POST /api/products", s.auth(s.createProduct)) // for admin and moderator only
+	mux.HandleFunc("GET /api/me", s.auth(s.getMe))
+	mux.HandleFunc("GET /api/products", s.auth(s.getProducts))
+	mux.HandleFunc("POST /api/products", s.auth(s.createProduct))
 	mux.HandleFunc("GET /api/products/{uuid}", s.auth(s.getProduct))
 	mux.HandleFunc("PATCH /api/products/{uuid}", s.auth(s.updateProduct))
 	mux.HandleFunc("DELETE /api/products/{uuid}", s.auth(s.deleteProduct))
-	mux.HandleFunc("POST /api/files", s.auth(s.UploadFile))        // for admin and moderator only
-	mux.HandleFunc("GET /api/categories", s.auth(s.getCategories)) // for admin and moderator only
-	mux.HandleFunc("GET /api/feedback", s.auth(s.getFeedback))     // for admin and moderator only
+	mux.HandleFunc("POST /api/files", s.auth(s.UploadFile))
+	mux.HandleFunc("GET /api/categories", s.auth(s.getCategories))
+	mux.HandleFunc("GET /api/categories/{uuid}", s.auth(s.getCategory))
+	mux.HandleFunc("POST /api/categories", s.auth(s.createCategory))
+	mux.HandleFunc("PATCH /api/categories/{uuid}", s.auth(s.updateCategory))
+	mux.HandleFunc("DELETE /api/categories/{uuid}", s.auth(s.deleteCategory))
+	mux.HandleFunc("GET /api/feedback", s.auth(s.getFeedback)) // for admin and moderator only
+	mux.HandleFunc("GET /api/feedback/{uuid}", s.auth(s.getFeedbackByUUID))
+	mux.HandleFunc("PATCH /api/feedback/{uuid}/status", s.auth(s.updateFeedbackStatus))
 	mux.HandleFunc("POST /api/feedback", s.auth(s.createFeedback)) // for all
 	mux.HandleFunc("GET /api/reviews", s.auth(s.getReviews))       // for admin and moderator only
-	mux.HandleFunc("GET /api/orders", s.auth(s.getOrders))         // for admin and moderator only
-	mux.HandleFunc("POST /api/orders", s.auth(s.createOrder))      // for all
+	mux.HandleFunc("GET /api/reviews/{uuid}", s.auth(s.getReview))
+	mux.HandleFunc("POST /api/reviews", s.auth(s.createReview))
+	mux.HandleFunc("PATCH /api/reviews/{uuid}", s.auth(s.updateReview))
+	mux.HandleFunc("DELETE /api/reviews/{uuid}", s.auth(s.deleteReview))
+	mux.HandleFunc("GET /api/orders", s.auth(s.getOrders)) // for admin and moderator only
+	mux.HandleFunc("GET /api/orders/{uuid}", s.auth(s.getOrder))
+	mux.HandleFunc("PATCH /api/orders/{uuid}/status", s.auth(s.updateOrderStatus))
+	mux.HandleFunc("POST /api/orders", s.auth(s.createOrder)) // for all
 	mux.HandleFunc("POST /api/orders/from-cart", s.auth(s.createOrderFromCart))
 	mux.HandleFunc("GET /api/cart", s.auth(s.getCart))
 	mux.HandleFunc("POST /api/cart/items", s.auth(s.upsertCartItem))
 	mux.HandleFunc("DELETE /api/cart/items/{product_uuid}", s.auth(s.deleteCartItem))
 	mux.HandleFunc("GET /api/users", s.auth(s.getUsers)) // for admin only
+	mux.HandleFunc("GET /api/users/{uuid}", s.auth(s.getUser))
+	mux.HandleFunc("PATCH /api/users/{uuid}/role", s.auth(s.updateUserRole))
 
 	return mux
 }

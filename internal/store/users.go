@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
@@ -47,6 +49,19 @@ func (s *Store) GetUserByTID(ctx context.Context, tid int64) (*models.User, erro
 	return user, nil
 }
 
+func (s *Store) GetUserByUUID(ctx context.Context, userUUID uuid.UUID) (*models.User, error) {
+	user := &models.User{}
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, tid, uuid, first_name, last_name, username, email, phone, password, role, created_at, updated_at FROM users WHERE uuid = $1",
+		userUUID,
+	).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Phone, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+	return user, nil
+}
+
 func (s *Store) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	user := &models.User{}
 	err := s.pool.QueryRow(
@@ -76,4 +91,28 @@ func (s *Store) UpdateUserPhone(ctx context.Context, userID int, phone string) e
 		phone, userID,
 	)
 	return wrapDBError(err)
+}
+
+func (s *Store) UpdateUserRole(ctx context.Context, userID int, role enums.UserRole) error {
+	tag, err := s.pool.Exec(
+		ctx,
+		"UPDATE users SET role = $1, updated_at = NOW() WHERE id = $2",
+		role, userID,
+	)
+	if err != nil {
+		return wrapDBError(err)
+	}
+	if tag.RowsAffected() == 0 {
+		return models.ErrNotFound
+	}
+	return nil
+}
+
+func (s *Store) CountUsersByRole(ctx context.Context, role enums.UserRole) (int, error) {
+	var count int
+	err := s.pool.QueryRow(ctx, "SELECT COUNT(*) FROM users WHERE role = $1", role).Scan(&count)
+	if err != nil {
+		return 0, wrapDBError(err)
+	}
+	return count, nil
 }

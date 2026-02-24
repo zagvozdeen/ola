@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Store) GetAllOrders(ctx context.Context) ([]models.Order, error) {
-	rows, err := s.pool.Query(ctx, "SELECT id, uuid, source, name, phone, content, user_id, created_at, updated_at FROM orders ORDER BY created_at DESC")
+	rows, err := s.pool.Query(ctx, "SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders ORDER BY created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -19,7 +19,7 @@ func (s *Store) GetAllOrders(ctx context.Context) ([]models.Order, error) {
 	orders := make([]models.Order, 0)
 	for rows.Next() {
 		order := models.Order{}
-		err = rows.Scan(&order.ID, &order.UUID, &order.Source, &order.Name, &order.Phone, &order.Content, &order.UserID, &order.CreatedAt, &order.UpdatedAt)
+		err = rows.Scan(&order.ID, &order.UUID, &order.Status, &order.Source, &order.Name, &order.Phone, &order.Content, &order.UserID, &order.CreatedAt, &order.UpdatedAt)
 		if err != nil {
 			return nil, wrapDBError(err)
 		}
@@ -32,13 +32,40 @@ func (s *Store) GetAllOrders(ctx context.Context) ([]models.Order, error) {
 	return orders, nil
 }
 
+func (s *Store) GetOrderByUUID(ctx context.Context, orderUUID uuid.UUID) (*models.Order, error) {
+	order := &models.Order{}
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders WHERE uuid = $1",
+		orderUUID,
+	).Scan(
+		&order.ID, &order.UUID, &order.Status, &order.Source, &order.Name, &order.Phone, &order.Content, &order.UserID, &order.CreatedAt, &order.UpdatedAt,
+	)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+
+	return order, nil
+}
+
 func (s *Store) CreateOrder(ctx context.Context, order *models.Order) error {
 	err := s.pool.QueryRow(
 		ctx,
-		"INSERT INTO orders (uuid, source, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-		order.UUID, order.Source, order.Name, order.Phone, order.Content, order.UserID, order.CreatedAt, order.UpdatedAt,
+		"INSERT INTO orders (uuid, status, source, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+		order.UUID, order.Status, order.Source, order.Name, order.Phone, order.Content, order.UserID, order.CreatedAt, order.UpdatedAt,
 	).Scan(&order.ID)
 	return wrapDBError(err)
+}
+
+func (s *Store) UpdateOrderStatus(ctx context.Context, orderID int, status enums.RequestStatus) error {
+	tag, err := s.pool.Exec(ctx, "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", status, orderID)
+	if err != nil {
+		return wrapDBError(err)
+	}
+	if tag.RowsAffected() == 0 {
+		return models.ErrNotFound
+	}
+	return nil
 }
 
 func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source enums.OrderSource, name, phone, content string) (*models.Order, error) {
@@ -63,6 +90,7 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 	now := time.Now()
 	order := &models.Order{
 		UUID:      uid,
+		Status:    enums.RequestStatusCreated,
 		Source:    source,
 		Name:      name,
 		Phone:     phone,
@@ -74,8 +102,8 @@ func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source 
 
 	err = tx.QueryRow(
 		ctx,
-		"INSERT INTO orders (uuid, source, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-		order.UUID, order.Source, order.Name, order.Phone, order.Content, order.UserID, order.CreatedAt, order.UpdatedAt,
+		"INSERT INTO orders (uuid, status, source, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+		order.UUID, order.Status, order.Source, order.Name, order.Phone, order.Content, order.UserID, order.CreatedAt, order.UpdatedAt,
 	).Scan(&order.ID)
 	if err != nil {
 		return nil, wrapDBError(err)

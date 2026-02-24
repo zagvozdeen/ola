@@ -23,6 +23,10 @@ import type {
   Product,
   Review,
   UpdateProductRequest,
+  UpdateRequestStatusRequest,
+  UpdateUserRoleRequest,
+  UpsertCategoryRequest,
+  UpsertReviewRequest,
   User,
 } from '@/types'
 
@@ -145,10 +149,69 @@ const getCategories = async (notify: Notify) => {
   }, { notify })
 }
 
+const getCategory = async (notify: Notify, uuid: string) => {
+  return fetchJson<Category>(`/api/categories/${uuid}`, {
+    headers: getAuthHeaders(),
+  }, { notify })
+}
+
+const createCategory = async (notify: Notify, payload: UpsertCategoryRequest) => {
+  return fetchJson<Category>(
+    '/api/categories',
+    {
+      method: 'POST',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
+}
+
+const updateCategory = async (notify: Notify, uuid: string, payload: UpsertCategoryRequest) => {
+  return fetchJson<Category>(
+    `/api/categories/${uuid}`,
+    {
+      method: 'PATCH',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
+}
+
+const deleteCategory = async (notify: Notify, uuid: string) => {
+  return fetchJson<null>(
+    `/api/categories/${uuid}`,
+    {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    },
+    { notify },
+  )
+}
+
 const getFeedback = async (notify: Notify) => {
   return fetchJson<Feedback[]>('/api/feedback', {
     headers: getAuthHeaders(),
   }, { notify })
+}
+
+const getFeedbackItem = async (notify: Notify, uuid: string) => {
+  return fetchJson<Feedback>(`/api/feedback/${uuid}`, {
+    headers: getAuthHeaders(),
+  }, { notify })
+}
+
+const updateFeedbackStatus = async (notify: Notify, uuid: string, payload: UpdateRequestStatusRequest) => {
+  return fetchJson<Feedback>(
+    `/api/feedback/${uuid}/status`,
+    {
+      method: 'PATCH',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
 }
 
 const createFeedback = async (notify: Notify, payload: CreateFeedbackRequest) => {
@@ -169,10 +232,69 @@ const getReviews = async (notify: Notify) => {
   }, { notify })
 }
 
+const getReview = async (notify: Notify, uuid: string) => {
+  return fetchJson<Review>(`/api/reviews/${uuid}`, {
+    headers: getAuthHeaders(),
+  }, { notify })
+}
+
+const createReview = async (notify: Notify, payload: UpsertReviewRequest) => {
+  return fetchJson<Review>(
+    '/api/reviews',
+    {
+      method: 'POST',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
+}
+
+const updateReview = async (notify: Notify, uuid: string, payload: UpsertReviewRequest) => {
+  return fetchJson<Review>(
+    `/api/reviews/${uuid}`,
+    {
+      method: 'PATCH',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
+}
+
+const deleteReview = async (notify: Notify, uuid: string) => {
+  return fetchJson<null>(
+    `/api/reviews/${uuid}`,
+    {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    },
+    { notify },
+  )
+}
+
 const getOrders = async (notify: Notify) => {
   return fetchJson<Order[]>('/api/orders', {
     headers: getAuthHeaders(),
   }, { notify })
+}
+
+const getOrder = async (notify: Notify, uuid: string) => {
+  return fetchJson<Order>(`/api/orders/${uuid}`, {
+    headers: getAuthHeaders(),
+  }, { notify })
+}
+
+const updateOrderStatus = async (notify: Notify, uuid: string, payload: UpdateRequestStatusRequest) => {
+  return fetchJson<Order>(
+    `/api/orders/${uuid}/status`,
+    {
+      method: 'PATCH',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
 }
 
 const getCart = async (notify: Notify) => {
@@ -237,6 +359,24 @@ const getUsers = async (notify: Notify) => {
   }, { notify })
 }
 
+const getUser = async (notify: Notify, uuid: string) => {
+  return fetchJson<User>(`/api/users/${uuid}`, {
+    headers: getAuthHeaders(),
+  }, { notify })
+}
+
+const updateUserRole = async (notify: Notify, uuid: string, payload: UpdateUserRoleRequest) => {
+  return fetchJson<User>(
+    `/api/users/${uuid}/role`,
+    {
+      method: 'PATCH',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
+}
+
 export const useFetch = () => {
   const notify = useNotifications()
 
@@ -252,15 +392,29 @@ export const useFetch = () => {
     deleteProduct: (uuid: string) => deleteProduct(notify, uuid),
     uploadFile: (file: globalThis.File) => uploadFile(notify, file),
     getCategories: () => getCategories(notify),
+    getCategory: (uuid: string) => getCategory(notify, uuid),
+    createCategory: (payload: UpsertCategoryRequest) => createCategory(notify, payload),
+    updateCategory: (uuid: string, payload: UpsertCategoryRequest) => updateCategory(notify, uuid, payload),
+    deleteCategory: (uuid: string) => deleteCategory(notify, uuid),
     getFeedback: () => getFeedback(notify),
+    getFeedbackItem: (uuid: string) => getFeedbackItem(notify, uuid),
+    updateFeedbackStatus: (uuid: string, payload: UpdateRequestStatusRequest) => updateFeedbackStatus(notify, uuid, payload),
     createFeedback: (payload: CreateFeedbackRequest) => createFeedback(notify, payload),
     getReviews: () => getReviews(notify),
+    getReview: (uuid: string) => getReview(notify, uuid),
+    createReview: (payload: UpsertReviewRequest) => createReview(notify, payload),
+    updateReview: (uuid: string, payload: UpsertReviewRequest) => updateReview(notify, uuid, payload),
+    deleteReview: (uuid: string) => deleteReview(notify, uuid),
     getOrders: () => getOrders(notify),
+    getOrder: (uuid: string) => getOrder(notify, uuid),
+    updateOrderStatus: (uuid: string, payload: UpdateRequestStatusRequest) => updateOrderStatus(notify, uuid, payload),
     getCart: () => getCart(notify),
     upsertCartItem: (productID: number, qty: number) => upsertCartItem(notify, productID, qty),
     deleteCartItem: (productUUID: string) => deleteCartItem(notify, productUUID),
     createOrder: (payload: CreateOrderRequest) => createOrder(notify, payload),
     createOrderFromCart: (payload: CreateOrderRequest) => createOrderFromCart(notify, payload),
     getUsers: () => getUsers(notify),
+    getUser: (uuid: string) => getUser(notify, uuid),
+    updateUserRole: (uuid: string, payload: UpdateUserRoleRequest) => updateUserRole(notify, uuid, payload),
   }
 }

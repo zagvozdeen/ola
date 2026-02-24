@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS categories
 
 CREATE TYPE product_type AS ENUM ('product', 'service');
 CREATE TYPE order_source AS ENUM ('landing', 'spa', 'tma');
+CREATE TYPE request_status AS ENUM ('created', 'in_progress', 'reviewed');
 
 CREATE TABLE IF NOT EXISTS products
 (
@@ -99,6 +100,7 @@ CREATE TABLE IF NOT EXISTS orders
 (
     id         SERIAL PRIMARY KEY,
     uuid       UUID                          NOT NULL UNIQUE,
+    status     request_status                NOT NULL,
     source     order_source                  NOT NULL,
     name       VARCHAR(255)                  NOT NULL,
     phone      VARCHAR(255)                  NOT NULL,
@@ -123,6 +125,7 @@ CREATE TABLE IF NOT EXISTS feedback
 (
     id         SERIAL PRIMARY KEY,
     uuid       UUID                          NOT NULL UNIQUE,
+    status     request_status                NOT NULL,
     source     order_source                  NOT NULL,
     type       VARCHAR(64)                   NOT NULL,
     name       VARCHAR(255)                  NOT NULL,
@@ -219,6 +222,7 @@ DROP TABLE IF EXISTS category_product;
 DROP TABLE IF EXISTS products;
 DROP TYPE IF EXISTS product_type;
 DROP TYPE IF EXISTS order_source;
+DROP TYPE IF EXISTS request_status;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS files;
 DROP TABLE IF EXISTS users;

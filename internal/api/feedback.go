@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json/v2"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -29,6 +30,28 @@ func (s *Service) getFeedback(r *http.Request, user *models.User) core.Response 
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get feedback: %w", err))
 	}
+	return core.JSON(http.StatusOK, feedback)
+}
+
+func (s *Service) getFeedbackByUUID(r *http.Request, user *models.User) core.Response {
+	res := allowForModeratorOrAdmin(user)
+	if res != nil {
+		return res
+	}
+
+	uid, err := uuid.Parse(r.PathValue("uuid"))
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback uuid: %w", err))
+	}
+
+	feedback, err := s.store.GetFeedbackByUUID(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return core.Err(http.StatusNotFound, fmt.Errorf("feedback not found"))
+		}
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get feedback: %w", err))
+	}
+
 	return core.JSON(http.StatusOK, feedback)
 }
 
@@ -64,6 +87,7 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 	}
 	feedback := &models.Feedback{
 		UUID:      uid,
+		Status:    enums.RequestStatusCreated,
 		Source:    sourceFromAuthHeader(r.Header.Get("Authorization")),
 		Type:      feedbackType,
 		Name:      req.Name,
@@ -100,6 +124,7 @@ func (s *Service) createGuestFeedback(r *http.Request) core.Response {
 	}
 	feedback := &models.Feedback{
 		UUID:      uid,
+		Status:    enums.RequestStatusCreated,
 		Source:    enums.OrderSourceLanding,
 		Type:      enums.FeedbackTypeFeedbackRequest,
 		Name:      req.Name,
@@ -114,4 +139,50 @@ func (s *Service) createGuestFeedback(r *http.Request) core.Response {
 	}
 
 	return core.JSON(http.StatusCreated, feedback)
+}
+
+type updateFeedbackStatusRequest struct {
+	Status string `json:"status" mold:"trim,lcase" validate:"required,oneof=created in_progress reviewed"`
+}
+
+func (s *Service) updateFeedbackStatus(r *http.Request, user *models.User) core.Response {
+	res := allowForModeratorOrAdmin(user)
+	if res != nil {
+		return res
+	}
+
+	uid, err := uuid.Parse(r.PathValue("uuid"))
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback uuid: %w", err))
+	}
+
+	req, res := core.Validate[updateFeedbackStatusRequest](r, s.conform, s.validate)
+	if res != nil {
+		return res
+	}
+
+	status, err := enums.NewRequestStatus(req.Status)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback status: %w", err))
+	}
+
+	feedback, err := s.store.GetFeedbackByUUID(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return core.Err(http.StatusNotFound, fmt.Errorf("feedback not found"))
+		}
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get feedback: %w", err))
+	}
+
+	err = s.store.UpdateFeedbackStatus(r.Context(), feedback.ID, status)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update feedback status: %w", err))
+	}
+
+	updated, err := s.store.GetFeedbackByUUID(r.Context(), uid)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated feedback: %w", err))
+	}
+
+	return core.JSON(http.StatusOK, updated)
 }

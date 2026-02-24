@@ -3,11 +3,13 @@ package store
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
 func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
-	rows, err := s.pool.Query(ctx, "SELECT id, uuid, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback ORDER BY created_at DESC")
+	rows, err := s.pool.Query(ctx, "SELECT id, uuid, status, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback ORDER BY created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -16,7 +18,7 @@ func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
 	feedbacks := make([]models.Feedback, 0)
 	for rows.Next() {
 		var feedback models.Feedback
-		err = rows.Scan(&feedback.ID, &feedback.UUID, &feedback.Source, &feedback.Type, &feedback.Name, &feedback.Phone, &feedback.Content, &feedback.UserID, &feedback.CreatedAt, &feedback.UpdatedAt)
+		err = rows.Scan(&feedback.ID, &feedback.UUID, &feedback.Status, &feedback.Source, &feedback.Type, &feedback.Name, &feedback.Phone, &feedback.Content, &feedback.UserID, &feedback.CreatedAt, &feedback.UpdatedAt)
 		if err != nil {
 			return nil, wrapDBError(err)
 		}
@@ -29,11 +31,38 @@ func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
 	return feedbacks, nil
 }
 
+func (s *Store) GetFeedbackByUUID(ctx context.Context, feedbackUUID uuid.UUID) (*models.Feedback, error) {
+	feedback := &models.Feedback{}
+	err := s.pool.QueryRow(
+		ctx,
+		"SELECT id, uuid, status, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback WHERE uuid = $1",
+		feedbackUUID,
+	).Scan(
+		&feedback.ID, &feedback.UUID, &feedback.Status, &feedback.Source, &feedback.Type, &feedback.Name, &feedback.Phone, &feedback.Content, &feedback.UserID, &feedback.CreatedAt, &feedback.UpdatedAt,
+	)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+
+	return feedback, nil
+}
+
 func (s *Store) CreateFeedback(ctx context.Context, feedback *models.Feedback) error {
 	err := s.pool.QueryRow(
 		ctx,
-		"INSERT INTO feedback (uuid, source, type, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
-		feedback.UUID, feedback.Source, feedback.Type, feedback.Name, feedback.Phone, feedback.Content, feedback.UserID, feedback.CreatedAt, feedback.UpdatedAt,
+		"INSERT INTO feedback (uuid, status, source, type, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
+		feedback.UUID, feedback.Status, feedback.Source, feedback.Type, feedback.Name, feedback.Phone, feedback.Content, feedback.UserID, feedback.CreatedAt, feedback.UpdatedAt,
 	).Scan(&feedback.ID)
 	return wrapDBError(err)
+}
+
+func (s *Store) UpdateFeedbackStatus(ctx context.Context, feedbackID int, status enums.RequestStatus) error {
+	tag, err := s.pool.Exec(ctx, "UPDATE feedback SET status = $1, updated_at = NOW() WHERE id = $2", status, feedbackID)
+	if err != nil {
+		return wrapDBError(err)
+	}
+	if tag.RowsAffected() == 0 {
+		return models.ErrNotFound
+	}
+	return nil
 }
