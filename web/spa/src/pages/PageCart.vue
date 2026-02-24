@@ -113,9 +113,7 @@
               v-maska
               class="w-full"
               placeholder="+7 (___) ___-__-__"
-              :input-props="{
-                'data-maska': '+7 (###) ###-##-##',
-              }"
+              :input-props="phoneInputProps"
             />
           </n-form-item>
 
@@ -148,16 +146,13 @@
 </template>
 
 <script setup lang="ts">
-// import IMask from 'imask'
 import {
   computed,
-  nextTick,
-  onBeforeUnmount,
   onMounted,
   reactive,
   ref,
+  type InputHTMLAttributes,
   useTemplateRef,
-  watch,
 } from 'vue'
 import FooterMenu from '@/components/FooterMenu.vue'
 import { cart, useAuthState } from '@/composables/useAuthState'
@@ -174,11 +169,10 @@ const notify = useNotifications()
 const sender = useSender()
 
 const formRef = useTemplateRef<FormInst>('formRef')
-// const phoneInputWrapperRef = ref<HTMLDivElement | null>(null)
 const isLoading = ref(true)
 const updatingProductID = ref<number | null>(null)
 const isOrdering = ref(false)
-// let phoneMask: ReturnType<typeof IMask> | null = null
+const phoneInputProps = { 'data-maska': '+7 (###) ###-##-##' } as unknown as InputHTMLAttributes
 
 const form = reactive<CreateOrderRequest>({
   name: '',
@@ -302,43 +296,6 @@ const onSubmitOrder = () => {
     }
   })
 }
-
-// const initPhoneMask = () => {
-//   if (phoneMask || !phoneInputWrapperRef.value) {
-//     return
-//   }
-//
-//   const phoneInput = phoneInputWrapperRef.value.querySelector('input')
-//   if (!(phoneInput instanceof HTMLInputElement)) {
-//     return
-//   }
-//
-//   phoneMask = IMask(phoneInput, {
-//     mask: '+{7} (000) 000-00-00',
-//   })
-// }
-
-// const destroyPhoneMask = () => {
-//   phoneMask?.destroy()
-//   phoneMask = null
-// }
-
-// watch(
-//   () => !isLoading.value && cart.items.length > 0,
-//   async (isOrderFormVisible) => {
-//     if (isOrderFormVisible) {
-//       await nextTick()
-//       initPhoneMask()
-//       return
-//     }
-//
-//     destroyPhoneMask()
-//   },
-// )
-
-// onBeforeUnmount(() => {
-//   destroyPhoneMask()
-// })
 
 onMounted(async () => {
   await auth.ensureUserLoaded()
