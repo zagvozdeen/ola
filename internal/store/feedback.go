@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
-	rows, err := s.pool.Query(ctx, "SELECT id, uuid, name, phone, content, user_id, created_at, updated_at FROM feedback ORDER BY created_at DESC")
+	rows, err := s.pool.Query(ctx, "SELECT id, uuid, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback ORDER BY created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -16,7 +16,7 @@ func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
 	feedbacks := make([]models.Feedback, 0)
 	for rows.Next() {
 		var feedback models.Feedback
-		err = rows.Scan(&feedback.ID, &feedback.UUID, &feedback.Name, &feedback.Phone, &feedback.Content, &feedback.UserID, &feedback.CreatedAt, &feedback.UpdatedAt)
+		err = rows.Scan(&feedback.ID, &feedback.UUID, &feedback.Source, &feedback.Type, &feedback.Name, &feedback.Phone, &feedback.Content, &feedback.UserID, &feedback.CreatedAt, &feedback.UpdatedAt)
 		if err != nil {
 			return nil, wrapDBError(err)
 		}
@@ -32,8 +32,8 @@ func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
 func (s *Store) CreateFeedback(ctx context.Context, feedback *models.Feedback) error {
 	err := s.pool.QueryRow(
 		ctx,
-		"INSERT INTO feedback (uuid, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-		feedback.UUID, feedback.Name, feedback.Phone, feedback.Content, feedback.UserID, feedback.CreatedAt, feedback.UpdatedAt,
+		"INSERT INTO feedback (uuid, source, type, name, phone, content, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+		feedback.UUID, feedback.Source, feedback.Type, feedback.Name, feedback.Phone, feedback.Content, feedback.UserID, feedback.CreatedAt, feedback.UpdatedAt,
 	).Scan(&feedback.ID)
 	return wrapDBError(err)
 }

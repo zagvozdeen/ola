@@ -58,6 +58,12 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 		return core.Err(http.StatusBadRequest, err)
 	}
 
+	err = s.store.UpdateUserPhone(r.Context(), user.ID, req.Phone)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
+	}
+	user.Phone = &req.Phone
+
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to generate uuid v7: %w", err))
@@ -96,6 +102,12 @@ func (s *Service) createOrderFromCart(r *http.Request, user *models.User) core.R
 	if err != nil {
 		return core.Err(http.StatusBadRequest, err)
 	}
+
+	err = s.store.UpdateUserPhone(r.Context(), user.ID, req.Phone)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
+	}
+	user.Phone = &req.Phone
 
 	order, err := s.store.CreateOrderFromUserCart(
 		r.Context(),

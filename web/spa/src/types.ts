@@ -18,6 +18,12 @@ export enum OrderSource {
   Tma = 'tma',
 }
 
+export enum FeedbackType {
+  ManagerContact = 'manager_contact',
+  PartnershipOffer = 'partnership_offer',
+  FeedbackRequest = 'feedback_request',
+}
+
 export const ProductTypeTranslates: Record<ProductType, string> = {
   [ProductType.Product]: 'Товар',
   [ProductType.Service]: 'Услуга',
@@ -36,6 +42,7 @@ export type User = {
   last_name?: string
   username?: string
   email?: string
+  phone?: string
   role: UserRole
   created_at: DateTime
   updated_at: DateTime
@@ -106,6 +113,8 @@ export type Order = {
 export type Feedback = {
   id: number
   uuid: UUID
+  source: OrderSource
+  type: FeedbackType
   name: string
   phone: string
   content: string
@@ -150,6 +159,7 @@ export type CreateFeedbackRequest = {
   name: string
   phone: string
   content: string
+  type: FeedbackType
 }
 
 export type CreateOrderRequest = {

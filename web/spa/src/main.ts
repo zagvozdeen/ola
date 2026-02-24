@@ -5,6 +5,7 @@ import App from '@/App.vue'
 import { configureHttp } from '@/composables/httpCore'
 import { isUserModerator, useAuthState } from '@/composables/useAuthState'
 import PageCart from '@/pages/PageCart.vue'
+import PageFeedbackForm from '@/pages/PageFeedbackForm.vue'
 import PageLogin from '@/pages/PageLogin.vue'
 import PageMain from '@/pages/PageMain.vue'
 import PageProductEdit from '@/pages/PageProductEdit.vue'
@@ -20,6 +21,9 @@ const router = createRouter({
     { path: '/register', name: 'register', component: PageRegister },
     { path: '/cart', name: 'cart', component: PageCart },
     { path: '/settings', name: 'settings', component: PageSettings },
+    { path: '/settings/manager', name: 'settings.manager', component: PageFeedbackForm },
+    { path: '/settings/feedback', name: 'settings.feedback', component: PageFeedbackForm },
+    { path: '/settings/partnership', name: 'settings.partnership', component: PageFeedbackForm },
     { path: '/products', name: 'products', component: PageProducts, meta: { requiresModerator: true } },
     { path: '/products/create', name: 'products.create', component: PageProductEdit, meta: { requiresModerator: true } },
     { path: '/products/:uuid/edit', name: 'products.edit', component: PageProductEdit, meta: { requiresModerator: true } },

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users
     last_name  VARCHAR(255) NULL,
     username   VARCHAR(255) NULL,
     email      VARCHAR(256) NULL,
+    phone      VARCHAR(255) NULL,
     password   VARCHAR(256) NULL,
     role       user_role    NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL,
@@ -122,6 +123,8 @@ CREATE TABLE IF NOT EXISTS feedback
 (
     id         SERIAL PRIMARY KEY,
     uuid       UUID                          NOT NULL UNIQUE,
+    source     order_source                  NOT NULL,
+    type       VARCHAR(64)                   NOT NULL,
     name       VARCHAR(255)                  NOT NULL,
     phone      VARCHAR(255)                  NOT NULL,
     content    TEXT                          NOT NULL,

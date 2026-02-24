@@ -15,6 +15,7 @@ type User struct {
 	LastName  *string        `json:"last_name"`
 	Username  *string        `json:"username"`
 	Email     *string        `json:"email"`
+	Phone     *string        `json:"phone"`
 	Password  *string        `json:"-"`
 	Role      enums.UserRole `json:"role"`
 	CreatedAt time.Time      `json:"created_at"`
@@ -93,14 +94,16 @@ type Order struct {
 }
 
 type Feedback struct {
-	ID        int       `json:"id"`
-	UUID      uuid.UUID `json:"uuid"`
-	Name      string    `json:"name"`
-	Phone     string    `json:"phone"`
-	Content   string    `json:"content"`
-	UserID    *int      `json:"user_id,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int                `json:"id"`
+	UUID      uuid.UUID          `json:"uuid"`
+	Source    enums.OrderSource  `json:"source"`
+	Type      enums.FeedbackType `json:"type"`
+	Name      string             `json:"name"`
+	Phone     string             `json:"phone"`
+	Content   string             `json:"content"`
+	UserID    *int               `json:"user_id,omitempty"`
+	CreatedAt time.Time          `json:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at"`
 }
 
 type Category struct {

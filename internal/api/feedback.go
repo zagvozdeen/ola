@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/zagvozdeen/ola/internal/api/core"
+	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
@@ -15,6 +16,7 @@ type createFeedbackRequest struct {
 	Name    string `json:"name" mold:"trim" validate:"required,max=255"`
 	Phone   string `json:"phone" mold:"trim" validate:"required,max=255,ru_phone"`
 	Content string `json:"content" mold:"trim" validate:"required,max=3000"`
+	Type    string `json:"type" mold:"trim,lcase" validate:"required,oneof=manager_contact partnership_offer feedback_request"`
 }
 
 func (s *Service) getFeedback(r *http.Request, user *models.User) core.Response {
@@ -45,12 +47,25 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 		return core.Err(http.StatusBadRequest, err)
 	}
 
+	feedbackType, err := enums.NewFeedbackType(req.Type)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback type: %w", err))
+	}
+
+	err = s.store.UpdateUserPhone(r.Context(), user.ID, req.Phone)
+	if err != nil {
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update user phone: %w", err))
+	}
+	user.Phone = &req.Phone
+
 	uid, err := uuid.NewV7()
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to generate uuid v7: %w", err))
 	}
 	feedback := &models.Feedback{
 		UUID:      uid,
+		Source:    sourceFromAuthHeader(r.Header.Get("Authorization")),
+		Type:      feedbackType,
 		Name:      req.Name,
 		Phone:     req.Phone,
 		Content:   req.Content,
@@ -85,6 +100,8 @@ func (s *Service) createGuestFeedback(r *http.Request) core.Response {
 	}
 	feedback := &models.Feedback{
 		UUID:      uid,
+		Source:    enums.OrderSourceLanding,
+		Type:      enums.FeedbackTypeFeedbackRequest,
 		Name:      req.Name,
 		Phone:     req.Phone,
 		Content:   req.Content,
