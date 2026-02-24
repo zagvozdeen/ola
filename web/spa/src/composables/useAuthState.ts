@@ -16,7 +16,7 @@ const isUserLoaded = ref(false)
 const isLoadingUser = ref(false)
 
 export const cart = reactive<Cart>({
-  product_ids: [],
+  items: [],
 })
 
 const authSource = ref<AuthSource>({ mode: 'guest' })
@@ -70,6 +70,7 @@ const authHeaderFromSource = (source: AuthSource): string | null => {
 
 const resetUserLoadingState = (isLoaded: boolean) => {
   currentUser.value = null
+  cart.items = []
   isUserLoaded.value = isLoaded
   isLoadingUser.value = false
   loadMePromise = null

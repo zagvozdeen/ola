@@ -60,9 +60,29 @@ type Review struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+type Cart struct {
+	ID        int       `json:"id"`
+	UUID      uuid.UUID `json:"uuid"`
+	UserID    *int      `json:"user_id,omitempty"`
+	SessionID *string   `json:"session_id,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CartItem struct {
+	ProductID   int               `json:"product_id"`
+	ProductUUID uuid.UUID         `json:"product_uuid"`
+	ProductName string            `json:"product_name"`
+	PriceFrom   int               `json:"price_from"`
+	PriceTo     *int              `json:"price_to,omitempty"`
+	Type        enums.ProductType `json:"type"`
+	FileContent *string           `json:"file_content,omitempty"`
+	Qty         int               `json:"qty"`
+}
+
 type Order struct {
 	ID        int               `json:"id"`
-	UUID      string            `json:"uuid"`
+	UUID      uuid.UUID         `json:"uuid"`
 	Source    enums.OrderSource `json:"source"`
 	Name      string            `json:"name"`
 	Phone     string            `json:"phone"`

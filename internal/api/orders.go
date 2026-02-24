@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json/v2"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -63,7 +64,7 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 	}
 
 	order := &models.Order{
-		UUID:      uid.String(),
+		UUID:      uid,
 		Source:    sourceFromAuthHeader(r.Header.Get("Authorization")),
 		Name:      req.Name,
 		Phone:     req.Phone,
@@ -76,6 +77,40 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 	err = s.store.CreateOrder(r.Context(), order)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create order: %w", err))
+	}
+
+	return core.JSON(http.StatusCreated, order)
+}
+
+func (s *Service) createOrderFromCart(r *http.Request, user *models.User) core.Response {
+	req := &createOrderRequest{}
+	err := json.UnmarshalRead(r.Body, req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
+	err = s.conform.Struct(r.Context(), req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
+	err = s.validate.StructCtx(r.Context(), req)
+	if err != nil {
+		return core.Err(http.StatusBadRequest, err)
+	}
+
+	order, err := s.store.CreateOrderFromUserCart(
+		r.Context(),
+		user.ID,
+		sourceFromAuthHeader(r.Header.Get("Authorization")),
+		req.Name,
+		req.Phone,
+		req.Content,
+	)
+	if err != nil {
+		if errors.Is(err, models.ErrCartEmpty) {
+			return core.Err(http.StatusBadRequest, fmt.Errorf("cart is empty"))
+		}
+
+		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create order from cart: %w", err))
 	}
 
 	return core.JSON(http.StatusCreated, order)
@@ -117,7 +152,7 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 	}
 
 	order := &models.Order{
-		UUID:      uid.String(),
+		UUID:      uid,
 		Source:    source,
 		Name:      req.Name,
 		Phone:     req.Phone,

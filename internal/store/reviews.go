@@ -33,7 +33,7 @@ func (s *Store) GetAllReviews(ctx context.Context) ([]models.Review, error) {
 func (s *Store) GetReviewByUUID(ctx context.Context, uuid uuid.UUID) (*models.Review, error) {
 	review := &models.Review{}
 	fileContent := ""
-	err := s.pool.QueryRow(ctx, "SELECT r.id, r.uuid::text, r.name, r.content, r.file_id, f.content, r.user_id, r.published_at, r.created_at, r.updated_at FROM reviews r JOIN files f ON f.id = r.file_id WHERE r.uuid = $1", uuid.String()).Scan(&review.ID, &review.UUID, &review.Name, &review.Content, &review.FileID, &fileContent, &review.UserID, &review.PublishedAt, &review.CreatedAt, &review.UpdatedAt)
+	err := s.pool.QueryRow(ctx, "SELECT r.id, r.uuid, r.name, r.content, r.file_id, f.content, r.user_id, r.published_at, r.created_at, r.updated_at FROM reviews r JOIN files f ON f.id = r.file_id WHERE r.uuid = $1", uuid).Scan(&review.ID, &review.UUID, &review.Name, &review.Content, &review.FileID, &fileContent, &review.UserID, &review.PublishedAt, &review.CreatedAt, &review.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

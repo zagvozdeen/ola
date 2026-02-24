@@ -67,6 +67,17 @@ export type Product = {
   updated_at: DateTime
 }
 
+export type CartItem = {
+  product_id: number
+  product_uuid: UUID
+  product_name: string
+  price_from: number
+  price_to?: number
+  type: ProductType
+  file_content?: string
+  qty: number
+}
+
 export type Review = {
   id: number
   uuid: UUID
@@ -190,5 +201,5 @@ export interface Notification {
 export type PusherFunc = (level: Levels, msg: string, date: number) => void
 
 export type Cart = {
-  product_ids: number[],
+  items: CartItem[]
 }

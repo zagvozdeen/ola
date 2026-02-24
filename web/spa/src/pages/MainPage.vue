@@ -22,16 +22,18 @@
         </div>
         <div class="flex justify-center">
           <button
-            v-if="!cart.product_ids.includes(product.id)"
-            class="w-full bg-green-700 rounded hover:bg-green-800 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center"
+            v-if="!isInCart(product.id)"
+            class="w-full bg-green-700 rounded hover:bg-green-800 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center disabled:opacity-50"
+            :disabled="isSubmitting(product.id)"
             @click="() => handleAddProductButton(product.id)"
           >
             Добавить
           </button>
           <button
             v-else
-            class="w-full bg-gray-600 rounded hover:bg-gray-700 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center"
-            @click="() => handleRemoveProductButton(product.id)"
+            class="w-full bg-gray-600 rounded hover:bg-gray-700 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center disabled:opacity-50"
+            :disabled="isSubmitting(product.id)"
+            @click="() => handleRemoveProductButton(product.id, product.uuid)"
           >
             Убрать из корзины
           </button>
@@ -44,30 +46,80 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import FooterMenu from '@/components/FooterMenu.vue'
 import { cart } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
+import { useNotifications } from '@/composables/useNotifications'
 import type { Product } from '@/types'
 
 const fetcher = useFetch()
+const notify = useNotifications()
 const products = ref<Product[]>([])
+const submitting = ref<number | null>(null)
 
-const handleAddProductButton = (id: number) => {
-  cart.product_ids.push(id)
+const cartProductIDs = computed(() => {
+  return new Set(cart.items.map(item => item.product_id))
+})
+
+const isSubmitting = (productID: number) => {
+  return submitting.value === productID
 }
 
-const handleRemoveProductButton = (id: number) => {
-  cart.product_ids = cart.product_ids.filter(_id => _id !== id)
+const isInCart = (productID: number) => {
+  return cartProductIDs.value.has(productID)
 }
 
-onMounted(() => {
-  fetcher
-    .getProducts()
-    .then(data => {
-      if (data.ok) {
-        products.value = data.data
-      }
-    })
+const refreshCart = async () => {
+  const data = await fetcher.getCart()
+
+  if (data.ok) {
+    cart.items = data.data
+  }
+}
+
+const handleAddProductButton = async (productID: number) => {
+  submitting.value = productID
+
+  try {
+    const data = await fetcher.upsertCartItem(productID, 1)
+
+    if (!data.ok) {
+      return
+    }
+
+    await refreshCart()
+    notify.info('Товар добавлен в корзину')
+  } finally {
+    submitting.value = null
+  }
+}
+
+const handleRemoveProductButton = async (productID: number, productUUID: string) => {
+  submitting.value = productID
+
+  try {
+    const data = await fetcher.deleteCartItem(productUUID)
+
+    if (!data.ok) {
+      return
+    }
+
+    await refreshCart()
+    notify.info('Товар убран из корзины')
+  } finally {
+    submitting.value = null
+  }
+}
+
+onMounted(async () => {
+  const [productsData] = await Promise.all([
+    fetcher.getProducts(),
+    refreshCart(),
+  ])
+
+  if (productsData.ok) {
+    products.value = productsData.data
+  }
 })
 </script>

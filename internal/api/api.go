@@ -97,7 +97,11 @@ func (s *Service) getRoutes() *http.ServeMux {
 	mux.HandleFunc("GET /api/reviews", s.auth(s.getReviews))       // for admin and moderator only
 	mux.HandleFunc("GET /api/orders", s.auth(s.getOrders))         // for admin and moderator only
 	mux.HandleFunc("POST /api/orders", s.auth(s.createOrder))      // for all
-	mux.HandleFunc("GET /api/users", s.auth(s.getUsers))           // for admin only
+	mux.HandleFunc("POST /api/orders/from-cart", s.auth(s.createOrderFromCart))
+	mux.HandleFunc("GET /api/cart", s.auth(s.getCart))
+	mux.HandleFunc("POST /api/cart/items", s.auth(s.upsertCartItem))
+	mux.HandleFunc("DELETE /api/cart/items/{product_uuid}", s.auth(s.deleteCartItem))
+	mux.HandleFunc("GET /api/users", s.auth(s.getUsers)) // for admin only
 
 	return mux
 }

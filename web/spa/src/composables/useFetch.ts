@@ -8,6 +8,7 @@ import { type Notify, useNotifications } from '@/composables/useNotifications'
 import type {
   AuthLoginRequest,
   AuthLoginResponse,
+  CartItem,
   AuthRegisterRequest,
   AuthRegisterResponse,
   Category,
@@ -174,9 +175,53 @@ const getOrders = async (notify: Notify) => {
   }, { notify })
 }
 
+const getCart = async (notify: Notify) => {
+  return fetchJson<CartItem[]>('/api/cart', {
+    headers: getAuthHeaders(),
+  }, { notify })
+}
+
+const upsertCartItem = async (notify: Notify, productID: number, qty: number) => {
+  return fetchJson<null>(
+    '/api/cart/items',
+    {
+      method: 'POST',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify({
+        product_id: productID,
+        qty,
+      }),
+    },
+    { notify },
+  )
+}
+
+const deleteCartItem = async (notify: Notify, productUUID: string) => {
+  return fetchJson<null>(
+    `/api/cart/items/${encodeURIComponent(productUUID)}`,
+    {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    },
+    { notify },
+  )
+}
+
 const createOrder = async (notify: Notify, payload: CreateOrderRequest) => {
   return fetchJson<Order>(
     '/api/orders',
+    {
+      method: 'POST',
+      headers: getAuthJsonHeaders(),
+      body: JSON.stringify(payload),
+    },
+    { notify },
+  )
+}
+
+const createOrderFromCart = async (notify: Notify, payload: CreateOrderRequest) => {
+  return fetchJson<Order>(
+    '/api/orders/from-cart',
     {
       method: 'POST',
       headers: getAuthJsonHeaders(),
@@ -211,7 +256,11 @@ export const useFetch = () => {
     createFeedback: (payload: CreateFeedbackRequest) => createFeedback(notify, payload),
     getReviews: () => getReviews(notify),
     getOrders: () => getOrders(notify),
+    getCart: () => getCart(notify),
+    upsertCartItem: (productID: number, qty: number) => upsertCartItem(notify, productID, qty),
+    deleteCartItem: (productUUID: string) => deleteCartItem(notify, productUUID),
     createOrder: (payload: CreateOrderRequest) => createOrder(notify, payload),
+    createOrderFromCart: (payload: CreateOrderRequest) => createOrderFromCart(notify, payload),
     getUsers: () => getUsers(notify),
   }
 }

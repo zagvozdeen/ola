@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) GetAllUsers(ctx context.Context) ([]models.User, error) {
-	rows, err := s.pool.Query(ctx, "SELECT id, tid, uuid::text, first_name, last_name, username, email, password, role, created_at, updated_at FROM users ORDER BY created_at DESC")
+	rows, err := s.pool.Query(ctx, "SELECT id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at FROM users ORDER BY created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -31,7 +31,7 @@ func (s *Store) GetAllUsers(ctx context.Context) ([]models.User, error) {
 
 func (s *Store) GetUserByID(ctx context.Context, id int) (*models.User, error) {
 	user := &models.User{}
-	err := s.pool.QueryRow(ctx, "SELECT id, tid, uuid::text, first_name, last_name, username, email, password, role, created_at, updated_at FROM users WHERE id = $1", id).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	err := s.pool.QueryRow(ctx, "SELECT id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at FROM users WHERE id = $1", id).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -40,7 +40,7 @@ func (s *Store) GetUserByID(ctx context.Context, id int) (*models.User, error) {
 
 func (s *Store) GetUserByTID(ctx context.Context, tid int64) (*models.User, error) {
 	user := &models.User{}
-	err := s.pool.QueryRow(ctx, "SELECT id, tid, uuid::text, first_name, last_name, username, email, password, role, created_at, updated_at FROM users WHERE tid = $1", tid).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	err := s.pool.QueryRow(ctx, "SELECT id, tid, uuid, first_name, last_name, username, email, password, role, created_at, updated_at FROM users WHERE tid = $1", tid).Scan(&user.ID, &user.TID, &user.UUID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}

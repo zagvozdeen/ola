@@ -19,6 +19,9 @@ func wrapDBError(err error) error {
 	if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok && pgErr.Code == "23505" {
 		return errors.Join(models.ErrUniqueViolation, err)
 	}
+	if pgErr, ok := errors.AsType[*pgconn.PgError](err); ok && pgErr.Code == "23503" {
+		return errors.Join(models.ErrNotFound, err)
+	}
 
 	return err
 }

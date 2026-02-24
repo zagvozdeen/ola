@@ -48,5 +48,7 @@ import { useRoute } from 'vue-router'
 import { cart } from '@/composables/useAuthState'
 
 const route = useRoute()
-const items = computed(() => cart.product_ids.length)
+const items = computed(() => {
+  return cart.items.reduce((sum, item) => sum + item.qty, 0)
+})
 </script>
