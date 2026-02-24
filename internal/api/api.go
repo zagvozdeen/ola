@@ -12,6 +12,7 @@ import (
 	"github.com/go-playground/mold/v4"
 	"github.com/go-playground/mold/v4/modifiers"
 	"github.com/go-playground/validator/v10"
+	"github.com/go-telegram/bot"
 	"github.com/zagvozdeen/ola/internal/config"
 	"github.com/zagvozdeen/ola/internal/event_bus"
 	"github.com/zagvozdeen/ola/internal/logger"
@@ -29,6 +30,7 @@ type Service struct {
 	conform    *mold.Transformer
 	workerPool *worker_pool.WorkerPool
 	eventBus   *event_bus.EventBus
+	bot        *bot.Bot
 }
 
 func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
@@ -58,6 +60,8 @@ func (s *Service) Run(ctx context.Context) {
 		s.log.Error("Failed to run seeder", err)
 		return
 	}
+
+	s.registerListeners()
 
 	errCh := make(chan error, 2)
 	wg := &sync.WaitGroup{}

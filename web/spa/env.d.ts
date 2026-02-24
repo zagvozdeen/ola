@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import type { BottomButton } from 'telegram-web-app'
 import 'telegram-web-app'
 
 interface ImportMetaEnv {
@@ -13,4 +14,10 @@ declare module '*.vue' {
     import type { DefineComponent } from 'vue'
     const component: DefineComponent<object, object, unknown>
     export default component
+}
+
+declare module 'telegram-web-app' {
+    interface WebApp {
+        BottomButton?: BottomButton
+    }
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -173,7 +174,7 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create guest order: %w", err))
 	}
 
-	s.eventBus.OrderCreated.Publish(r.Context(), order)
+	s.eventBus.OrderCreated.Publish(context.WithoutCancel(r.Context()), order)
 
 	return core.JSON(http.StatusCreated, order)
 }

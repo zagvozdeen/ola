@@ -42,8 +42,9 @@ const writeStoredToken = (token: string | null) => {
 
 const detectAuthSource = (): AuthSource => {
   const tmaInitData = readTelegramInitData()
-
   if (tmaInitData) {
+    window.Telegram.WebApp.isVerticalSwipesEnabled = false
+
     return { mode: 'telegram', initData: tmaInitData }
   }
 

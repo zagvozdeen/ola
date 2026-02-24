@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -98,7 +99,7 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create feedback: %w", err))
 	}
 
-	s.eventBus.FeedbackCreated.Publish(r.Context(), feedback)
+	s.eventBus.FeedbackCreated.Publish(context.WithoutCancel(r.Context()), feedback)
 
 	return core.JSON(http.StatusCreated, feedback)
 }
@@ -136,7 +137,7 @@ func (s *Service) createGuestFeedback(r *http.Request) core.Response {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create guest feedback: %w", err))
 	}
 
-	s.eventBus.FeedbackCreated.Publish(r.Context(), feedback)
+	s.eventBus.FeedbackCreated.Publish(context.WithoutCancel(r.Context()), feedback)
 
 	return core.JSON(http.StatusCreated, feedback)
 }

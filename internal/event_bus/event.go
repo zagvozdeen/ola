@@ -14,15 +14,13 @@ type Event[T any] struct {
 	subs   map[uint64]Handler[T]
 	pool   *worker_pool.WorkerPool
 	nextID uint64
-	//onError func(error)
-	mu sync.RWMutex
+	mu     sync.RWMutex
 }
 
 func NewEvent[T any](pool *worker_pool.WorkerPool) *Event[T] {
 	return &Event[T]{
 		subs: map[uint64]Handler[T]{},
 		pool: pool,
-		//onError: onError,
 	}
 }
 

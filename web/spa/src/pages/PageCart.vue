@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <h1 class="text-lg font-bold">
+    <h1
+      class="text-lg font-bold"
+      style="margin-top: calc(var(--tg-content-safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px))"
+    >
       Корзина
     </h1>
 
