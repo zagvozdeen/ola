@@ -1,11 +1,16 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">
-    <HeaderMenu
-      title="Редактирование пользователя"
-      :edit="true"
-      back="users"
-      @ready="onSubmit"
-    />
+  <AppLayout
+    title="Редактирование пользователя"
+    back="settings"
+    @save="onSubmit"
+  >
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">-->
+    <!--    <HeaderMenu-->
+    <!--      title="Редактирование пользователя"-->
+    <!--      :edit="true"-->
+    <!--      back="users"-->
+    <!--      @ready="onSubmit"-->
+    <!--    />-->
 
     <div
       v-if="isLoading"
@@ -47,7 +52,8 @@
         />
       </n-form-item>
     </n-form>
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +65,7 @@ import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type FormInst, type FormRules, NForm, NFormItem, NInput, NSelect, NSpin } from 'naive-ui'
 import { type UpdateUserRoleRequest, type User, UserRole, UserRoleOptions } from '@/types'
+import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
 const router = useRouter()

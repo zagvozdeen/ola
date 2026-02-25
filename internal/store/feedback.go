@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
@@ -29,6 +28,18 @@ func (s *Store) GetAllFeedback(ctx context.Context) ([]models.Feedback, error) {
 	}
 
 	return feedbacks, nil
+}
+
+func (s *Store) GetFeedbackByID(ctx context.Context, id int) (*models.Feedback, error) {
+	feedback := &models.Feedback{}
+	err := s.querier(ctx).QueryRow(
+		ctx,
+		"SELECT id, uuid, status, source, type, name, phone, content, user_id, created_at, updated_at FROM feedback WHERE id = $1",
+		id,
+	).Scan(
+		&feedback.ID, &feedback.UUID, &feedback.Status, &feedback.Source, &feedback.Type, &feedback.Name, &feedback.Phone, &feedback.Content, &feedback.UserID, &feedback.CreatedAt, &feedback.UpdatedAt,
+	)
+	return feedback, wrapDBError(err)
 }
 
 func (s *Store) GetFeedbackByUUID(ctx context.Context, feedbackUUID uuid.UUID) (*models.Feedback, error) {
@@ -56,13 +67,11 @@ func (s *Store) CreateFeedback(ctx context.Context, feedback *models.Feedback) e
 	return wrapDBError(err)
 }
 
-func (s *Store) UpdateFeedbackStatus(ctx context.Context, feedbackID int, status enums.RequestStatus) error {
-	tag, err := s.querier(ctx).Exec(ctx, "UPDATE feedback SET status = $1, updated_at = NOW() WHERE id = $2", status, feedbackID)
-	if err != nil {
-		return wrapDBError(err)
-	}
-	if tag.RowsAffected() == 0 {
-		return models.ErrNotFound
-	}
-	return nil
+func (s *Store) UpdateFeedbackStatus(ctx context.Context, feedback *models.Feedback) error {
+	_, err := s.querier(ctx).Exec(
+		ctx,
+		"UPDATE feedback SET status = $2, updated_at = $3 WHERE id = $1",
+		feedback.ID, feedback.Status, feedback.UpdatedAt,
+	)
+	return wrapDBError(err)
 }

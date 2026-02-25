@@ -143,7 +143,7 @@ func (s *Service) createGuestFeedback(r *http.Request) core.Response {
 }
 
 type updateFeedbackStatusRequest struct {
-	Status string `json:"status" mold:"trim,lcase" validate:"required,oneof=created in_progress reviewed"`
+	Status enums.RequestStatus `json:"status"`
 }
 
 func (s *Service) updateFeedbackStatus(r *http.Request, user *models.User) core.Response {
@@ -162,10 +162,10 @@ func (s *Service) updateFeedbackStatus(r *http.Request, user *models.User) core.
 		return res
 	}
 
-	status, err := enums.NewRequestStatus(req.Status)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback status: %w", err))
-	}
+	//status, err := enums.NewRequestStatus(req.Status)
+	//if err != nil {
+	//	return core.Err(http.StatusBadRequest, fmt.Errorf("invalid feedback status: %w", err))
+	//}
 
 	feedback, err := s.store.GetFeedbackByUUID(r.Context(), uid)
 	if err != nil {
@@ -175,15 +175,17 @@ func (s *Service) updateFeedbackStatus(r *http.Request, user *models.User) core.
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get feedback: %w", err))
 	}
 
-	err = s.store.UpdateFeedbackStatus(r.Context(), feedback.ID, status)
+	feedback.Status = req.Status
+	feedback.UpdatedAt = time.Now()
+	err = s.store.UpdateFeedbackStatus(r.Context(), feedback)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update feedback status: %w", err))
 	}
 
-	feedback, err = s.store.GetFeedbackByUUID(r.Context(), uid)
-	if err != nil {
-		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated feedback: %w", err))
-	}
+	//feedback, err = s.store.GetFeedbackByUUID(r.Context(), uid)
+	//if err != nil {
+	//	return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated feedback: %w", err))
+	//}
 
 	s.eventBus.FeedbackChanged.Publish(context.WithoutCancel(r.Context()), feedback)
 

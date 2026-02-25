@@ -1,11 +1,16 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <HeaderMenu
-      title="Все продукты"
-      :edit="false"
-      back="settings"
-      create="products.create"
-    />
+  <AppLayout
+    title="Все продукты"
+    back="settings"
+    no-save
+  >
+    <!--    <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
+    <!--      <HeaderMenu-->
+    <!--        title=""-->
+    <!--        :edit="false"-->
+    <!--        back="settings"-->
+    <!--        create="products.create"-->
+    <!--      />-->
 
     <div
       v-if="isLoading"
@@ -73,7 +78,8 @@
     >
       Список продуктов пуст.
     </div>
-  </div>
+    <!--    </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -83,6 +89,7 @@ import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { type Product, ProductTypeTranslates } from '@/types'
 import { NPopconfirm, NSpin } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const fetcher = useFetch()
 const notify = useNotifications()

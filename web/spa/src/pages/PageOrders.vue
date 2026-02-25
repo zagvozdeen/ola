@@ -1,10 +1,15 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <HeaderMenu
-      title="Заказы"
-      :edit="false"
-      back="settings"
-    />
+  <AppLayout
+    title="Заказы"
+    back="settings"
+    no-save
+  >
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
+    <!--    <HeaderMenu-->
+    <!--      title="Заказы"-->
+    <!--      :edit="false"-->
+    <!--      back="settings"-->
+    <!--    />-->
 
     <div
       v-if="isLoading"
@@ -24,7 +29,12 @@
       >
         <div class="flex justify-between gap-2">
           <span class="font-bold text-sm truncate">{{ order.name }}</span>
-          <span class="text-xs uppercase bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ RequestStatusTranslates[order.status] }}</span>
+          <span
+            class="text-xs uppercase font-bold px-2 py-0.5 rounded-full"
+            :class="{
+              [RequestStatusBgColor[order.status]]:true,
+            }"
+          >{{ RequestStatusTranslates[order.status] }}</span>
         </div>
         <p class="text-xs text-gray-300 line-clamp-2">
           {{ order.content }}
@@ -49,15 +59,17 @@
     >
       Список заказов пуст.
     </div>
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
-import { type Order, RequestStatusTranslates } from '@/types'
+import { type Order, RequestStatusBgColor, RequestStatusTranslates } from '@/types'
 import { NSpin } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const fetcher = useFetch()
 const orders = ref<Order[]>([])

@@ -1,151 +1,154 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <h1
-      class="text-lg font-bold"
-      style="margin-top: calc(var(--tg-content-safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px))"
-    >
-      Корзина
-    </h1>
-
-    <div
-      v-if="isLoading"
-      class="flex justify-center my-4"
-    >
-      <n-spin size="small" />
-    </div>
-
-    <template v-else>
+  <AppLayout title="Корзина">
+    <div class="flex flex-col gap-4">
       <div
-        v-if="cart.items.length === 0"
-        class="bg-gray-500/20 border border-gray-500/30 rounded-2xl p-4"
+        v-if="isLoading"
+        class="flex justify-center my-4"
       >
-        <p class="text-sm text-gray-300">
-          В корзине пока нет товаров.
-        </p>
-        <router-link
-          class="inline-flex mt-3 bg-gray-600 hover:bg-gray-700 rounded px-3 py-1.5 text-xs font-bold"
-          :to="{ name: 'main' }"
-        >
-          Перейти к ассортименту
-        </router-link>
+        <n-spin size="small" />
       </div>
 
       <template v-else>
-        <ul class="grid grid-cols-1 gap-2">
-          <li
-            v-for="item in cart.items"
-            :key="item.product_id"
-            class="bg-gray-500/20 border border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
+        <div
+          v-if="cart.items.length === 0"
+          class="bg-gray-500/20 border border-gray-500/30 rounded-2xl p-4"
+        >
+          <p class="text-sm text-gray-300">
+            В корзине пока нет товаров.
+          </p>
+          <router-link
+            class="inline-flex mt-3 bg-gray-600 hover:bg-gray-700 rounded px-3 py-1.5 text-xs font-bold"
+            :to="{ name: 'main' }"
           >
-            <img
-              class="size-20 object-cover rounded-lg"
-              :src="item.file_content"
-              alt=""
-            >
-
-            <div class="flex-1 min-w-0">
-              <div class="flex justify-between gap-2">
-                <span class="font-bold text-sm truncate">{{ item.product_name }}</span>
-                <span class="text-xs uppercase bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ ProductTypeTranslates[item.type] }}</span>
-              </div>
-
-              <p class="text-xs mt-1 font-medium">
-                от {{ item.price_from }} ₽{{ item.price_to ? ` до ${item.price_to} ₽` : '' }}
-              </p>
-
-              <div class="flex items-center gap-2 mt-2">
-                <button
-                  class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
-                  :disabled="isUpdating(item.product_id)"
-                  @click="() => handleDecrementQty(item.product_id, item.product_uuid, item.qty)"
-                >
-                  -
-                </button>
-                <span class="text-xs min-w-6 text-center">{{ item.qty }}</span>
-                <button
-                  class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
-                  :disabled="isUpdating(item.product_id)"
-                  @click="() => handleIncrementQty(item.product_id, item.qty)"
-                >
-                  +
-                </button>
-                <button
-                  class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer ml-auto"
-                  :disabled="isUpdating(item.product_id)"
-                  @click="() => handleRemoveItem(item.product_id, item.product_uuid)"
-                >
-                  Удалить
-                </button>
-              </div>
-            </div>
-          </li>
-        </ul>
-
-        <div class="bg-gray-500/20 border border-gray-500/20 rounded-2xl p-4">
-          <p class="text-sm">
-            Позиций: <b>{{ totalItemsQty }}</b>
-          </p>
-          <p class="text-sm mt-1">
-            Сумма: <b>от {{ totalPriceFrom }} ₽{{ totalPriceTo !== null ? ` до ${totalPriceTo} ₽` : '' }}</b>
-          </p>
+            Перейти к ассортименту
+          </router-link>
         </div>
 
-        <n-form
-          ref="formRef"
-          class="w-full bg-gray-500/20 p-4 rounded-2xl"
-          :rules="rules"
-          :model="form"
-          @submit.prevent="onSubmitOrder"
-        >
-          <n-form-item
-            label="Имя"
-            path="name"
-          >
-            <n-input
-              v-model:value="form.name"
-              placeholder="Введите имя"
-            />
-          </n-form-item>
+        <template v-else>
+          <ul class="grid grid-cols-1 gap-2">
+            <li
+              v-for="item in cart.items"
+              :key="item.product_id"
+              class="bg-gray-500/20 border border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
+            >
+              <img
+                class="size-20 object-cover rounded-lg"
+                :src="item.file_content"
+                alt=""
+              >
 
-          <n-form-item
-            label="Телефон"
-            path="phone"
-          >
-            <n-input
-              v-model:value="form.phone"
-              v-maska
-              class="w-full"
-              placeholder="+7 (___) ___-__-__"
-              :input-props="phoneInputProps"
-            />
-          </n-form-item>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between gap-2">
+                  <span class="font-bold text-sm truncate">{{ item.product_name }}</span>
+                  <span
+                    class="text-xs uppercase font-bold px-2 py-0.5 rounded-full"
+                    :class="{ [ProductTypeBgColor[item.type]]:true }"
+                  >{{ ProductTypeTranslates[item.type] }}</span>
+                </div>
 
-          <n-form-item
-            label="Комментарий"
-            path="content"
-          >
-            <n-input
-              v-model:value="form.content"
-              type="textarea"
-              placeholder="Комментарий к заказу"
-              :autosize="{ minRows: 3, maxRows: 6 }"
-            />
-          </n-form-item>
+                <p class="text-xs mt-1 font-medium">
+                  от {{ item.price_from }} ₽{{ item.price_to ? ` до ${item.price_to} ₽` : '' }}
+                </p>
 
-          <n-button
-            attr-type="submit"
-            class="w-full"
-            type="success"
-            :disabled="isOrdering"
+                <div class="flex items-center gap-2 mt-2">
+                  <button
+                    class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                    :disabled="isUpdating(item.product_id)"
+                    @click="() => handleDecrementQty(item.product_id, item.product_uuid, item.qty)"
+                  >
+                    -
+                  </button>
+                  <span class="text-xs min-w-6 text-center">{{ item.qty }}</span>
+                  <button
+                    class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                    :disabled="isUpdating(item.product_id)"
+                    @click="() => handleIncrementQty(item.product_id, item.qty)"
+                  >
+                    +
+                  </button>
+                  <button
+                    class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer ml-auto"
+                    :disabled="isUpdating(item.product_id)"
+                    @click="() => handleRemoveItem(item.product_id, item.product_uuid)"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <div class="bg-gray-500/20 border border-gray-500/20 rounded-2xl p-4">
+            <p class="text-sm">
+              Позиций: <b>{{ totalItemsQty }}</b>
+            </p>
+            <p class="text-sm mt-1">
+              Сумма: <b>от {{ totalPriceFrom }} ₽{{ totalPriceTo !== null ? ` до ${totalPriceTo} ₽` : '' }}</b>
+            </p>
+          </div>
+
+          <n-form
+            ref="formRef"
+            class="w-full bg-gray-500/20 p-4 rounded-2xl"
+            :rules="rules"
+            :model="form"
+            @submit.prevent="onSubmitOrder"
           >
-            Оформить заказ
-          </n-button>
-        </n-form>
+            <n-form-item
+              label="Имя"
+              path="name"
+            >
+              <n-input
+                v-model:value="form.name"
+                placeholder="Введите имя"
+              />
+            </n-form-item>
+
+            <n-form-item
+              label="Телефон"
+              path="phone"
+            >
+              <n-input
+                v-model:value="form.phone"
+                v-maska
+                class="w-full"
+                placeholder="+7 (___) ___-__-__"
+                :input-props="phoneInputProps"
+              />
+            </n-form-item>
+
+            <n-form-item
+              label="Комментарий"
+              path="content"
+            >
+              <n-input
+                v-model:value="form.content"
+                type="textarea"
+                placeholder="Комментарий к заказу"
+                :autosize="{ minRows: 3, maxRows: 6 }"
+              />
+            </n-form-item>
+
+            <n-form-item
+              :show-feedback="false"
+              :show-label="false"
+            >
+              <n-button
+                attr-type="submit"
+                class="flex-1"
+                type="success"
+                :disabled="isOrdering"
+              >
+                Оформить заказ
+              </n-button>
+            </n-form-item>
+          </n-form>
+        </template>
       </template>
-    </template>
 
-    <FooterMenu />
-  </div>
+      <FooterMenu />
+    </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -162,9 +165,10 @@ import { cart, useAuthState } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
-import { type CreateOrderRequest, ProductTypeTranslates } from '@/types'
+import { type CreateOrderRequest, ProductTypeBgColor, ProductTypeTranslates } from '@/types'
 import { type FormInst, NButton, NForm, NFormItem, NInput, NSpin, type FormRules } from 'naive-ui'
 import { vMaska } from 'maska/vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 const auth = useAuthState()
 const fetcher = useFetch()

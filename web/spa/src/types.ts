@@ -24,6 +24,12 @@ export enum RequestStatus {
   Reviewed = 'reviewed',
 }
 
+export const RequestStatusBgColor: Record<RequestStatus, string> = {
+  [RequestStatus.Created]: 'bg-blue-700',
+  [RequestStatus.InProgress]: 'bg-yellow-700',
+  [RequestStatus.Reviewed]: 'bg-green-700',
+}
+
 export enum FeedbackType {
   ManagerContact = 'manager_contact',
   PartnershipOffer = 'partnership_offer',
@@ -33,6 +39,11 @@ export enum FeedbackType {
 export const ProductTypeTranslates: Record<ProductType, string> = {
   [ProductType.Product]: 'Товар',
   [ProductType.Service]: 'Услуга',
+}
+
+export const ProductTypeBgColor: Record<ProductType, string> = {
+  [ProductType.Product]: 'bg-green-700',
+  [ProductType.Service]: 'bg-blue-700',
 }
 
 export const RequestStatusTranslates: Record<RequestStatus, string> = {

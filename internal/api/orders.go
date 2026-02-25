@@ -184,7 +184,7 @@ func (s *Service) createGuestOrder(r *http.Request) core.Response {
 }
 
 type updateOrderStatusRequest struct {
-	Status string `json:"status" mold:"trim,lcase" validate:"required,oneof=created in_progress reviewed"`
+	Status enums.RequestStatus `json:"status"`
 }
 
 func (s *Service) updateOrderStatus(r *http.Request, user *models.User) core.Response {
@@ -203,10 +203,10 @@ func (s *Service) updateOrderStatus(r *http.Request, user *models.User) core.Res
 		return res
 	}
 
-	status, err := enums.NewRequestStatus(req.Status)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order status: %w", err))
-	}
+	//status, err := enums.NewRequestStatus(req.Status)
+	//if err != nil {
+	//	return core.Err(http.StatusBadRequest, fmt.Errorf("invalid order status: %w", err))
+	//}
 
 	order, err := s.store.GetOrderByUUID(r.Context(), uid)
 	if err != nil {
@@ -216,15 +216,17 @@ func (s *Service) updateOrderStatus(r *http.Request, user *models.User) core.Res
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to get order: %w", err))
 	}
 
-	err = s.store.UpdateOrderStatus(r.Context(), order.ID, status)
+	order.Status = req.Status
+	order.UpdatedAt = time.Now()
+	err = s.store.UpdateOrderStatus(r.Context(), order)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update order status: %w", err))
 	}
 
-	order, err = s.store.GetOrderByUUID(r.Context(), uid)
-	if err != nil {
-		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated order: %w", err))
-	}
+	//order, err = s.store.GetOrderByUUID(r.Context(), uid)
+	//if err != nil {
+	//	return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated order: %w", err))
+	//}
 
 	s.eventBus.OrderChanged.Publish(context.WithoutCancel(r.Context()), order)
 

@@ -1,11 +1,16 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <HeaderMenu
-      title="Категории"
-      :edit="false"
-      back="settings"
-      create="categories.create"
-    />
+  <AppLayout
+    title="Категории"
+    back="settings"
+    no-save
+  >
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
+    <!--    <HeaderMenu-->
+    <!--      title="Категории"-->
+    <!--      :edit="false"-->
+    <!--      back="settings"-->
+    <!--      create="categories.create"-->
+    <!--    />-->
 
     <div
       v-if="isLoading"
@@ -57,7 +62,8 @@
     >
       Список категорий пуст.
     </div>
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -67,6 +73,7 @@ import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { type Category } from '@/types'
 import { NPopconfirm, NSpin } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const fetcher = useFetch()
 const notify = useNotifications()

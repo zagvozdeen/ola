@@ -4,4 +4,7 @@
 
 @theme {
     --font-nunito: "Nunito", sans-serif;
+
+    --tg-safe-area-inset-top: calc(var(--spacing) * 4);
+    --tg-content-safe-area-inset-top: calc(var(--spacing) * 10);
 }

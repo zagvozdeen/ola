@@ -26,7 +26,7 @@ func (s *Service) startBot(ctx context.Context) error {
 		s.cfg.Telegram.BotToken,
 		bot.WithDefaultHandler(s.defaultHandler),
 		bot.WithCallbackQueryDataHandler(orderCallbackPrefix, bot.MatchTypePrefix, s.handleOrderStatusCallback),
-		bot.WithCallbackQueryDataHandler(feedbackCallbackPrefix, bot.MatchTypePrefix, s.handleOrderStatusCallback),
+		bot.WithCallbackQueryDataHandler(feedbackCallbackPrefix, bot.MatchTypePrefix, s.handleFeedbackStatusCallback),
 	)
 	if err != nil {
 		return err
@@ -103,25 +103,62 @@ func (s *Service) handleOrderStatusCallback(ctx context.Context, b *bot.Bot, upd
 		return
 	}
 
-	err := s.store.UpdateOrderStatus(ctx, orderID, status)
+	order, err := s.store.GetOrderByID(ctx, orderID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
 			s.answerOrderStatusCallback(ctx, b, callback.ID, "Заказ не найден")
 			return
 		}
+		s.log.Error("Failed to load order after telegram callback", err)
+		s.answerOrderStatusCallback(ctx, b, callback.ID, "Не удалось получить заказ")
+		return
+	}
+
+	order.Status = status
+	order.UpdatedAt = time.Now()
+	err = s.store.UpdateOrderStatus(ctx, order)
+	if err != nil {
 		s.log.Error("Failed to update order status from telegram callback", err)
 		s.answerOrderStatusCallback(ctx, b, callback.ID, "Не удалось обновить статус")
 		return
 	}
 
-	order, err := s.store.GetOrderByID(ctx, orderID)
-	if err != nil {
-		s.log.Error("Failed to load order after telegram callback", err)
-		s.answerOrderStatusCallback(ctx, b, callback.ID, "Статус обновлён, но не удалось обновить сообщение")
+	s.eventBus.OrderChanged.Publish(context.WithoutCancel(ctx), order)
+	s.answerOrderStatusCallback(ctx, b, callback.ID, fmt.Sprintf("Статус: %s", status.Label()))
+}
+
+func (s *Service) handleFeedbackStatusCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
+	callback := update.CallbackQuery
+	if callback == nil {
 		return
 	}
 
-	s.eventBus.OrderChanged.Publish(context.WithoutCancel(ctx), order)
+	feedbackID, status, ok := parseFeedbackStatusCallbackData(callback.Data)
+	if !ok {
+		return
+	}
+
+	feedback, err := s.store.GetFeedbackByID(ctx, feedbackID)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			s.answerOrderStatusCallback(ctx, b, callback.ID, "Обратная связь не найден")
+			return
+		}
+		s.log.Error("Failed to load order after telegram callback", err)
+		s.answerOrderStatusCallback(ctx, b, callback.ID, "Не удалось получить обратную связь")
+		return
+	}
+
+	feedback.Status = status
+	feedback.UpdatedAt = time.Now()
+	err = s.store.UpdateFeedbackStatus(ctx, feedback)
+	if err != nil {
+		s.log.Error("Failed to update order status from telegram callback", err)
+		s.answerOrderStatusCallback(ctx, b, callback.ID, "Не удалось обновить обратную связь")
+		return
+	}
+
+	s.eventBus.FeedbackChanged.Publish(context.WithoutCancel(ctx), feedback)
 	s.answerOrderStatusCallback(ctx, b, callback.ID, fmt.Sprintf("Статус: %s", status.Label()))
 }
 
@@ -139,6 +176,25 @@ func (s *Service) answerOrderStatusCallback(ctx context.Context, b *bot.Bot, cal
 func parseOrderStatusCallbackData(data string) (int, enums.RequestStatus, bool) {
 	parts := strings.Split(data, ":")
 	if len(parts) != 3 || parts[0] != orderCallbackPrefix {
+		return 0, enums.RequestStatus{}, false
+	}
+
+	orderID, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, enums.RequestStatus{}, false
+	}
+
+	status, err := enums.NewRequestStatus(parts[2])
+	if err != nil {
+		return 0, enums.RequestStatus{}, false
+	}
+
+	return orderID, status, true
+}
+
+func parseFeedbackStatusCallbackData(data string) (int, enums.RequestStatus, bool) {
+	parts := strings.Split(data, ":")
+	if len(parts) != 3 || parts[0] != feedbackCallbackPrefix {
 		return 0, enums.RequestStatus{}, false
 	}
 

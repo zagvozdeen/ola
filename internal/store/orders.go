@@ -73,15 +73,13 @@ func (s *Store) CreateOrder(ctx context.Context, order *models.Order) error {
 	return wrapDBError(err)
 }
 
-func (s *Store) UpdateOrderStatus(ctx context.Context, orderID int, status enums.RequestStatus) error {
-	tag, err := s.querier(ctx).Exec(ctx, "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", status, orderID)
-	if err != nil {
-		return wrapDBError(err)
-	}
-	if tag.RowsAffected() == 0 {
-		return models.ErrNotFound
-	}
-	return nil
+func (s *Store) UpdateOrderStatus(ctx context.Context, order *models.Order) error {
+	_, err := s.querier(ctx).Exec(
+		ctx,
+		"UPDATE orders SET status = $1, updated_at = $2 WHERE id = $3",
+		order.Status, order.UpdatedAt, order.ID,
+	)
+	return wrapDBError(err)
 }
 
 func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source enums.OrderSource, name, phone, content string) (*models.Order, error) {

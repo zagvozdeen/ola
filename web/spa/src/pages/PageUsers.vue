@@ -1,10 +1,15 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <HeaderMenu
-      title="Пользователи"
-      :edit="false"
-      back="settings"
-    />
+  <AppLayout
+    title="Пользователи"
+    back="settings"
+    no-save
+  >
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
+    <!--    <HeaderMenu-->
+    <!--      title="Пользователи"-->
+    <!--      :edit="false"-->
+    <!--      back="settings"-->
+    <!--    />-->
 
     <div
       v-if="isLoading"
@@ -46,7 +51,8 @@
     >
       Список пользователей пуст.
     </div>
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -55,6 +61,7 @@ import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { type User, UserRoleTranslates } from '@/types'
 import { NSpin } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const fetcher = useFetch()
 const users = ref<User[]>([])

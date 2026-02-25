@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -75,9 +74,9 @@ func (s *Service) registerListeners() {
 			},
 		})
 		if err != nil {
-			if strings.Contains(strings.ToLower(err.Error()), "message is not modified") {
-				return nil
-			}
+			//if strings.Contains(strings.ToLower(err.Error()), "message is not modified") {
+			//	return nil
+			//}
 			return fmt.Errorf("failed to edit order telegram message: %w", err)
 		}
 
@@ -91,7 +90,7 @@ func (s *Service) registerListeners() {
 		message, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    s.cfg.Telegram.GroupID,
 			ParseMode: models.ParseModeMarkdown,
-			Text:      "*Пришла новая заявка на обслуживание 🎈*\n\nНажмите на кнопку ниже, чтобы посмотреть заявку\\!",
+			Text:      buildFeedbackTelegramText(feedback),
 			ReplyMarkup: models.InlineKeyboardMarkup{
 				InlineKeyboard: [][]models.InlineKeyboardButton{
 					getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID),
@@ -116,10 +115,37 @@ func (s *Service) registerListeners() {
 	})
 
 	s.eventBus.FeedbackChanged.Subscribe(func(ctx context.Context, feedback *model.Feedback) error {
-		if feedback == nil {
+		if s.bot == nil || feedback == nil {
 			return nil
 		}
-		// Feedback model does not have OrderID right now, so this event is ignored for telegram order messages.
+
+		message, err := s.store.GetFeedbackTelegramMessageByFeedbackID(ctx, feedback.ID)
+		if err != nil {
+			if errors.Is(err, model.ErrNotFound) {
+				return nil
+			}
+			return fmt.Errorf("failed to load order telegram message: %w", err)
+		}
+
+		_, err = s.bot.EditMessageText(ctx, &bot.EditMessageTextParams{
+			ChatID:    message.ChatID,
+			MessageID: message.MessageID,
+			ParseMode: models.ParseModeMarkdown,
+			Text:      buildFeedbackTelegramText(feedback),
+			ReplyMarkup: models.InlineKeyboardMarkup{
+				InlineKeyboard: [][]models.InlineKeyboardButton{
+					getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID),
+					{{Text: "Посмотреть заявку", URL: "https://t.me/ola_studio_bot?startapp"}},
+				},
+			},
+		})
+		if err != nil {
+			//if strings.Contains(strings.ToLower(err.Error()), "message is not modified") {
+			//	return nil
+			//}
+			return fmt.Errorf("failed to edit feedback telegram message: %w", err)
+		}
+
 		return nil
 	})
 }
@@ -156,5 +182,18 @@ func buildOrderTelegramText(order *model.Order) string {
 		bot.EscapeMarkdown(order.Name),
 		bot.EscapeMarkdown(order.Phone),
 		bot.EscapeMarkdown(order.Content),
+	)
+}
+
+func buildFeedbackTelegramText(feedback *model.Feedback) string {
+	return fmt.Sprintf(
+		"%s Обратная связь \\#%s\n\n*– UUID\\:* %s\n*– Статус\\:* %s\n*– Имя\\:* %s\n*– Телефон\\:* %s\n*– Комментарий\\:* %s",
+		feedback.Status.Emoji(),
+		bot.EscapeMarkdown(strconv.Itoa(feedback.ID)),
+		bot.EscapeMarkdown(feedback.UUID.String()),
+		bot.EscapeMarkdown(feedback.Status.Label()),
+		bot.EscapeMarkdown(feedback.Name),
+		bot.EscapeMarkdown(feedback.Phone),
+		bot.EscapeMarkdown(feedback.Content),
 	)
 }

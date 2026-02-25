@@ -1,11 +1,16 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">
-    <HeaderMenu
-      title="Редактирование заказа"
-      :edit="true"
-      back="orders"
-      @ready="onSubmit"
-    />
+  <AppLayout
+    title="Редактирование заказа"
+    back="orders"
+    @save="onSubmit"
+  >
+    <!--    <div class="min-h-dvh w-full flex flex-col gap-4 py-6">-->
+    <!--      <HeaderMenu-->
+    <!--        title="Редактирование заказа"-->
+    <!--        :edit="true"-->
+    <!--        back="orders"-->
+    <!--        @ready="onSubmit"-->
+    <!--      />-->
 
     <div
       v-if="isLoading"
@@ -56,7 +61,9 @@
         />
       </n-form-item>
     </n-form>
-  </div>
+    <!--  </div>-->
+    <!--    </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -68,6 +75,7 @@ import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type Order, RequestStatus, RequestStatusOptions, type UpdateRequestStatusRequest } from '@/types'
 import { type FormInst, type FormRules, NForm, NFormItem, NInput, NSelect, NSpin } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
 const router = useRouter()

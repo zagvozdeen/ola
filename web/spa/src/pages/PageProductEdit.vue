@@ -1,11 +1,16 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">
-    <HeaderMenu
-      :title="title"
-      :edit="true"
-      back="products"
-      @ready="onSubmit"
-    />
+  <AppLayout
+    :title="title"
+    back="products"
+    @save="onSubmit"
+  >
+    <!--    <div class="min-h-dvh w-full flex flex-col gap-4 py-6">-->
+    <!--      <HeaderMenu-->
+    <!--        :title="title"-->
+    <!--        :edit="true"-->
+    <!--        back="products"-->
+    <!--        @ready="onSubmit"-->
+    <!--      />-->
 
     <div
       v-if="isLoading"
@@ -91,7 +96,8 @@
         />
       </n-form-item>
     </n-form>
-  </div>
+    <!--    </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -104,6 +110,7 @@ import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type CreateProductRequest, ProductTypeOptions } from '@/types'
 import { type FormInst, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpin, type FormRules } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
 const router = useRouter()

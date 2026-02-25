@@ -1,10 +1,15 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <HeaderMenu
-      title="Заявки обратной связи"
-      :edit="false"
-      back="settings"
-    />
+  <AppLayout
+    title="Заявки обратной связи"
+    back="settings"
+    no-save
+  >
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
+    <!--    <HeaderMenu-->
+    <!--      title="Заявки обратной связи"-->
+    <!--      :edit="false"-->
+    <!--      back="settings"-->
+    <!--    />-->
 
     <div
       v-if="isLoading"
@@ -49,7 +54,8 @@
     >
       Список заявок пуст.
     </div>
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -58,6 +64,7 @@ import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { type Feedback, RequestStatusTranslates } from '@/types'
 import { NSpin } from 'naive-ui'
+import AppLayout from '@/components/AppLayout.vue'
 
 const fetcher = useFetch()
 const feedbacks = ref<Feedback[]>([])

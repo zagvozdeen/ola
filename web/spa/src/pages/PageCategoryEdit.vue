@@ -1,11 +1,16 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">
-    <HeaderMenu
-      :title="title"
-      :edit="true"
-      back="categories"
-      @ready="onSubmit"
-    />
+  <AppLayout
+    :title="title"
+    back="categories"
+    @save="onSubmit"
+  >
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">-->
+    <!--    <HeaderMenu-->
+    <!--      :title="title"-->
+    <!--      :edit="true"-->
+    <!--      back="categories"-->
+    <!--      @ready="onSubmit"-->
+    <!--    />-->
 
     <div
       v-if="isLoading"
@@ -32,7 +37,8 @@
         />
       </n-form-item>
     </n-form>
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -44,6 +50,7 @@ import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type FormInst, type FormRules, NForm, NFormItem, NInput, NSpin } from 'naive-ui'
 import { type UpsertCategoryRequest } from '@/types'
+import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
 const router = useRouter()

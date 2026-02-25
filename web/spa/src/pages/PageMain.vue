@@ -1,11 +1,12 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">
-    <h1
-      class="text-lg font-bold"
-      style="margin-top: calc(var(--tg-content-safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px))"
-    >
-      Каталог товаров и услуг
-    </h1>
+  <AppLayout title="Товары и услуги">
+    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
+    <!--    <h1-->
+    <!--      class="text-lg font-bold"-->
+    <!--      style="margin-top: calc(var(&#45;&#45;tg-content-safe-area-inset-top, 0px) + var(&#45;&#45;tg-safe-area-inset-top, 0px))"-->
+    <!--    >-->
+    <!--      Каталог товаров и услуг-->
+    <!--    </h1>-->
 
     <ul class="grid grid-cols-2 gap-2">
       <li
@@ -49,7 +50,8 @@
     </ul>
 
     <FooterMenu />
-  </div>
+    <!--  </div>-->
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +61,7 @@ import { cart } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import type { Product } from '@/types'
+import AppLayout from '@/components/AppLayout.vue'
 
 const fetcher = useFetch()
 const notify = useNotifications()
