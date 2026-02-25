@@ -221,10 +221,12 @@ func (s *Service) updateOrderStatus(r *http.Request, user *models.User) core.Res
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update order status: %w", err))
 	}
 
-	updated, err := s.store.GetOrderByUUID(r.Context(), uid)
+	order, err = s.store.GetOrderByUUID(r.Context(), uid)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated order: %w", err))
 	}
 
-	return core.JSON(http.StatusOK, updated)
+	s.eventBus.OrderChanged.Publish(context.WithoutCancel(r.Context()), order)
+
+	return core.JSON(http.StatusOK, order)
 }

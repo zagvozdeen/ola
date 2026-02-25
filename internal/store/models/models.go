@@ -124,5 +124,11 @@ type CategoryProduct struct {
 type OrderTelegramMessage struct {
 	OrderID   int   `json:"order_id"`
 	ChatID    int64 `json:"chat_id"`
-	MessageID int64 `json:"message_id"`
+	MessageID int   `json:"message_id"`
+}
+
+type FeedbackTelegramMessage struct {
+	FeedbackID int   `json:"feedback_id"`
+	ChatID     int64 `json:"chat_id"`
+	MessageID  int   `json:"message_id"`
 }

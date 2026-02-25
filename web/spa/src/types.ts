@@ -64,13 +64,13 @@ export const UserRoleOptions = Object.values(UserRole).map((key) => ({
 
 export type User = {
   id: number
-  tid?: number
+  tid: number | null
   uuid: UUID
   first_name: string
-  last_name?: string
-  username?: string
-  email?: string
-  phone?: string
+  last_name: string | null
+  username: string | null
+  email: string | null
+  phone: string | null
   role: UserRole
   created_at: DateTime
   updated_at: DateTime
@@ -193,9 +193,9 @@ export type CreateFeedbackRequest = {
 }
 
 export type CreateOrderRequest = {
-  name: string
-  phone: string
-  content: string
+  name: string | null
+  phone: string | null
+  content: string | null
 }
 
 export type UpdateRequestStatusRequest = {

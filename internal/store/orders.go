@@ -48,6 +48,22 @@ func (s *Store) GetOrderByUUID(ctx context.Context, orderUUID uuid.UUID) (*model
 	return order, nil
 }
 
+func (s *Store) GetOrderByID(ctx context.Context, orderID int) (*models.Order, error) {
+	order := &models.Order{}
+	err := s.querier(ctx).QueryRow(
+		ctx,
+		"SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders WHERE id = $1",
+		orderID,
+	).Scan(
+		&order.ID, &order.UUID, &order.Status, &order.Source, &order.Name, &order.Phone, &order.Content, &order.UserID, &order.CreatedAt, &order.UpdatedAt,
+	)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+
+	return order, nil
+}
+
 func (s *Store) CreateOrder(ctx context.Context, order *models.Order) error {
 	err := s.querier(ctx).QueryRow(
 		ctx,

@@ -7,7 +7,9 @@ import (
 )
 
 type RequestStatus struct {
-	slug string
+	slug  string
+	emoji string
+	label string
 }
 
 func NewRequestStatus(s string) (RequestStatus, error) {
@@ -24,13 +26,21 @@ func NewRequestStatus(s string) (RequestStatus, error) {
 }
 
 var (
-	RequestStatusCreated    = RequestStatus{slug: "created"}
-	RequestStatusInProgress = RequestStatus{slug: "in_progress"}
-	RequestStatusReviewed   = RequestStatus{slug: "reviewed"}
+	RequestStatusCreated    = RequestStatus{slug: "created", emoji: "🆕", label: "Новый"}
+	RequestStatusInProgress = RequestStatus{slug: "in_progress", emoji: "💼", label: "В работе"}
+	RequestStatusReviewed   = RequestStatus{slug: "reviewed", emoji: "✅", label: "Завершён"}
 )
 
-func (s *RequestStatus) String() string {
+func (s RequestStatus) String() string {
 	return s.slug
+}
+
+func (s RequestStatus) Emoji() string {
+	return s.emoji
+}
+
+func (s RequestStatus) Label() string {
+	return s.label
 }
 
 func (s *RequestStatus) Scan(src any) error {

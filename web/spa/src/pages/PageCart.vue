@@ -305,6 +305,7 @@ onMounted(async () => {
 
   if (auth.currentUser.value) {
     form.name = auth.currentUser.value.first_name
+    form.phone = auth.currentUser.value.phone
   }
 
   await refreshCart()

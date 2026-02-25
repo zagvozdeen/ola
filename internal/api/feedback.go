@@ -180,10 +180,12 @@ func (s *Service) updateFeedbackStatus(r *http.Request, user *models.User) core.
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to update feedback status: %w", err))
 	}
 
-	updated, err := s.store.GetFeedbackByUUID(r.Context(), uid)
+	feedback, err = s.store.GetFeedbackByUUID(r.Context(), uid)
 	if err != nil {
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to load updated feedback: %w", err))
 	}
 
-	return core.JSON(http.StatusOK, updated)
+	s.eventBus.FeedbackChanged.Publish(context.WithoutCancel(r.Context()), feedback)
+
+	return core.JSON(http.StatusOK, feedback)
 }

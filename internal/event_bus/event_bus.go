@@ -8,11 +8,15 @@ import (
 type EventBus struct {
 	OrderCreated    *Event[*models.Order]
 	FeedbackCreated *Event[*models.Feedback]
+	OrderChanged    *Event[*models.Order]
+	FeedbackChanged *Event[*models.Feedback]
 }
 
 func New(pool *worker_pool.WorkerPool) *EventBus {
 	return &EventBus{
 		OrderCreated:    NewEvent[*models.Order](pool),
 		FeedbackCreated: NewEvent[*models.Feedback](pool),
+		OrderChanged:    NewEvent[*models.Order](pool),
+		FeedbackChanged: NewEvent[*models.Feedback](pool),
 	}
 }

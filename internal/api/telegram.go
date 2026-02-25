@@ -3,6 +3,9 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-telegram/bot"
@@ -19,7 +22,12 @@ func (s *Service) startBot(ctx context.Context) error {
 		s.log.Info("Telegram bot disabled")
 		return errTelegramBotDisabled
 	}
-	b, err := bot.New(s.cfg.Telegram.BotToken, bot.WithDefaultHandler(s.defaultHandler), bot.WithDebug())
+	b, err := bot.New(
+		s.cfg.Telegram.BotToken,
+		bot.WithDefaultHandler(s.defaultHandler),
+		bot.WithCallbackQueryDataHandler(orderCallbackPrefix, bot.MatchTypePrefix, s.handleOrderStatusCallback),
+		bot.WithCallbackQueryDataHandler(feedbackCallbackPrefix, bot.MatchTypePrefix, s.handleOrderStatusCallback),
+	)
 	if err != nil {
 		return err
 	}
@@ -82,4 +90,67 @@ func (s *Service) defaultHandler(ctx context.Context, b *bot.Bot, update *models
 		s.log.Error("Failed to send telegram message", err)
 		return
 	}
+}
+
+func (s *Service) handleOrderStatusCallback(ctx context.Context, b *bot.Bot, update *models.Update) {
+	callback := update.CallbackQuery
+	if callback == nil {
+		return
+	}
+
+	orderID, status, ok := parseOrderStatusCallbackData(callback.Data)
+	if !ok {
+		return
+	}
+
+	err := s.store.UpdateOrderStatus(ctx, orderID, status)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			s.answerOrderStatusCallback(ctx, b, callback.ID, "Заказ не найден")
+			return
+		}
+		s.log.Error("Failed to update order status from telegram callback", err)
+		s.answerOrderStatusCallback(ctx, b, callback.ID, "Не удалось обновить статус")
+		return
+	}
+
+	order, err := s.store.GetOrderByID(ctx, orderID)
+	if err != nil {
+		s.log.Error("Failed to load order after telegram callback", err)
+		s.answerOrderStatusCallback(ctx, b, callback.ID, "Статус обновлён, но не удалось обновить сообщение")
+		return
+	}
+
+	s.eventBus.OrderChanged.Publish(context.WithoutCancel(ctx), order)
+	s.answerOrderStatusCallback(ctx, b, callback.ID, fmt.Sprintf("Статус: %s", status.Label()))
+}
+
+func (s *Service) answerOrderStatusCallback(ctx context.Context, b *bot.Bot, callbackID string, text string) {
+	_, err := b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
+		CallbackQueryID: callbackID,
+		Text:            text,
+		ShowAlert:       false,
+	})
+	if err != nil {
+		s.log.Error("Failed to answer callback query", err)
+	}
+}
+
+func parseOrderStatusCallbackData(data string) (int, enums.RequestStatus, bool) {
+	parts := strings.Split(data, ":")
+	if len(parts) != 3 || parts[0] != orderCallbackPrefix {
+		return 0, enums.RequestStatus{}, false
+	}
+
+	orderID, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, enums.RequestStatus{}, false
+	}
+
+	status, err := enums.NewRequestStatus(parts[2])
+	if err != nil {
+		return 0, enums.RequestStatus{}, false
+	}
+
+	return orderID, status, true
 }

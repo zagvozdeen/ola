@@ -1,12 +1,9 @@
 <template>
-  <div class="min-h-dvh w-full flex flex-col gap-4 py-6">
-    <HeaderMenu
-      :title="title"
-      :edit="true"
-      back="settings"
-      @ready="onSubmit"
-    />
-
+  <AppLayout
+    :title="title"
+    back="settings"
+    @save="onSubmit"
+  >
     <n-form
       ref="formRef"
       class="w-full bg-gray-500/20 p-4 rounded-2xl"
@@ -49,13 +46,12 @@
         />
       </n-form-item>
     </n-form>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, type InputHTMLAttributes, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useAuthState } from '@/composables/useAuthState'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
@@ -63,6 +59,7 @@ import { useSender } from '@/composables/useSender'
 import { type CreateFeedbackRequest, FeedbackType } from '@/types'
 import { type FormInst, NForm, NFormItem, NInput, type FormRules } from 'naive-ui'
 import { vMaska } from 'maska/vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
 const auth = useAuthState()
@@ -148,8 +145,6 @@ const onSubmit = () => {
     }
 
     notify.info(successByType[form.type])
-    form.name = ''
-    form.phone = ''
     form.content = ''
   })
 }
