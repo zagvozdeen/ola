@@ -7,7 +7,8 @@ import (
 )
 
 type FeedbackType struct {
-	slug string
+	slug  string
+	label string
 }
 
 func NewFeedbackType(s string) (FeedbackType, error) {
@@ -24,13 +25,17 @@ func NewFeedbackType(s string) (FeedbackType, error) {
 }
 
 var (
-	FeedbackTypeManagerContact   = FeedbackType{slug: "manager_contact"}
-	FeedbackTypePartnershipOffer = FeedbackType{slug: "partnership_offer"}
-	FeedbackTypeFeedbackRequest  = FeedbackType{slug: "feedback_request"}
+	FeedbackTypeManagerContact   = FeedbackType{slug: "manager_contact", label: "Связаться с менеджером"}
+	FeedbackTypePartnershipOffer = FeedbackType{slug: "partnership_offer", label: "Предложение о сотрудничестве"}
+	FeedbackTypeFeedbackRequest  = FeedbackType{slug: "feedback_request", label: "Обратная связь"}
 )
 
-func (t *FeedbackType) String() string {
+func (t FeedbackType) String() string {
 	return t.slug
+}
+
+func (t FeedbackType) Label() string {
+	return t.label
 }
 
 func (t *FeedbackType) Scan(src any) error {

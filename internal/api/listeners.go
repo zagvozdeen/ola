@@ -23,10 +23,19 @@ func (s *Service) registerListeners() {
 			return nil
 		}
 
+		var user *model.User
+		var err error
+		if order.UserID != nil {
+			user, err = s.store.GetUserByID(ctx, *order.UserID)
+			if err != nil {
+				return fmt.Errorf("failed to get user: %w", err)
+			}
+		}
+
 		message, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      s.cfg.Telegram.GroupID,
 			ParseMode:   models.ParseModeMarkdown,
-			Text:        buildOrderTelegramText(order),
+			Text:        buildOrderTelegramText(order, user),
 			ReplyMarkup: getKeyboard(order.Status, orderCallbackPrefix, order.ID, order.UUID),
 		})
 		if err != nil {
@@ -50,6 +59,15 @@ func (s *Service) registerListeners() {
 			return nil
 		}
 
+		var user *model.User
+		var err error
+		if order.UserID != nil {
+			user, err = s.store.GetUserByID(ctx, *order.UserID)
+			if err != nil {
+				return fmt.Errorf("failed to get user: %w", err)
+			}
+		}
+
 		message, err := s.store.GetOrderTelegramMessageByOrderID(ctx, order.ID)
 		if err != nil {
 			if errors.Is(err, model.ErrNotFound) {
@@ -62,7 +80,7 @@ func (s *Service) registerListeners() {
 			ChatID:      message.ChatID,
 			MessageID:   message.MessageID,
 			ParseMode:   models.ParseModeMarkdown,
-			Text:        buildOrderTelegramText(order),
+			Text:        buildOrderTelegramText(order, user),
 			ReplyMarkup: getKeyboard(order.Status, orderCallbackPrefix, order.ID, order.UUID),
 		})
 		if err != nil {
@@ -76,10 +94,20 @@ func (s *Service) registerListeners() {
 		if feedback == nil || s.bot == nil {
 			return nil
 		}
+
+		var user *model.User
+		var err error
+		if feedback.UserID != nil {
+			user, err = s.store.GetUserByID(ctx, *feedback.UserID)
+			if err != nil {
+				return fmt.Errorf("failed to get user: %w", err)
+			}
+		}
+
 		message, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      s.cfg.Telegram.GroupID,
 			ParseMode:   models.ParseModeMarkdown,
-			Text:        buildFeedbackTelegramText(feedback),
+			Text:        buildFeedbackTelegramText(feedback, user),
 			ReplyMarkup: getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID, feedback.UUID),
 		})
 		if err != nil {
@@ -103,6 +131,15 @@ func (s *Service) registerListeners() {
 			return nil
 		}
 
+		var user *model.User
+		var err error
+		if feedback.UserID != nil {
+			user, err = s.store.GetUserByID(ctx, *feedback.UserID)
+			if err != nil {
+				return fmt.Errorf("failed to get user: %w", err)
+			}
+		}
+
 		message, err := s.store.GetFeedbackTelegramMessageByFeedbackID(ctx, feedback.ID)
 		if err != nil {
 			if errors.Is(err, model.ErrNotFound) {
@@ -115,7 +152,7 @@ func (s *Service) registerListeners() {
 			ChatID:      message.ChatID,
 			MessageID:   message.MessageID,
 			ParseMode:   models.ParseModeMarkdown,
-			Text:        buildFeedbackTelegramText(feedback),
+			Text:        buildFeedbackTelegramText(feedback, user),
 			ReplyMarkup: getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID, feedback.UUID),
 		})
 		if err != nil {
@@ -166,27 +203,36 @@ func getKeyboard(status enums.RequestStatus, prefix string, id int, uuid uuid.UU
 	}
 }
 
-func buildOrderTelegramText(order *model.Order) string {
+func buildOrderTelegramText(order *model.Order, user *model.User) string {
+	name := bot.EscapeMarkdown(order.Name)
+	if user != nil && user.Username != nil {
+		name = fmt.Sprintf("[%s](%s)", name, bot.EscapeMarkdown("https://t.me/"+*user.Username))
+	}
 	return fmt.Sprintf(
 		"%s Заказ \\#%s\n\n*– UUID\\:* %s\n*– Статус\\:* %s\n*– Имя\\:* %s\n*– Телефон\\:* %s\n*– Комментарий\\:* %s",
 		order.Status.Emoji(),
 		bot.EscapeMarkdown(strconv.Itoa(order.ID)),
 		bot.EscapeMarkdown(order.UUID.String()),
 		bot.EscapeMarkdown(order.Status.Label()),
-		bot.EscapeMarkdown(order.Name),
+		name,
 		bot.EscapeMarkdown(order.Phone),
 		bot.EscapeMarkdown(order.Content),
 	)
 }
 
-func buildFeedbackTelegramText(feedback *model.Feedback) string {
+func buildFeedbackTelegramText(feedback *model.Feedback, user *model.User) string {
+	name := bot.EscapeMarkdown(feedback.Name)
+	if user != nil && user.Username != nil {
+		name = fmt.Sprintf("[%s](%s)", name, bot.EscapeMarkdown("https://t.me/"+*user.Username))
+	}
 	return fmt.Sprintf(
-		"%s Обратная связь \\#%s\n\n*– UUID\\:* %s\n*– Статус\\:* %s\n*– Имя\\:* %s\n*– Телефон\\:* %s\n*– Комментарий\\:* %s",
+		"%s Обратная связь \\#%s\n\n*– UUID\\:* %s\n*– Статус\\:* %s\n*– Тип\\:* %s\n*– Имя\\:* %s\n*– Телефон\\:* %s\n*– Комментарий\\:* %s",
 		feedback.Status.Emoji(),
 		bot.EscapeMarkdown(strconv.Itoa(feedback.ID)),
 		bot.EscapeMarkdown(feedback.UUID.String()),
 		bot.EscapeMarkdown(feedback.Status.Label()),
-		bot.EscapeMarkdown(feedback.Name),
+		bot.EscapeMarkdown(feedback.Type.Label()),
+		name,
 		bot.EscapeMarkdown(feedback.Phone),
 		bot.EscapeMarkdown(feedback.Content),
 	)
