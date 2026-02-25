@@ -99,6 +99,8 @@ func (s *Service) createOrder(r *http.Request, user *models.User) core.Response 
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to create order: %w", err))
 	}
 
+	s.eventBus.OrderCreated.Publish(context.WithoutCancel(r.Context()), order)
+
 	return core.JSON(http.StatusCreated, order)
 }
 
@@ -137,6 +139,8 @@ func (s *Service) createOrderFromCart(r *http.Request, user *models.User) core.R
 	}
 
 	s.store.Commit(ctx)
+
+	s.eventBus.OrderCreated.Publish(context.WithoutCancel(r.Context()), order)
 
 	return core.JSON(http.StatusCreated, order)
 }

@@ -121,5 +121,8 @@ type CategoryProduct struct {
 	ProductID  int `json:"product_id"`
 }
 
-type OrderCreated struct {
+type OrderTelegramMessage struct {
+	OrderID   int   `json:"order_id"`
+	ChatID    int64 `json:"chat_id"`
+	MessageID int64 `json:"message_id"`
 }
