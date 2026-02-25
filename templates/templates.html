@@ -1,0 +1,57 @@
+{{ define "header" }}
+<header class="{{ if not .IsBlock }}absolute{{ end }} w-full z-10">
+    <div class="max-w-350 mx-auto px-4">
+        <div class="flex justify-between items-center gap-2">
+            <div class="flex items-center gap-4 lg:gap-8">
+                <a href="/">
+                    <img class="w-16 sm:w-20" src="/logo.png" alt="Логотип" width="80" height="80">
+                </a>
+                <ul class="hidden items-center gap-4 text-sm lg:flex lg:text-base {{ if .IsBlock }}text-black{{ else }}text-white{{ end }}">
+                    <li><a class="font-semibold hover:text-purple-500 transition-colors" href="/#about">о нас</a></li>
+                    <li><a class="font-semibold hover:text-purple-500 transition-colors" href="/#products">ассортимент</a></li>
+                    <li><a class="font-semibold hover:text-purple-500 transition-colors" href="/#services">услуги</a></li>
+                    <li><a class="font-semibold hover:text-purple-500 transition-colors" href="/#reviews">отзывы</a></li>
+                    <li><a class="font-semibold hover:text-purple-500 transition-colors" href="/#contacts">контакты</a></li>
+                    <li><a class="font-semibold hover:text-purple-500 transition-colors" href="/delivery">оплата и доставка</a></li>
+                </ul>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="hidden sm:inline font-semibold text-sm {{ if .IsBlock }}text-black{{ else }}text-white{{ end }}">г. Екатеринбург</span>
+                <a class="hidden md:inline-flex bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-6 py-2 font-bold text-sm lg:text-base" href="/#order">оформить праздник</a>
+                <button id="menu-toggle" class="burger{{ if .IsBlock}} burger--dark{{ end }} inline-flex lg:hidden" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="mobile-menu lg:hidden" id="mobile-menu" aria-hidden="true">
+    <button id="mobile-menu-toggle" class="burger burger--dark mobile-menu__toggle inline-flex" type="button" aria-label="Закрыть меню" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="mobile-menu__panel">
+        <a href="/">
+            <img class="w-20" src="/logo.png" alt="Логотип" width="80" height="80">
+        </a>
+        <nav>
+            <ul class="flex flex-col items-center gap-6 text-lg font-bold">
+                <li><a class="text-black transition-colors hover:text-purple-500" href="/#about">о нас</a></li>
+                <li><a class="text-black transition-colors hover:text-purple-500" href="/#products">ассортимент</a></li>
+                <li><a class="text-black transition-colors hover:text-purple-500" href="/#services">услуги</a></li>
+                <li><a class="text-black transition-colors hover:text-purple-500" href="/#reviews">отзывы</a></li>
+                <li><a class="text-black transition-colors hover:text-purple-500" href="/#contacts">контакты</a></li>
+                <li><a class="text-black transition-colors hover:text-purple-500" href="/delivery">оплата и доставка</a></li>
+            </ul>
+        </nav>
+        <div class="mt-10 flex flex-col items-center gap-4">
+            <span class="font-semibold text-sm text-black/70">г. Екатеринбург</span>
+            <a class="bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-8 py-3 font-bold text-base" href="#order">оформить праздник</a>
+        </div>
+    </div>
+</div>
+{{ end }}

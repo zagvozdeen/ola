@@ -1,7 +1,10 @@
 import './styles.css'
-import IMask from 'imask'
+// import IMask from 'imask'
 import { i18n } from '../../spa/src/composables/useI18n'
 import type { ValidationError } from '../../spa/src/types'
+import { MaskInput } from 'maska'
+
+new MaskInput('[data-maska]')
 
 type FeedbackFormConfig = {
   endpoint: string
@@ -30,25 +33,33 @@ const getValidationMessage = (field: string, tag: string): string => {
 
 const initMobileMenu = (): void => {
   const toggle = document.getElementById('menu-toggle')
+  const popupToggle = document.getElementById('mobile-menu-toggle')
   const menu = document.getElementById('mobile-menu')
 
   if (!(toggle instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) {
     return
   }
 
-  const body = document.body
+  const toggles = [toggle]
+  if (popupToggle instanceof HTMLButtonElement) {
+    toggles.push(popupToggle)
+  }
 
   const setOpen = (isOpen: boolean): void => {
     menu.classList.toggle('is-open', isOpen)
-    toggle.classList.toggle('is-open', isOpen)
-    body.classList.toggle('menu-open', isOpen)
-    toggle.setAttribute('aria-expanded', String(isOpen))
+    toggles.forEach((button) => {
+      button.classList.toggle('is-open', isOpen)
+      button.setAttribute('aria-expanded', String(isOpen))
+    })
+    document.body.classList.toggle('menu-open', isOpen)
     menu.setAttribute('aria-hidden', String(!isOpen))
   }
 
-  toggle.addEventListener('click', () => {
-    const isOpen = !menu.classList.contains('is-open')
-    setOpen(isOpen)
+  toggles.forEach((button) => {
+    button.addEventListener('click', () => {
+      const isOpen = !menu.classList.contains('is-open')
+      setOpen(isOpen)
+    })
   })
 
   menu.addEventListener('click', (event) => {
@@ -64,19 +75,19 @@ const initMobileMenu = (): void => {
 
     setOpen(false)
 
-    const hash = link.getAttribute('href') || ''
-    if (!hash.startsWith('#') || hash === '#') {
-      return
-    }
-
-    const section = document.querySelector<HTMLElement>(hash)
-    if (!section) {
-      return
-    }
-
-    event.preventDefault()
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    history.pushState(null, '', hash)
+    // const hash = link.getAttribute('href') || ''
+    // if (!hash.startsWith('#') || hash === '#') {
+    //   return
+    // }
+    //
+    // const section = document.querySelector<HTMLElement>(hash)
+    // if (!section) {
+    //   return
+    // }
+    //
+    // event.preventDefault()
+    // section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // history.pushState(null, '', hash)
   })
 
   window.addEventListener('keydown', (event) => {
@@ -155,9 +166,9 @@ const initFeedbackForm = (
     return hasValidationErrors
   }
 
-  const phoneMask = IMask(phoneInput, {
-    mask: '+{7} (000) 000-00-00',
-  })
+  // const phoneMask = IMask(phoneInput, {
+  //   mask: '+{7} (000) 000-00-00',
+  // })
 
   consentInput.addEventListener('change', () => {
     if (consentInput.checked) {
@@ -221,7 +232,7 @@ const initFeedbackForm = (
 
       setStatus(config.successMessage, 'success')
       form.reset()
-      phoneMask.value = ''
+      // phoneMask.value = ''
     } catch {
       setStatus(i18n['form.network_error'] || 'Ошибка сети. Попробуйте позже', 'error')
     } finally {
@@ -244,7 +255,7 @@ const initReviewForms = (): void => {
   if (orderForm) {
     initFeedbackForm(orderForm, {
       endpoint: '/api/guest/orders',
-      successMessage: 'Спасибо! Заявка отправлена',
+      successMessage: 'Спасибо, заявка отправлена!',
       submitErrorMessage: 'Не удалось отправить заявку',
     })
   }

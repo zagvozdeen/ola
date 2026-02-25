@@ -5,58 +5,15 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>OLA studio</title>
+    <title>{{ .Title }}</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     {{ .Head }}
 </head>
-<body class="antialiased font-gothic overflow-x-hidden">
-<header class="absolute w-full z-10">
-    <div class="max-w-350 mx-auto px-4">
-        <div class="flex justify-between items-center gap-2">
-            <div class="flex items-center gap-4 lg:gap-8">
-                <img class="w-16 sm:w-20" src="/logo.png" alt="Логотип" width="80" height="80">
-                <ul class="hidden items-center gap-4 text-sm lg:flex lg:text-base">
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#about">о нас</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#products">ассортимент</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#services">услуги</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#reviews">отзывы</a></li>
-                    <li><a class="text-white font-bold hover:text-purple-500 transition-colors" href="#contacts">контакты</a></li>
-                </ul>
-            </div>
-            <div class="flex items-center gap-4">
-                <span class="hidden sm:inline font-semibold text-white text-sm">г. Екатеринбург</span>
-                <a class="hidden md:inline-flex bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-6 py-2 font-bold text-sm lg:text-base" href="#order">оформить праздник</a>
-                <button id="menu-toggle" class="burger inline-flex lg:hidden" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
-
-<div class="mobile-menu lg:hidden" id="mobile-menu" aria-hidden="true">
-    <div class="mobile-menu__panel">
-        <img class="w-20" src="/logo.png" alt="Логотип" width="80" height="80">
-        <nav>
-            <ul class="flex flex-col items-center gap-6 text-lg font-bold">
-                <li><a class="text-black transition-colors hover:text-purple-500" href="#about">о нас</a></li>
-                <li><a class="text-black transition-colors hover:text-purple-500" href="#products">ассортимент</a></li>
-                <li><a class="text-black transition-colors hover:text-purple-500" href="#services">услуги</a></li>
-                <li><a class="text-black transition-colors hover:text-purple-500" href="#reviews">отзывы</a></li>
-                <li><a class="text-black transition-colors hover:text-purple-500" href="#contacts">контакты</a></li>
-            </ul>
-        </nav>
-        <div class="mt-10 flex flex-col items-center gap-4">
-            <span class="font-semibold text-sm text-black/70">г. Екатеринбург</span>
-            <a class="bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-8 py-3 font-bold text-base" href="#order">оформить праздник</a>
-        </div>
-    </div>
-</div>
+<body class="antialiased font-inter overflow-x-hidden">
+{{ template "header" }}
 
 <div class="relative h-132">
     <img class="-z-20 absolute inset-0 h-full w-full object-cover" src="/image_1.png" alt="Задний фон в виде шариков">
@@ -67,7 +24,7 @@
     </div>
 </div>
 
-<div id="about" class="mt-30 mb-33">
+<div id="about" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-purple-500 font-bold mb-10">Почему выбирают OLA Studio?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Мы подходим к каждому заказу с душой. Наша главная задача<br>— сделать ваш праздник особенным и подарить яркие<br>впечатления!</h3>
@@ -97,7 +54,7 @@
     </div>
 </div>
 
-<div id="products" class="mt-30 mb-33">
+<div id="products" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-300 mx-auto px-4">
         <h2 class="text-center text-3xl sm:text-4xl lg:text-5xl text-purple-500 font-bold mb-10">Наш ассортимент</h2>
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
@@ -118,7 +75,7 @@
     </div>
 </div>
 
-<div id="services" class="mt-30 mb-33">
+<div id="services" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-300 mx-auto px-4">
         <h2 class="text-center text-3xl sm:text-4xl lg:text-5xl text-purple-500 font-bold mb-10">Услуги</h2>
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
@@ -168,7 +125,7 @@
     </div>
 </div>
 
-<div class="mt-30 mb-33">
+<div class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-purple-500 font-bold mb-10">Как мы работаем?</h2>
         <div class="relative mt-16">
@@ -207,7 +164,7 @@
     </div>
 </div>
 
-<div id="reviews" class="mt-30 mb-33">
+<div id="reviews" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-purple-500 font-bold mb-10">Что наши клиенты говорят<br>о нас?</h2>
 <!--        <div class="mb-6 flex items-center justify-center gap-4">-->
@@ -219,17 +176,21 @@
 <!--            </button>-->
 <!--        </div>-->
         <div class="max-w-full overflow-x-auto">
-        <div class="mx-auto" style="width:560px; height:800px; overflow:hidden; position:relative;">
-            <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/53260486857?comments"></iframe>
-            <a href="https://yandex.ru/maps/org/yandeks_market/53260486857/" target="_blank" style="box-sizing:border-box;text-decoration:none;color:#b3b3b3;font-size:10px;font-family:YS Text,sans-serif;position:absolute;bottom:8px;width:100%;text-align:center;left:0;overflow:hidden;text-overflow:ellipsis;display:block;max-height:14px;white-space:nowrap;padding:0 16px;">Яндекс Маркет на карте Екатеринбурга — Яндекс Карты
-            </a>
-        </div>
+<!--        <div class="mx-auto" style="width:560px; height:800px; overflow:hidden; position:relative;">-->
+<!--            <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/53260486857?comments"></iframe>-->
+<!--            <a href="https://yandex.ru/maps/org/yandeks_market/53260486857/" target="_blank" style="box-sizing:border-box;text-decoration:none;color:#b3b3b3;font-size:10px;font-family:YS Text,sans-serif;position:absolute;bottom:8px;width:100%;text-align:center;left:0;overflow:hidden;text-overflow:ellipsis;display:block;max-height:14px;white-space:nowrap;padding:0 16px;">Яндекс Маркет на карте Екатеринбурга — Яндекс Карты-->
+<!--            </a>-->
+<!--        </div>-->
+            <div class="mx-auto" style="width:560px;height:800px;overflow:hidden;position:relative;">
+                <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/146941894574?comments"></iframe>
+                <a href="https://yandex.com/maps/org/ola_studio/146941894574/" target="_blank" style="box-sizing:border-box;text-decoration:none;color:#b3b3b3;font-size:10px;font-family:YS Text,sans-serif;padding:0 20px;position:absolute;bottom:8px;width:100%;text-align:center;left:0;overflow:hidden;text-overflow:ellipsis;display:block;max-height:14px;white-space:nowrap;padding:0 16px;box-sizing:border-box">Ola studio на карте Екатеринбурга — Яндекс Карты</a>
+            </div>
         </div>
     </div>
 </div>
 
 
-<!--<div class="mt-30 mb-33">-->
+<!--<div class="my-20 sm:mt-30 sm:mb-33">-->
 <!--    <div class="max-w-250 mx-auto px-4">-->
 <!--        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-purple-500 font-bold mb-10">Поделитесь своим мнением!</h2>-->
 <!--        <h3 class="text-center font-bold text-xl mb-25">Ваша обратная связь помогает нам развиваться и<br>становиться лучше.</h3>-->
@@ -271,7 +232,7 @@
 <!--    </div>-->
 <!--</div>-->
 
-<div id="order" class="mt-30 mb-33">
+<div id="order" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-purple-500 font-bold mb-10">Готовы создать незабываемый праздник?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Оставьте заявку, и мы подготовим для вас<br>индивидуальное предложение.</h3>
@@ -284,7 +245,7 @@
 
             <div class="mb-6">
                 <label for="order-phone" class="block text-base font-bold text-black">Ваш телефон</label>
-                <input id="order-phone" name="phone" type="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
+                <input id="order-phone" name="phone" type="tel" autocomplete="tel" data-maska="+7 (###) ### ## ##" placeholder="+7 (___) ___-__-__" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-purple-500" required>
                 <p data-error-for="phone" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
             </div>
 
@@ -298,8 +259,7 @@
                 <label for="order-consent" class="flex items-start gap-3 text-sm font-medium text-black/80 select-none cursor-pointer">
                     <input id="order-consent" name="consent" type="checkbox" class="mt-0.5 size-4 shrink-0 accent-yellow-400" required>
                     <span>
-                        Я даю согласие на <a href="#" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">обработку персональных данных</a>
-                        и ознакомлен(а) с <a href="#" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">Политикой обработки персональных данных</a>.
+                        Я даю согласие на обработку персональных данных и ознакомлен(а) с <a href="/privacy" class="underline decoration-black/60 underline-offset-2 hover:text-purple-500">Политикой обработки персональных данных</a>.
                     </span>
                 </label>
                 <p data-error-for="consent" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
@@ -315,7 +275,7 @@
 
 <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A79e908e0d899c87b29a13c43983ae40a86394524a07ff3d21439d89f9962906c&amp;width=100%25&amp;height=500&amp;lang=ru_RU&amp;scroll=true"></script>
 
-<div id="contacts" class="mt-30 mb-33">
+<div id="contacts" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-purple-500 font-bold mb-10">Контакты</h2>
         <ul class="flex flex-col items-center gap-2">
@@ -356,7 +316,7 @@
 
 <footer class="bg-purple-500 py-10">
     <div class="max-w-350 mx-auto px-4">
-        <p class="text-white font-bold text-sm">© 2025-2026. Сбор и обработка персональных данных производится в соответствии с <a href="#" class="underline decoration-white underline-offset-2 hover:text-gray-200">политикой конфиденциальности</a>.</p>
+        <p class="text-white font-bold text-sm">© 2025-2026. Сбор и обработка персональных данных производится в соответствии с <a href="/privacy" class="underline decoration-white underline-offset-2 hover:text-gray-200">политикой конфиденциальности</a>.</p>
     </div>
 </footer>
 </body>

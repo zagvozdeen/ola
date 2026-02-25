@@ -21,7 +21,8 @@ type PageData struct {
 	Products   []models.Product
 	Services   []models.Product
 	Categories []models.Category
-	Reviews    []models.Review
+	Title      string
+	IsBlock    bool
 }
 
 type viteManifestEntry struct {
@@ -84,14 +85,26 @@ func (s *Service) index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
-	tmlp, err := template.ParseFiles("templates/index.html")
+	isBlock, title, page, err := getTemplate(r)
 	if err != nil {
-		s.log.Error("Failed to parse template", err)
+		s.log.Warn("Get template error", slog.Any("error", err))
+		http.NotFound(w, r)
+		return
+	}
+	//filenames := []string{}
+	//switch r.URL.Path {
+	//case "/delivery", "/delivery/":
+	//	filenames[0] =
+	//}
+	var templates *template.Template
+	templates, err = s.getTemplates()
+	if err != nil {
+		s.log.Error("Get templates error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	head := template.HTML(`<script type="module" src="http://localhost:5173/@vite/client"></script>
-<script type="module" src="http://localhost:5173/web/landing/src/main.ts"></script>`)
+	var head template.HTML
 	if s.cfg.App.IsProduction {
 		head, err = s.renderViteHead(viteHeadParams{
 			ManifestPath:         "public/.vite/manifest.json",
@@ -104,6 +117,8 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 			s.log.Error("Failed to render vite head", err)
 			return
 		}
+	} else {
+		head = `<script type="module" src="http://localhost:5173/@vite/client"></script> <script type="module" src="http://localhost:5173/web/landing/src/main.ts"></script>`
 	}
 
 	allProducts, err := s.store.GetAllProducts(r.Context())
@@ -125,21 +140,55 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		Head:     head,
 		Products: products,
 		Services: services,
+		Title:    title,
+		IsBlock:  isBlock,
 	}
 	data.Categories, err = s.store.GetAllCategories(r.Context())
 	if err != nil {
 		s.log.Error("Failed to get categories", err)
 		return
 	}
-	data.Reviews, err = s.store.GetAllReviews(r.Context())
+	//data.Reviews, err = s.store.GetAllReviews(r.Context())
+	//if err != nil {
+	//	s.log.Error("Failed to get all reviews", err)
+	//	return
+	//}
+	err = templates.ExecuteTemplate(w, page, data)
 	if err != nil {
-		s.log.Error("Failed to get all reviews", err)
+		s.log.Error("Failed to execute template", err, slog.String("path", r.URL.Path))
 		return
 	}
-	err = tmlp.Execute(w, data)
-	if err != nil {
-		s.log.Error("Failed to execute template", err, slog.String("proto", r.Proto), slog.String("url", r.URL.String()))
-		return
+}
+
+func (s *Service) getTemplates() (templates *template.Template, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.templates == nil {
+		templates, err = template.ParseFiles("templates/index.html", "templates/delivery.html", "templates/privacy.html", "templates/templates.html")
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse template: %w", err)
+		}
+	}
+	if s.cfg.App.IsProduction {
+		if s.templates == nil {
+			s.templates = templates
+		}
+		return s.templates, nil
+	}
+	return templates, nil
+}
+
+func getTemplate(r *http.Request) (isBlock bool, title string, template string, err error) {
+	switch r.URL.Path {
+	case "/":
+		return false, "OLA Studio", "index.html", nil
+	case "/delivery", "/delivery/":
+		return true, "Доставка, оплата и возврат | OLA Studio", "delivery.html", nil
+	case "/privacy", "/privacy/":
+		return true, "Политика конфиденциальности | OLA studio", "privacy.html", nil
+	default:
+		return false, "", "", fmt.Errorf("page not found: %s", r.URL.Path)
 	}
 }
 

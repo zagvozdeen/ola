@@ -1,0 +1,31 @@
+<!doctype html>
+<html class="scroll-smooth" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ .Title }}</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet">
+    {{ .Head }}
+</head>
+<body class="antialiased font-inter overflow-x-hidden">
+{{ template "header" . }}
+
+<main class="max-w-4xl mx-auto px-4">
+    <article class="pt-30 pb-15">
+        <h2 class="text-3xl font-bold text-purple-500 mb-10">Политика в отношении обработки персональных данных</h2>
+        <div class="flex flex-col gap-8 text-xl font-medium">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur cum dolor nisi odio reprehenderit! Asperiores commodi corporis, cupiditate, doloribus, eos error iste molestias officia omnis possimus quidem saepe ullam ut.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur cum dolor nisi odio reprehenderit! Asperiores commodi corporis, cupiditate, doloribus, eos error iste molestias officia omnis possimus quidem saepe ullam ut.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur cum dolor nisi odio reprehenderit! Asperiores commodi corporis, cupiditate, doloribus, eos error iste molestias officia omnis possimus quidem saepe ullam ut.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur cum dolor nisi odio reprehenderit! Asperiores commodi corporis, cupiditate, doloribus, eos error iste molestias officia omnis possimus quidem saepe ullam ut.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur cum dolor nisi odio reprehenderit! Asperiores commodi corporis, cupiditate, doloribus, eos error iste molestias officia omnis possimus quidem saepe ullam ut.</p>
+        </div>
+    </article>
+</main>
+</body>
+</html>

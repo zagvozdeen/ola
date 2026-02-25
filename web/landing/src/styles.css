@@ -4,6 +4,7 @@
 
 @theme {
     --font-gothic: "Gothic A1", sans-serif;
+    --font-inter: "Inter", sans-serif;
 }
 
 @keyframes categories-marquee {
@@ -46,6 +47,14 @@ body.menu-open {
     transition: transform 0.25s ease, opacity 0.2s ease, background 0.2s ease;
 }
 
+.burger--dark {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.burger--dark span {
+    background: #111;
+}
+
 .burger.is-open {
     border-color: rgba(0, 0, 0, 0.2);
 }
@@ -76,6 +85,13 @@ body.menu-open {
     pointer-events: none;
     transition: opacity 0.3s ease, visibility 0.3s ease;
     z-index: 40;
+}
+
+.mobile-menu__toggle {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    z-index: 1;
 }
 
 .mobile-menu.is-open {

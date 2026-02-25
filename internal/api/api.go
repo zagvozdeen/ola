@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/http/httputil"
 	"sync"
@@ -31,6 +32,8 @@ type Service struct {
 	workerPool *worker_pool.WorkerPool
 	eventBus   *event_bus.EventBus
 	bot        *bot.Bot
+	templates  *template.Template
+	mu         sync.Mutex
 }
 
 func New(cfg *config.Config, log *logger.Logger, store *store.Store) *Service {
