@@ -28,70 +28,63 @@ const getValidationMessage = (field: string, tag: string): string => {
   return i18n['validation.invalid'] || 'Некорректное значение'
 }
 
-const initReviewsSlider = (): void => {
-  const slider = document.getElementById('reviews-slider')
-  const track = document.getElementById('reviews-track')
-  const prev = document.getElementById('reviews-prev')
-  const next = document.getElementById('reviews-next')
+const initMobileMenu = (): void => {
+  const toggle = document.getElementById('menu-toggle')
+  const menu = document.getElementById('mobile-menu')
 
-  if (
-    !(slider instanceof HTMLElement) ||
-    !(track instanceof HTMLElement) ||
-    !(prev instanceof HTMLButtonElement) ||
-    !(next instanceof HTMLButtonElement)
-  ) {
+  if (!(toggle instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) {
     return
   }
 
-  const slides: HTMLElement[] = Array.from(
-    track.querySelectorAll<HTMLElement>('.review-slide'),
-  )
-  if (slides.length === 0) {
-    return
+  const body = document.body
+
+  const setOpen = (isOpen: boolean): void => {
+    menu.classList.toggle('is-open', isOpen)
+    toggle.classList.toggle('is-open', isOpen)
+    body.classList.toggle('menu-open', isOpen)
+    toggle.setAttribute('aria-expanded', String(isOpen))
+    menu.setAttribute('aria-hidden', String(!isOpen))
   }
 
-  let index = 0
+  toggle.addEventListener('click', () => {
+    const isOpen = !menu.classList.contains('is-open')
+    setOpen(isOpen)
+  })
 
-  const getGap = (): number => {
-    const styles = window.getComputedStyle(track)
-    const rawGap = styles.columnGap || styles.gap || '0'
-    const parsedGap = Number.parseFloat(rawGap)
-    return Number.isNaN(parsedGap) ? 0 : parsedGap
-  }
+  menu.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null
+    const link = target?.closest<HTMLAnchorElement>('a[href]')
 
-  const getStep = (): number => {
-    const firstSlide = slides[0]
-    if (!firstSlide) {
-      return 0
+    if (!link) {
+      if (target === menu) {
+        setOpen(false)
+      }
+      return
     }
-    return firstSlide.getBoundingClientRect().width + getGap()
-  }
 
-  const render = (): void => {
-    const maxIndex = slides.length - 1
-    if (index < 0) index = 0
-    if (index > maxIndex) index = maxIndex
+    setOpen(false)
 
-    track.style.transform = `translate3d(${-index * getStep()}px, 0, 0)`
+    const hash = link.getAttribute('href') || ''
+    if (!hash.startsWith('#') || hash === '#') {
+      return
+    }
 
-    prev.disabled = index === 0
-    next.disabled = index === maxIndex
-    prev.classList.toggle('opacity-40', prev.disabled)
-    next.classList.toggle('opacity-40', next.disabled)
-  }
+    const section = document.querySelector<HTMLElement>(hash)
+    if (!section) {
+      return
+    }
 
-  prev.addEventListener('click', () => {
-    index -= 1
-    render()
+    event.preventDefault()
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    history.pushState(null, '', hash)
   })
 
-  next.addEventListener('click', () => {
-    index += 1
-    render()
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu.classList.contains('is-open')) {
+      setOpen(false)
+      toggle.focus()
+    }
   })
-
-  window.addEventListener('resize', render)
-  render()
 }
 
 const initFeedbackForm = (
@@ -258,7 +251,7 @@ const initReviewForms = (): void => {
 }
 
 const initLandingPage = (): void => {
-  initReviewsSlider()
+  initMobileMenu()
   initReviewForms()
 }
 

@@ -12,10 +12,12 @@ import (
 	model "github.com/zagvozdeen/ola/internal/store/models"
 )
 
+var errTelegramBotDisabled = errors.New("telegram bot disabled")
+
 func (s *Service) startBot(ctx context.Context) error {
 	if !s.cfg.Telegram.BotEnabled {
 		s.log.Info("Telegram bot disabled")
-		return nil
+		return errTelegramBotDisabled
 	}
 	b, err := bot.New(s.cfg.Telegram.BotToken, bot.WithDefaultHandler(s.defaultHandler), bot.WithDebug())
 	if err != nil {

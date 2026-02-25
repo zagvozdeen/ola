@@ -1,7 +1,10 @@
-.PHONY: dev build deploy
+.PHONY: dev test build deploy
 
 dev:
 	GOEXPERIMENT=jsonv2 go run cmd/main.go -config=config.local.yaml
+
+test:
+	GOEXPERIMENT=jsonv2 go test ./...
 
 build:
 	GOEXPERIMENT=jsonv2 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ola cmd/main.go

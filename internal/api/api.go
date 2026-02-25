@@ -69,7 +69,10 @@ func (s *Service) Run(ctx context.Context) {
 		errCh <- server.ListenAndServe()
 	})
 	wg.Go(func() {
-		errCh <- s.startBot(ctx)
+		startBotErr := s.startBot(ctx)
+		if !errors.Is(startBotErr, errTelegramBotDisabled) {
+			errCh <- startBotErr
+		}
 	})
 	wg.Go(func() {
 		s.workerPool.Run(ctx)

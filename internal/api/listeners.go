@@ -11,6 +11,9 @@ import (
 
 func (s *Service) registerListeners() {
 	s.eventBus.OrderCreated.Subscribe(func(ctx context.Context, order *model.Order) error {
+		if s.bot == nil {
+			return nil
+		}
 		_, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    s.cfg.Telegram.GroupID,
 			ParseMode: models.ParseModeMarkdown,
@@ -27,6 +30,9 @@ func (s *Service) registerListeners() {
 	})
 
 	s.eventBus.FeedbackCreated.Subscribe(func(ctx context.Context, feedback *model.Feedback) error {
+		if s.bot == nil {
+			return nil
+		}
 		_, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    s.cfg.Telegram.GroupID,
 			ParseMode: models.ParseModeMarkdown,
