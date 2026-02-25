@@ -65,7 +65,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { type Order, RequestStatusBgColor, RequestStatusTranslates } from '@/types'
 import { NSpin } from 'naive-ui'

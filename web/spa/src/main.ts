@@ -1,6 +1,6 @@
 import '@/styles.css'
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import App from '@/App.vue'
 import { configureHttp } from '@/composables/httpCore'
 import { isUserAdmin, isUserModerator, useAuthState } from '@/composables/useAuthState'
@@ -22,6 +22,10 @@ import PageRegister from '@/pages/PageRegister.vue'
 import PageSettings from '@/pages/PageSettings.vue'
 import PageUserEdit from '@/pages/PageUserEdit.vue'
 import PageUsers from '@/pages/PageUsers.vue'
+import { Buffer } from 'buffer'
+import base64url from 'base64url'
+
+window.Buffer = Buffer
 
 const router = createRouter({
   history: createWebHistory('/spa/'),
@@ -68,7 +72,28 @@ configureHttp({
   },
 })
 
-router.beforeEach(async (to) => {
+let isFirst = true
+router.beforeEach(async (to, from) => {
+  if (from === START_LOCATION && isFirst) {
+    isFirst = false
+    if (auth.authSource.value.mode === 'telegram') {
+      if (auth.authSource.value.startParam) {
+        try {
+          const param = base64url.decode(auth.authSource.value.startParam)
+          const [model, uuid] = param.split(':', 2)
+          switch (model) {
+          case 'order':
+            return { name: 'orders.edit', params: { uuid } }
+          case 'feedback':
+            return { name: 'feedback.edit', params: { uuid } }
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+  }
+
   const isAuthPage = to.name === 'login' || to.name === 'register'
   const requiresModerator = Boolean(to.meta['requiresModerator'])
   const requiresAdmin = Boolean(to.meta['requiresAdmin'])

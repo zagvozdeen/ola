@@ -7,7 +7,7 @@ type AuthMode = 'guest' | 'bearer' | 'telegram'
 type AuthSource =
   | { mode: 'guest' }
   | { mode: 'bearer'; token: string }
-  | { mode: 'telegram'; initData: string }
+  | { mode: 'telegram'; initData: string, startParam: string | undefined }
 
 const TOKEN_KEY = 'token'
 
@@ -45,7 +45,12 @@ const detectAuthSource = (): AuthSource => {
   if (tmaInitData) {
     window.Telegram.WebApp.isVerticalSwipesEnabled = false
 
-    return { mode: 'telegram', initData: tmaInitData }
+
+    return {
+      mode: 'telegram',
+      initData: tmaInitData,
+      startParam: window.Telegram.WebApp?.initDataUnsafe?.start_param,
+    }
   }
 
   const token = readStoredToken()
@@ -132,7 +137,7 @@ export const useAuthState = () => {
 
     const tmaInitData = readTelegramInitData()
     authSource.value = tmaInitData
-      ? { mode: 'telegram', initData: tmaInitData }
+      ? { mode: 'telegram', initData: tmaInitData, startParam: undefined }
       : { mode: 'guest' }
 
     resetUserLoadingState(false)
@@ -155,7 +160,7 @@ export const useAuthState = () => {
 
     const tmaInitData = readTelegramInitData()
     authSource.value = tmaInitData
-      ? { mode: 'telegram', initData: tmaInitData }
+      ? { mode: 'telegram', initData: tmaInitData, startParam: undefined }
       : { mode: 'guest' }
 
     resetUserLoadingState(true)

@@ -2,12 +2,14 @@ package api
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strconv"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/google/uuid"
 	"github.com/zagvozdeen/ola/internal/store/enums"
 	model "github.com/zagvozdeen/ola/internal/store/models"
 )
@@ -22,15 +24,10 @@ func (s *Service) registerListeners() {
 		}
 
 		message, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:    s.cfg.Telegram.GroupID,
-			ParseMode: models.ParseModeMarkdown,
-			Text:      buildOrderTelegramText(order),
-			ReplyMarkup: models.InlineKeyboardMarkup{
-				InlineKeyboard: [][]models.InlineKeyboardButton{
-					getKeyboard(order.Status, orderCallbackPrefix, order.ID),
-					{{Text: "Посмотреть заказ", URL: "https://t.me/ola_studio_bot?startapp"}},
-				},
-			},
+			ChatID:      s.cfg.Telegram.GroupID,
+			ParseMode:   models.ParseModeMarkdown,
+			Text:        buildOrderTelegramText(order),
+			ReplyMarkup: getKeyboard(order.Status, orderCallbackPrefix, order.ID, order.UUID),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to send order telegram message: %w", err)
@@ -62,21 +59,13 @@ func (s *Service) registerListeners() {
 		}
 
 		_, err = s.bot.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:    message.ChatID,
-			MessageID: message.MessageID,
-			ParseMode: models.ParseModeMarkdown,
-			Text:      buildOrderTelegramText(order),
-			ReplyMarkup: models.InlineKeyboardMarkup{
-				InlineKeyboard: [][]models.InlineKeyboardButton{
-					getKeyboard(order.Status, orderCallbackPrefix, order.ID),
-					{{Text: "Посмотреть заказ", URL: "https://t.me/ola_studio_bot?startapp"}},
-				},
-			},
+			ChatID:      message.ChatID,
+			MessageID:   message.MessageID,
+			ParseMode:   models.ParseModeMarkdown,
+			Text:        buildOrderTelegramText(order),
+			ReplyMarkup: getKeyboard(order.Status, orderCallbackPrefix, order.ID, order.UUID),
 		})
 		if err != nil {
-			//if strings.Contains(strings.ToLower(err.Error()), "message is not modified") {
-			//	return nil
-			//}
 			return fmt.Errorf("failed to edit order telegram message: %w", err)
 		}
 
@@ -88,15 +77,10 @@ func (s *Service) registerListeners() {
 			return nil
 		}
 		message, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:    s.cfg.Telegram.GroupID,
-			ParseMode: models.ParseModeMarkdown,
-			Text:      buildFeedbackTelegramText(feedback),
-			ReplyMarkup: models.InlineKeyboardMarkup{
-				InlineKeyboard: [][]models.InlineKeyboardButton{
-					getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID),
-					{{Text: "Посмотреть заявку", URL: "https://t.me/ola_studio_bot?startapp"}},
-				},
-			},
+			ChatID:      s.cfg.Telegram.GroupID,
+			ParseMode:   models.ParseModeMarkdown,
+			Text:        buildFeedbackTelegramText(feedback),
+			ReplyMarkup: getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID, feedback.UUID),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to send telegram message: %w", err)
@@ -128,21 +112,13 @@ func (s *Service) registerListeners() {
 		}
 
 		_, err = s.bot.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:    message.ChatID,
-			MessageID: message.MessageID,
-			ParseMode: models.ParseModeMarkdown,
-			Text:      buildFeedbackTelegramText(feedback),
-			ReplyMarkup: models.InlineKeyboardMarkup{
-				InlineKeyboard: [][]models.InlineKeyboardButton{
-					getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID),
-					{{Text: "Посмотреть заявку", URL: "https://t.me/ola_studio_bot?startapp"}},
-				},
-			},
+			ChatID:      message.ChatID,
+			MessageID:   message.MessageID,
+			ParseMode:   models.ParseModeMarkdown,
+			Text:        buildFeedbackTelegramText(feedback),
+			ReplyMarkup: getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID, feedback.UUID),
 		})
 		if err != nil {
-			//if strings.Contains(strings.ToLower(err.Error()), "message is not modified") {
-			//	return nil
-			//}
 			return fmt.Errorf("failed to edit feedback telegram message: %w", err)
 		}
 
@@ -150,25 +126,43 @@ func (s *Service) registerListeners() {
 	})
 }
 
-func getKeyboard(status enums.RequestStatus, prefix string, id int) []models.InlineKeyboardButton {
+func getKeyboard(status enums.RequestStatus, prefix string, id int, uuid uuid.UUID) models.ReplyMarkup {
+	var text, value string
+	switch prefix {
+	case orderCallbackPrefix:
+		text = "Посмотреть заказ"
+		value = base64.URLEncoding.EncodeToString([]byte("order:" + uuid.String()))
+	case feedbackCallbackPrefix:
+		text = "Посмотреть заявку"
+		value = base64.URLEncoding.EncodeToString([]byte("feedback:" + uuid.String()))
+	default:
+		return nil
+	}
+	var keyboard []models.InlineKeyboardButton
 	switch status {
 	case enums.RequestStatusCreated:
-		return []models.InlineKeyboardButton{
+		keyboard = []models.InlineKeyboardButton{
 			{Text: "Взять в работу", CallbackData: fmt.Sprintf("%s:%d:%s", prefix, id, enums.RequestStatusInProgress)},
 			{Text: "Завершить", CallbackData: fmt.Sprintf("%s:%d:%s", prefix, id, enums.RequestStatusReviewed)},
 		}
 	case enums.RequestStatusInProgress:
-		return []models.InlineKeyboardButton{
+		keyboard = []models.InlineKeyboardButton{
 			{Text: "Открыть", CallbackData: fmt.Sprintf("%s:%d:%s", prefix, id, enums.RequestStatusCreated)},
 			{Text: "Завершить", CallbackData: fmt.Sprintf("%s:%d:%s", prefix, id, enums.RequestStatusReviewed)},
 		}
 	case enums.RequestStatusReviewed:
-		return []models.InlineKeyboardButton{
+		keyboard = []models.InlineKeyboardButton{
 			{Text: "Открыть", CallbackData: fmt.Sprintf("%s:%d:%s", prefix, id, enums.RequestStatusCreated)},
 			{Text: "Взять в работу", CallbackData: fmt.Sprintf("%s:%d:%s", prefix, id, enums.RequestStatusInProgress)},
 		}
 	default:
 		return nil
+	}
+	return models.InlineKeyboardMarkup{
+		InlineKeyboard: [][]models.InlineKeyboardButton{
+			keyboard,
+			{{Text: text, URL: "https://t.me/ola_studio_bot?startapp=" + value}},
+		},
 	}
 }
 

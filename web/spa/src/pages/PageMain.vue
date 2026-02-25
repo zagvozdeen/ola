@@ -1,13 +1,5 @@
 <template>
   <AppLayout title="Товары и услуги">
-    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
-    <!--    <h1-->
-    <!--      class="text-lg font-bold"-->
-    <!--      style="margin-top: calc(var(&#45;&#45;tg-content-safe-area-inset-top, 0px) + var(&#45;&#45;tg-safe-area-inset-top, 0px))"-->
-    <!--    >-->
-    <!--      Каталог товаров и услуг-->
-    <!--    </h1>-->
-
     <ul class="grid grid-cols-2 gap-2">
       <li
         v-for="product in products"
@@ -50,7 +42,6 @@
     </ul>
 
     <FooterMenu />
-    <!--  </div>-->
   </AppLayout>
 </template>
 
