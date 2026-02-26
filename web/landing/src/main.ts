@@ -1,5 +1,4 @@
 import './styles.css'
-// import IMask from 'imask'
 import { i18n } from '../../spa/src/composables/useI18n'
 import type { ValidationError } from '../../spa/src/types'
 import { MaskInput } from 'maska'
@@ -166,10 +165,6 @@ const initFeedbackForm = (
     return hasValidationErrors
   }
 
-  // const phoneMask = IMask(phoneInput, {
-  //   mask: '+{7} (000) 000-00-00',
-  // })
-
   consentInput.addEventListener('change', () => {
     if (consentInput.checked) {
       setFieldError('consent')
@@ -242,14 +237,14 @@ const initFeedbackForm = (
 }
 
 const initReviewForms = (): void => {
-  const feedbackForm = document.querySelector<HTMLFormElement>('#feedback-form')
-  if (feedbackForm) {
-    initFeedbackForm(feedbackForm, {
-      endpoint: '/api/guest/feedback',
-      successMessage: 'Спасибо! Отзыв отправлен',
-      submitErrorMessage: 'Не удалось отправить отзыв',
-    })
-  }
+  // const feedbackForm = document.querySelector<HTMLFormElement>('#feedback-form')
+  // if (feedbackForm) {
+  //   initFeedbackForm(feedbackForm, {
+  //     endpoint: '/api/guest/feedback',
+  //     successMessage: 'Спасибо! Отзыв отправлен',
+  //     submitErrorMessage: 'Не удалось отправить отзыв',
+  //   })
+  // }
 
   const orderForm = document.querySelector<HTMLFormElement>('#order-form')
   if (orderForm) {

@@ -68,13 +68,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
 import { type Feedback, RequestStatus, RequestStatusOptions, type UpdateRequestStatusRequest } from '@/types'
 import { type FormInst, type FormRules, NForm, NFormItem, NInput, NSelect, NSpin } from 'naive-ui'
-import App from '@/App.vue'
 import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()

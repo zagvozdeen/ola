@@ -4,7 +4,6 @@ import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  // root: resolve(__dirname, 'web'),
   appType: 'mpa',
   plugins: [
     vue(),
@@ -15,7 +14,6 @@ export default defineConfig({
       '@': resolve(__dirname, 'web/spa/src'),
     },
   },
-  // envDir: resolve(__dirname),
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,

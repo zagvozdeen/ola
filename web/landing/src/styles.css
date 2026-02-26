@@ -3,7 +3,7 @@
 @source "../../../templates/index.html";
 
 @theme {
-    --font-gothic: "Gothic A1", sans-serif;
+    /*--font-gothic: "Gothic A1", sans-serif;*/
     --font-inter: "Inter", sans-serif;
 }
 

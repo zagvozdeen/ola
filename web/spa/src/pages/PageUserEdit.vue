@@ -59,7 +59,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
@@ -114,7 +113,8 @@ onMounted(() => {
     return
   }
 
-  fetcher.getUser(uuid)
+  fetcher
+    .getUser(uuid)
     .then(data => {
       if (data.ok) {
         targetUser.value = data.data

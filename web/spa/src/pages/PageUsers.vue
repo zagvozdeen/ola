@@ -4,13 +4,6 @@
     back="settings"
     no-save
   >
-    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
-    <!--    <HeaderMenu-->
-    <!--      title="Пользователи"-->
-    <!--      :edit="false"-->
-    <!--      back="settings"-->
-    <!--    />-->
-
     <div
       v-if="isLoading"
       class="flex justify-center my-4"
@@ -51,13 +44,11 @@
     >
       Список пользователей пуст.
     </div>
-    <!--  </div>-->
   </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { type User, UserRoleTranslates } from '@/types'
 import { NSpin } from 'naive-ui'
@@ -67,16 +58,16 @@ const fetcher = useFetch()
 const users = ref<User[]>([])
 const isLoading = ref(true)
 
-const initPage = async () => {
-  isLoading.value = true
-  const data = await fetcher.getUsers()
-  if (data.ok) {
-    users.value = data.data
-  }
-  isLoading.value = false
-}
-
 onMounted(() => {
-  void initPage()
+  fetcher
+    .getUsers()
+    .then(data => {
+      if (data.ok) {
+        users.value = data.data
+      }
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
 })
 </script>

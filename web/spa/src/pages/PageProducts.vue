@@ -84,7 +84,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { type Product, ProductTypeTranslates } from '@/types'

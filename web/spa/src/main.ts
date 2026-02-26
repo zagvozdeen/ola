@@ -17,8 +17,6 @@ import PageOrders from '@/pages/PageOrders.vue'
 import PageProductEdit from '@/pages/PageProductEdit.vue'
 import PageProducts from '@/pages/PageProducts.vue'
 import PageRegister from '@/pages/PageRegister.vue'
-// import PageReviewEdit from '@/pages/PageReviewEdit.vue'
-// import PageReviews from '@/pages/PageReviews.vue'
 import PageSettings from '@/pages/PageSettings.vue'
 import PageUserEdit from '@/pages/PageUserEdit.vue'
 import PageUsers from '@/pages/PageUsers.vue'
@@ -48,9 +46,6 @@ const router = createRouter({
     { path: '/categories', name: 'categories', component: PageCategories, meta: { requiresModerator: true } },
     { path: '/categories/create', name: 'categories.create', component: PageCategoryEdit, meta: { requiresModerator: true } },
     { path: '/categories/:uuid/edit', name: 'categories.edit', component: PageCategoryEdit, meta: { requiresModerator: true } },
-    // { path: '/reviews', name: 'reviews', component: PageReviews, meta: { requiresModerator: true } },
-    // { path: '/reviews/create', name: 'reviews.create', component: PageReviewEdit, meta: { requiresModerator: true } },
-    // { path: '/reviews/:uuid/edit', name: 'reviews.edit', component: PageReviewEdit, meta: { requiresModerator: true } },
     { path: '/users', name: 'users', component: PageUsers, meta: { requiresAdmin: true } },
     { path: '/users/:uuid/edit', name: 'users.edit', component: PageUserEdit, meta: { requiresAdmin: true } },
   ],

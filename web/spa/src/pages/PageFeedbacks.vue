@@ -4,13 +4,6 @@
     back="settings"
     no-save
   >
-    <!--  <div class="min-h-dvh w-full flex flex-col gap-4 py-6 pb-22">-->
-    <!--    <HeaderMenu-->
-    <!--      title="Заявки обратной связи"-->
-    <!--      :edit="false"-->
-    <!--      back="settings"-->
-    <!--    />-->
-
     <div
       v-if="isLoading"
       class="flex justify-center my-4"
@@ -54,13 +47,11 @@
     >
       Список заявок пуст.
     </div>
-    <!--  </div>-->
   </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import { useFetch } from '@/composables/useFetch'
 import { type Feedback, RequestStatusTranslates } from '@/types'
 import { NSpin } from 'naive-ui'

@@ -1,7 +1,5 @@
 .idea
 .DS_Store
-.env
-.env.production
 node_modules
 dist
 config.*.yaml

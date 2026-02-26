@@ -182,10 +182,6 @@ export type AuthLoginRequest = {
   password: string
 }
 
-export type AuthLoginResponse = {
-  token: string
-}
-
 export type AuthRegisterRequest = {
   first_name: string | null
   last_name: string | null
@@ -193,8 +189,6 @@ export type AuthRegisterRequest = {
   password: string | null
   password_confirmation: string | null
 }
-
-export type AuthRegisterResponse = User
 
 export type CreateFeedbackRequest = {
   name: string
@@ -217,30 +211,8 @@ export type UpsertCategoryRequest = {
   name: string | null
 }
 
-export type UpsertReviewRequest = {
-  name: string | null
-  content: string | null
-  file_id: number | null
-  published_at: DateTime | null
-}
-
 export type UpdateUserRoleRequest = {
   role: UserRole | null
-}
-
-export type CreateGuestFeedbackRequest = {
-  name: string
-  phone: string
-  content: string
-  consent: boolean
-}
-
-export type CreateGuestOrderRequest = {
-  name: string
-  phone: string
-  content: string
-  consent: boolean
-  source?: OrderSource
 }
 
 export type CreateProductRequest = {
@@ -251,8 +223,6 @@ export type CreateProductRequest = {
   type: ProductType | null
   file_id: number | null
 }
-
-export type UpdateProductRequest = CreateProductRequest
 
 export type ValidationError = {
   message: string

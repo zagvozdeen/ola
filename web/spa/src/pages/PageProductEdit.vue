@@ -103,7 +103,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import HeaderMenu from '@/components/HeaderMenu.vue'
 import AppUploadFile from '@/components/AppUploadFile.vue'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
@@ -210,6 +209,8 @@ const onSubmit = () => {
       await router.push({ name: 'products' })
       return
     }
+
+    if(unsureUUID(notify, router)) return
 
     const data = await fetcher.updateProduct(uuid, payload)
     if (data.ok) {
