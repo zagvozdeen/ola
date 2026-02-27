@@ -23,7 +23,7 @@ type User struct {
 }
 
 type File struct {
-	ID         int       `json:"id"`
+	//ID         int       `json:"id"`
 	UUID       uuid.UUID `json:"uuid"`
 	Content    string    `json:"content"`
 	Size       int64     `json:"size"`
@@ -39,33 +39,20 @@ type Product struct {
 	Name        string            `json:"name"`
 	Description string            `json:"description"`
 	PriceFrom   int               `json:"price_from"`
-	PriceTo     *int              `json:"price_to,omitempty"`
+	PriceTo     *int              `json:"price_to"`
 	Type        enums.ProductType `json:"type"`
-	FileID      int               `json:"file_id"`
-	FileContent *string           `json:"file_content,omitempty"`
+	IsMain      bool              `json:"is_main"`
+	FileContent string            `json:"file_content"`
 	UserID      int               `json:"user_id"`
 	CreatedAt   time.Time         `json:"created_at"`
 	UpdatedAt   time.Time         `json:"updated_at"`
 }
 
-type Review struct {
-	ID          int       `json:"id"`
-	UUID        uuid.UUID `json:"uuid"`
-	Name        string    `json:"name"`
-	Content     string    `json:"content"`
-	FileID      int       `json:"file_id"`
-	FileContent *string   `json:"file_content,omitempty"`
-	UserID      int       `json:"user_id"`
-	PublishedAt time.Time `json:"published_at"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-}
-
 type Cart struct {
 	ID        int       `json:"id"`
 	UUID      uuid.UUID `json:"uuid"`
-	UserID    *int      `json:"user_id,omitempty"`
-	SessionID *string   `json:"session_id,omitempty"`
+	UserID    *int      `json:"user_id"`
+	SessionID *string   `json:"session_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -89,7 +76,7 @@ type Order struct {
 	Name      string              `json:"name"`
 	Phone     string              `json:"phone"`
 	Content   string              `json:"content"`
-	UserID    *int                `json:"user_id,omitempty"`
+	UserID    *int                `json:"user_id"`
 	CreatedAt time.Time           `json:"created_at"`
 	UpdatedAt time.Time           `json:"updated_at"`
 }
@@ -103,7 +90,7 @@ type Feedback struct {
 	Name      string              `json:"name"`
 	Phone     string              `json:"phone"`
 	Content   string              `json:"content"`
-	UserID    *int                `json:"user_id,omitempty"`
+	UserID    int                 `json:"user_id"`
 	CreatedAt time.Time           `json:"created_at"`
 	UpdatedAt time.Time           `json:"updated_at"`
 }
@@ -131,4 +118,20 @@ type FeedbackTelegramMessage struct {
 	FeedbackID int   `json:"feedback_id"`
 	ChatID     int64 `json:"chat_id"`
 	MessageID  int   `json:"message_id"`
+}
+
+type OrderComment struct {
+	ID        int
+	UUID      uuid.UUID
+	Content   string
+	OrderID   int
+	UserID    int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type Action struct {
+	ID        int
+	Content   string
+	CreatedAt time.Time
 }

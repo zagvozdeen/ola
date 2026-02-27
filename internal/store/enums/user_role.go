@@ -14,6 +14,8 @@ func NewUserRole(s string) (UserRole, error) {
 	switch s {
 	case UserRoleUser.slug:
 		return UserRoleUser, nil
+	case UserRoleManager.slug:
+		return UserRoleManager, nil
 	case UserRoleModerator.slug:
 		return UserRoleModerator, nil
 	case UserRoleAdmin.slug:
@@ -25,6 +27,7 @@ func NewUserRole(s string) (UserRole, error) {
 
 var (
 	UserRoleUser      = UserRole{slug: "user"}
+	UserRoleManager   = UserRole{slug: "manager"}
 	UserRoleModerator = UserRole{slug: "moderator"}
 	UserRoleAdmin     = UserRole{slug: "admin"}
 )

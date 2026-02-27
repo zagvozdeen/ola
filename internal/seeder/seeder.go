@@ -178,41 +178,41 @@ func (s *Seeder) Run(ctx context.Context) error {
 		}
 	}
 
-	reviews := []struct {
-		uuid    uuid.UUID
-		name    string
-		content string
-	}{
-		{uuid: uuid.MustParse("f3ab6d17-11af-11f1-b4af-c87f54a92045"), name: "Елена", content: "Огромное спасибо за шарики! Именинник был в восторге и доставка порадовала, все вовремя) Не пожалела, что обратилась именно к вам!"},
-		{uuid: uuid.MustParse("f3ab78e7-11af-11f1-b4af-c87f54a92045"), name: "Евгений", content: "Обратился за бабл боксом с украшением внутри, хотелось поздравить девушку с годовщиной. Она очень удивилась такой креативной идее. Я тоже не видел ничего подобного в нашем городе до этого)) Желаю вам дальнейшего развития, вы классные!"},
-		{uuid: uuid.MustParse("f3ab7f35-11af-11f1-b4af-c87f54a92045"), name: "Александр", content: "Выражаю благодарность студии за профессиональное оформление нашего корпоратива. Требовался лаконичный декор в цветах компании. Результат превзошел ожидания: композиции у входа и фотозона были выполнены безупречно, с вниманием к деталям. Отдельно отмечу пунктуальность, четкое соблюдение сроков и договоренностей."},
-		{uuid: uuid.MustParse("f3ab84ad-11af-11f1-b4af-c87f54a92045"), name: "Любовь", content: "Благодарю персонал за то, что взялись за очень срочный заказ, выполнили и доставили максимально быстро. Посоветую вас друзьям и сама обращусь еще не раз."},
-		{uuid: uuid.MustParse("f3ab8aa7-11af-11f1-b4af-c87f54a92045"), name: "Анна", content: "Как человек, который ценит визуал, долго искала в Екатеринбурге студию, которая умеет в тренды. Команда Ola предложила крутые цветовые сочетания для моей вечеринки. Шары держались несколько дней, не теряя вид! Ни одного лопнувшего. Это показатель. Если вам важен дизайн, атмосфера и стойкость - выбор очевиден."},
-	}
-	for i, r := range reviews {
-		if err != nil {
-			return fmt.Errorf("failed to create uuid: %w", err)
-		}
-		_, err = s.store.GetReviewByUUID(ctx, r.uuid)
-		if err != nil {
-			if !errors.Is(err, models.ErrNotFound) {
-				return fmt.Errorf("failed to get review by id: %w", err)
-			}
-			err = s.store.CreateReview(ctx, &models.Review{
-				UUID:        r.uuid,
-				Name:        r.name,
-				Content:     r.content,
-				FileID:      files[i+4].id,
-				UserID:      user.ID,
-				PublishedAt: time.Now(),
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			})
-			if err != nil {
-				return fmt.Errorf("failed to create review: %w", err)
-			}
-		}
-	}
+	//reviews := []struct {
+	//	uuid    uuid.UUID
+	//	name    string
+	//	content string
+	//}{
+	//	{uuid: uuid.MustParse("f3ab6d17-11af-11f1-b4af-c87f54a92045"), name: "Елена", content: "Огромное спасибо за шарики! Именинник был в восторге и доставка порадовала, все вовремя) Не пожалела, что обратилась именно к вам!"},
+	//	{uuid: uuid.MustParse("f3ab78e7-11af-11f1-b4af-c87f54a92045"), name: "Евгений", content: "Обратился за бабл боксом с украшением внутри, хотелось поздравить девушку с годовщиной. Она очень удивилась такой креативной идее. Я тоже не видел ничего подобного в нашем городе до этого)) Желаю вам дальнейшего развития, вы классные!"},
+	//	{uuid: uuid.MustParse("f3ab7f35-11af-11f1-b4af-c87f54a92045"), name: "Александр", content: "Выражаю благодарность студии за профессиональное оформление нашего корпоратива. Требовался лаконичный декор в цветах компании. Результат превзошел ожидания: композиции у входа и фотозона были выполнены безупречно, с вниманием к деталям. Отдельно отмечу пунктуальность, четкое соблюдение сроков и договоренностей."},
+	//	{uuid: uuid.MustParse("f3ab84ad-11af-11f1-b4af-c87f54a92045"), name: "Любовь", content: "Благодарю персонал за то, что взялись за очень срочный заказ, выполнили и доставили максимально быстро. Посоветую вас друзьям и сама обращусь еще не раз."},
+	//	{uuid: uuid.MustParse("f3ab8aa7-11af-11f1-b4af-c87f54a92045"), name: "Анна", content: "Как человек, который ценит визуал, долго искала в Екатеринбурге студию, которая умеет в тренды. Команда Ola предложила крутые цветовые сочетания для моей вечеринки. Шары держались несколько дней, не теряя вид! Ни одного лопнувшего. Это показатель. Если вам важен дизайн, атмосфера и стойкость - выбор очевиден."},
+	//}
+	//for i, r := range reviews {
+	//	if err != nil {
+	//		return fmt.Errorf("failed to create uuid: %w", err)
+	//	}
+	//	_, err = s.store.GetReviewByUUID(ctx, r.uuid)
+	//	if err != nil {
+	//		if !errors.Is(err, models.ErrNotFound) {
+	//			return fmt.Errorf("failed to get review by id: %w", err)
+	//		}
+	//		err = s.store.CreateReview(ctx, &models.Review{
+	//			UUID:        r.uuid,
+	//			Name:        r.name,
+	//			Content:     r.content,
+	//			FileID:      files[i+4].id,
+	//			UserID:      user.ID,
+	//			PublishedAt: time.Now(),
+	//			CreatedAt:   time.Now(),
+	//			UpdatedAt:   time.Now(),
+	//		})
+	//		if err != nil {
+	//			return fmt.Errorf("failed to create review: %w", err)
+	//		}
+	//	}
+	//}
 
 	s.store.Commit(ctx)
 	s.log.Info("Seeder complete the work")
