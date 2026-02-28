@@ -23,7 +23,7 @@
         <div class="flex justify-center">
           <button
             v-if="!isInCart(product.id)"
-            class="w-full bg-yellow-500 text-black rounded hover:bg-yellow-600 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center disabled:opacity-50"
+            class="w-full bg-grape-500 text-black rounded hover:bg-grape-600 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center disabled:opacity-50"
             :disabled="isSubmitting(product.id)"
             @click="() => handleAddProductButton(product.id)"
           >

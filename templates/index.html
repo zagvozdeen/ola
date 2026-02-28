@@ -35,32 +35,32 @@
     <div class="-z-20 absolute inset-0 bg-black/10"></div>
     <div class="max-w-350 mx-auto px-4 pb-8">
         <div class="text-4xl sm:text-5xl lg:text-6xl text-white font-bold pt-[30dvh]">Воздушный декор<br>для неповторимых<br>событий</div>
-        <a class="inline-block mt-8 sm:mt-10 bg-grape hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 font-bold text-base sm:text-lg lg:text-xl" href="#order">оформить праздник</a>
+        <a class="inline-block mt-8 sm:mt-10 bg-grape-500 hover:bg-lemon-500 hover:text-black transition-colors text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 font-bold text-base sm:text-lg lg:text-xl" href="#order">оформить праздник</a>
     </div>
 </div>
 
 <div id="about" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
-        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape font-bold mb-10">Почему выбирают OLA Studio?</h2>
+        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape-500 font-bold mb-10">Почему выбирают OLA Studio?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Мы подходим к каждому заказу с душой. Наша главная задача<br>— сделать ваш праздник особенным и подарить яркие<br>впечатления!</h3>
         <ul class="flex flex-col gap-8 lg:gap-0">
             <li>
                 <div class="relative pl-18">
-                    <h4 class="text-grape font-bold text-2xl lowercase">гарантия качества</h4>
+                    <h4 class="text-grape-500 font-bold text-2xl lowercase">гарантия качества</h4>
                     <p class="font-medium mt-4">премиальные материалы и долгий срок<br>службы шаров</p>
                     <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">01</span>
                 </div>
             </li>
             <li class="ml-auto">
                 <div class="relative pl-18">
-                    <h4 class="text-grape font-bold text-2xl lowercase">гарантия качества</h4>
+                    <h4 class="text-grape-500 font-bold text-2xl lowercase">гарантия качества</h4>
                     <p class="font-medium mt-4">премиальные материалы и долгий срок<br>службы шаров</p>
                     <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">02</span>
                 </div>
             </li>
             <li>
                 <div class="relative pl-18">
-                    <h4 class="text-grape font-bold text-2xl lowercase">гарантия качества</h4>
+                    <h4 class="text-grape-500 font-bold text-2xl lowercase">гарантия качества</h4>
                     <p class="font-medium mt-4">премиальные материалы и долгий срок<br>службы шаров</p>
                     <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">03</span>
                 </div>
@@ -71,15 +71,15 @@
 
 <div id="products" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-300 mx-auto px-4">
-        <h2 class="text-center text-3xl sm:text-4xl lg:text-5xl text-grape font-bold mb-10">Наш ассортимент</h2>
+        <h2 class="text-center text-3xl sm:text-4xl lg:text-5xl text-grape-500 font-bold mb-10">Наш ассортимент</h2>
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
             {{ range .Products }}
             <article class="flex h-full flex-col bg-white">
                 <img class="h-80 w-full object-cover" src="{{ .FileContent }}" alt="Фотография для товара «{{ .Name }}»" width="360" height="208">
-                <p class="mt-4 text-lg font-bold text-grape">от {{ .PriceFrom }} ₽{{ if .PriceTo }} до {{ .PriceTo }} ₽{{ end }}</p>
+                <p class="mt-4 text-lg font-bold text-grape-500">от {{ .PriceFrom }} ₽{{ if .PriceTo }} до {{ .PriceTo }} ₽{{ end }}</p>
                 <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
                 <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>
-                <a href="#order" class="mt-auto rounded-full inline-flex items-center justify-center bg-lemon px-4 py-2 text-xs font-bold text-black transition hover:bg-yellow-300">узнать больше и сделать заказ</a>
+                <a href="#order" class="mt-auto rounded-full inline-flex items-center justify-center bg-lemon-500 px-4 py-2 text-xs font-bold text-black transition hover:bg-lemon-600">узнать больше и сделать заказ</a>
             </article>
             {{ else }}
             <article class="bg-white">
@@ -92,15 +92,15 @@
 
 <div id="services" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-300 mx-auto px-4">
-        <h2 class="text-center text-3xl sm:text-4xl lg:text-5xl text-grape font-bold mb-10">Услуги</h2>
+        <h2 class="text-center text-3xl sm:text-4xl lg:text-5xl text-grape-500 font-bold mb-10">Услуги</h2>
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
             {{ range .Services }}
             <article class="flex h-full flex-col bg-white">
                 <img class="h-80 w-full object-cover" src="{{ .FileContent }}" alt="Фотография для услуги «{{ .Name }}»" width="360" height="208">
-                <p class="mt-4 text-lg font-bold text-grape">от {{ .PriceFrom }} ₽{{ if .PriceTo }} до {{ .PriceTo }} ₽{{ end }}</p>
+                <p class="mt-4 text-lg font-bold text-grape-500">от {{ .PriceFrom }} ₽{{ if .PriceTo }} до {{ .PriceTo }} ₽{{ end }}</p>
                 <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
                 <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>
-                <a href="#order" class="mt-auto rounded-full inline-flex items-center justify-center bg-lemon px-4 py-2 text-xs font-bold text-black transition hover:bg-yellow-300">узнать больше и сделать заказ</a>
+                <a href="#order" class="mt-auto rounded-full inline-flex items-center justify-center bg-lemon-500 px-4 py-2 text-xs font-bold text-black transition hover:bg-lemon-600">узнать больше и сделать заказ</a>
             </article>
             {{ else }}
             <article class="bg-white">
@@ -116,22 +116,22 @@
         {{ if .Categories }}
         <div class="categories-marquee-track flex w-max items-center gap-4">
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
         </div>
         {{ else }}
@@ -142,35 +142,35 @@
 
 <div class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
-        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape font-bold mb-10">Как мы работаем?</h2>
+        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape-500 font-bold mb-10">Как мы работаем?</h2>
         <div class="relative mt-16">
-            <span class="absolute left-4 top-0 h-full w-1 bg-lemon md:left-1/2 md:-translate-x-1/2"></span>
+            <span class="absolute left-4 top-0 h-full w-1 bg-lemon-500 md:left-1/2 md:-translate-x-1/2"></span>
             <ul class="space-y-12">
                 <li class="relative md:grid md:grid-cols-2">
                     <div class="pl-14 md:pl-0 md:pr-16 md:text-right">
-                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon border-4 border-white md:left-auto md:right-[calc(50%-10px)]"></span>
-                        <h4 class="text-2xl sm:text-3xl font-bold text-grape">Заявка и консультация</h4>
+                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon-500 border-4 border-white md:left-auto md:right-[calc(50%-10px)]"></span>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-grape-500">Заявка и консультация</h4>
                         <p class="mt-3 text-base font-medium text-black/80">Обсуждаем формат события, бюджет и сроки, чтобы предложить лучшие решения.</p>
                     </div>
                 </li>
                 <li class="relative md:grid md:grid-cols-2">
                     <div class="pl-14 md:col-start-2 md:pl-16">
-                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon border-4 border-white md:left-[calc(50%-10px)]"></span>
-                        <h4 class="text-2xl sm:text-3xl font-bold text-grape">Подбор концепции</h4>
+                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon-500 border-4 border-white md:left-[calc(50%-10px)]"></span>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-grape-500">Подбор концепции</h4>
                         <p class="mt-3 text-base font-medium text-black/80">Готовим варианты композиций, цветовые сочетания и визуальные референсы под ваш праздник.</p>
                     </div>
                 </li>
                 <li class="relative md:grid md:grid-cols-2">
                     <div class="pl-14 md:pl-0 md:pr-16 md:text-right">
-                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon border-4 border-white md:left-auto md:right-[calc(50%-10px)]"></span>
-                        <h4 class="text-2xl sm:text-3xl font-bold text-grape">Подготовка и производство</h4>
+                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon-500 border-4 border-white md:left-auto md:right-[calc(50%-10px)]"></span>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-grape-500">Подготовка и производство</h4>
                         <p class="mt-3 text-base font-medium text-black/80">Собираем декор из качественных материалов и заранее проверяем каждую деталь.</p>
                     </div>
                 </li>
                 <li class="relative md:grid md:grid-cols-2">
                     <div class="pl-14 md:col-start-2 md:pl-16">
-                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon border-4 border-white md:left-[calc(50%-10px)]"></span>
-                        <h4 class="text-2xl sm:text-3xl font-bold text-grape">Монтаж и финальный штрих</h4>
+                        <span class="absolute left-2 top-2 size-5 rounded-full bg-lemon-500 border-4 border-white md:left-[calc(50%-10px)]"></span>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-grape-500">Монтаж и финальный штрих</h4>
                         <p class="mt-3 text-base font-medium text-black/80">Приезжаем на площадку, оформляем пространство и доводим композиции до идеала.</p>
                     </div>
                 </li>
@@ -181,7 +181,7 @@
 
 <div id="reviews" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
-        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape font-bold mb-10">Что наши клиенты говорят<br>о нас?</h2>
+        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape-500 font-bold mb-10">Что наши клиенты говорят<br>о нас?</h2>
         <div class="max-w-full overflow-x-auto">
             <div class="mx-auto" style="width:560px;height:800px;overflow:hidden;position:relative;">
                 <iframe style="width:100%;height:100%;border:1px solid #e6e6e6;border-radius:8px;box-sizing:border-box" src="https://yandex.ru/maps-reviews-widget/146941894574?comments"></iframe>
@@ -193,39 +193,39 @@
 
 <div id="order" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
-        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape font-bold mb-10">Готовы создать незабываемый праздник?</h2>
+        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape-500 font-bold mb-10">Готовы создать незабываемый праздник?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Оставьте заявку, и мы подготовим для вас<br>индивидуальное предложение.</h3>
         <form id="order-form" class="mx-auto max-w-3xl" novalidate>
             <div class="mb-6">
                 <label for="order-name" class="block text-base font-bold text-black">Ваше имя</label>
-                <input id="order-name" name="name" type="text" autocomplete="name" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-grape" required>
+                <input id="order-name" name="name" type="text" autocomplete="name" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-grape-500" required>
                 <p data-error-for="name" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
             </div>
 
             <div class="mb-6">
                 <label for="order-phone" class="block text-base font-bold text-black">Ваш телефон</label>
-                <input id="order-phone" name="phone" type="tel" autocomplete="tel" data-maska="+7 (###) ###-##-##" placeholder="+7 (___) ___-__-__" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-grape" required>
+                <input id="order-phone" name="phone" type="tel" autocomplete="tel" data-maska="+7 (###) ###-##-##" placeholder="+7 (___) ___-__-__" class="mt-2 block w-full border border-black px-4 py-3 text-base text-black outline-none transition focus:border-grape-500" required>
                 <p data-error-for="phone" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
             </div>
 
             <div class="mb-6">
                 <label for="order-content" class="block text-base font-bold text-black">Какой товар / услуга вас интересует?</label>
-                <textarea id="order-content" name="content" rows="5" class="mt-2 block w-full resize-y border border-black px-4 py-3 text-base text-black outline-none transition focus:border-grape" required></textarea>
+                <textarea id="order-content" name="content" rows="5" class="mt-2 block w-full resize-y border border-black px-4 py-3 text-base text-black outline-none transition focus:border-grape-500" required></textarea>
                 <p data-error-for="content" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
             </div>
 
             <div class="mb-8">
                 <label for="order-consent" class="flex items-start gap-3 text-sm font-medium text-black/80 select-none cursor-pointer">
-                    <input id="order-consent" name="consent" type="checkbox" class="mt-0.5 size-4 shrink-0 accent-lemon" required>
+                    <input id="order-consent" name="consent" type="checkbox" class="mt-0.5 size-4 shrink-0 accent-lemon-500" required>
                     <span>
-                        Я даю согласие на обработку персональных данных и ознакомлен(а) с <a href="/privacy" class="underline decoration-black/60 underline-offset-2 hover:text-grape">Политикой обработки персональных данных</a>.
+                        Я даю согласие на обработку персональных данных и ознакомлен(а) с <a href="/privacy" class="underline decoration-black/60 underline-offset-2 hover:text-grape-600">Политикой обработки персональных данных</a>.
                     </span>
                 </label>
                 <p data-error-for="consent" class="invisible mt-1 min-h-5 text-sm text-red-600" aria-live="polite"></p>
             </div>
 
             <div class="flex justify-center">
-                <button type="submit" class="inline-flex items-center rounded-full cursor-pointer bg-lemon px-8 py-3 text-sm font-bold uppercase text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60">отправить</button>
+                <button type="submit" class="inline-flex items-center rounded-full cursor-pointer bg-lemon-500 px-8 py-3 text-sm font-bold uppercase text-black transition hover:bg-lemon-600 disabled:cursor-not-allowed disabled:opacity-60">отправить</button>
             </div>
             <p data-form-status class="invisible mt-3 min-h-5 text-sm font-semibold" aria-live="polite"></p>
         </form>
@@ -236,14 +236,14 @@
 
 <div id="contacts" class="my-20 sm:mt-30 sm:mb-33">
     <div class="max-w-250 mx-auto px-4">
-        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape font-bold mb-10">Контакты</h2>
+        <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape-500 font-bold mb-10">Контакты</h2>
         <ul class="flex flex-col items-center gap-2">
             <li><a class="font-bold text-xl hover:underline" href="tel:+79935140405">+7 993 514 04 05</a></li>
             <li><a class="font-bold text-xl hover:underline" href="mailto:olastudioekb@mail.ru">olastudioekb@mail.ru</a></li>
         </ul>
         <ul class="flex justify-center gap-2 mt-10">
             <li>
-                <a class="flex items-center justify-center rounded-full size-12 bg-grape hover:bg-purple-600 transition-colors" href="https://vk.com/olastudioekb" target="_blank">
+                <a class="flex items-center justify-center rounded-full size-12 bg-grape-500 hover:bg-grape-600 transition-colors" href="https://vk.com/olastudioekb" target="_blank">
                     <svg fill="#fff" width="28px" height="28px" viewBox="-2.5 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
                         <title>VK</title>
                         <path d="M16.563 15.75c-0.5-0.188-0.5-0.906-0.531-1.406-0.125-1.781 0.5-4.5-0.25-5.656-0.531-0.688-3.094-0.625-4.656-0.531-0.438 0.063-0.969 0.156-1.344 0.344s-0.75 0.5-0.75 0.781c0 0.406 0.938 0.344 1.281 0.875 0.375 0.563 0.375 1.781 0.375 2.781 0 1.156-0.188 2.688-0.656 2.75-0.719 0.031-1.125-0.688-1.5-1.219-0.75-1.031-1.5-2.313-2.063-3.563-0.281-0.656-0.438-1.375-0.844-1.656-0.625-0.438-1.75-0.469-2.844-0.438-1 0.031-2.438-0.094-2.719 0.5-0.219 0.656 0.25 1.281 0.5 1.813 1.281 2.781 2.656 5.219 4.344 7.531 1.563 2.156 3.031 3.875 5.906 4.781 0.813 0.25 4.375 0.969 5.094 0 0.25-0.375 0.188-1.219 0.313-1.844s0.281-1.25 0.875-1.281c0.5-0.031 0.781 0.406 1.094 0.719 0.344 0.344 0.625 0.625 0.875 0.938 0.594 0.594 1.219 1.406 1.969 1.719 1.031 0.438 2.625 0.313 4.125 0.25 1.219-0.031 2.094-0.281 2.188-1 0.063-0.563-0.563-1.375-0.938-1.844-0.938-1.156-1.375-1.5-2.438-2.563-0.469-0.469-1.063-0.969-1.063-1.531-0.031-0.344 0.25-0.656 0.5-1 1.094-1.625 2.188-2.781 3.188-4.469 0.281-0.5 0.938-1.656 0.688-2.219-0.281-0.625-1.844-0.438-2.813-0.438-1.25 0-2.875-0.094-3.188 0.156-0.594 0.406-0.844 1.063-1.125 1.688-0.625 1.438-1.469 2.906-2.344 4-0.313 0.375-0.906 1.156-1.25 1.031z"></path>
@@ -251,7 +251,7 @@
                 </a>
             </li>
             <li>
-                <a class="flex items-center justify-center rounded-full size-12 bg-grape hover:bg-purple-600 transition-colors" href="https://t.me/OLAstudio_admin" target="_blank">
+                <a class="flex items-center justify-center rounded-full size-12 bg-grape-500 hover:bg-grape-600 transition-colors" href="https://t.me/OLAstudio_admin" target="_blank">
                     <svg width="28px" height="28px" class="pr-0.5" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <title>Telegram</title>
                         <path d="M41.4193 7.30899C41.4193 7.30899 45.3046 5.79399 44.9808 9.47328C44.8729 10.9883 43.9016 16.2908 43.1461 22.0262L40.5559 39.0159C40.5559 39.0159 40.3401 41.5048 38.3974 41.9377C36.4547 42.3705 33.5408 40.4227 33.0011 39.9898C32.5694 39.6652 24.9068 34.7955 22.2086 32.4148C21.4531 31.7655 20.5897 30.4669 22.3165 28.9519L33.6487 18.1305C34.9438 16.8319 36.2389 13.8019 30.8426 17.4812L15.7331 27.7616C15.7331 27.7616 14.0063 28.8437 10.7686 27.8698L3.75342 25.7055C3.75342 25.7055 1.16321 24.0823 5.58815 22.459C16.3807 17.3729 29.6555 12.1786 41.4193 7.30899Z" fill="#fff"/>
@@ -259,7 +259,7 @@
                 </a>
             </li>
             <li>
-                <a class="flex items-center justify-center rounded-full size-12 bg-grape hover:bg-purple-600 transition-colors" href="https://www.instagram.com/olastudio_ekb?igsh=dWFuNHlkMmtiaGtx&utm_source=qr" target="_blank">
+                <a class="flex items-center justify-center rounded-full size-12 bg-grape-500 hover:bg-grape-600 transition-colors" href="https://www.instagram.com/olastudio_ekb?igsh=dWFuNHlkMmtiaGtx&utm_source=qr" target="_blank">
                     <svg fill="#fff" width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <title>Instagram*</title>
                         <g>
@@ -273,7 +273,7 @@
     </div>
 </div>
 
-<footer class="bg-grape text-white py-10">
+<footer class="bg-grape-500 text-white py-10">
     <div class="max-w-350 mx-auto px-4">
         <p class="font-semibold text-sm">© 2025-2026. Сбор и обработка персональных данных производится в соответствии с <a href="/privacy" class="underline decoration-white underline-offset-2 hover:text-gray-200">политикой конфиденциальности</a>.</p>
         <small class="font-medium">* Компания Meta Platforms Inc. признана экстремистской организацией, и ее деятельность запрещена на территории РФ</small>

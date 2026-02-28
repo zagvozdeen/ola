@@ -7,4 +7,9 @@
 
     --tg-safe-area-inset-top: calc(var(--spacing) * 4);
     --tg-content-safe-area-inset-top: calc(var(--spacing) * 10);
+
+    --color-lemon-500: #FDFDA7;
+    --color-lemon-600: #FCF75E;
+    --color-grape-500: #A17FD3;
+    --color-grape-600: #8E67C4;
 }

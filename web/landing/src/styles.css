@@ -5,9 +5,10 @@
 @theme {
     --font-inter: "Inter", sans-serif;
 
-    --color-lemon: #FDFDA7;
+    --color-lemon-500: #FDFDA7;
     --color-lemon-600: #FCF75E;
-    --color-grape: #A17FD3;
+    --color-grape-500: #A17FD3;
+    --color-grape-600: #8E67C4;
 }
 
 @keyframes categories-marquee {
