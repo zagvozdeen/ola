@@ -1,12 +1,31 @@
 [Unit]
-Description=OLA web app and telegram bot
-After=multi-user.target
+Description=Olastudio web application and telegram bot
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-User=root
-Group=root
-WorkingDirectory=/var/www/ola.creavo.ru
-ExecStart=/bin/bash -c "cd /var/www/ola.creavo.ru && ./ola"
+Type=simple
+User=ola
+Group=ola
+
+WorkingDirectory=/var/www/olastudio-ekb.ru
+ExecStart=/var/www/olastudio-ekb.ru/ola
+
+UMask=0027
+
+# Не перезапускать при падении (по умолчанию и так no, но явно читаемее)
+Restart=no
+
+# Небольшая “закалка”, обычно не ломает Go-сервисы
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
 
 [Install]
 WantedBy=multi-user.target

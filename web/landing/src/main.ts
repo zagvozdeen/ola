@@ -67,20 +67,6 @@ const initMobileMenu = (): void => {
     }
 
     setOpen(false)
-
-    // const hash = link.getAttribute('href') || ''
-    // if (!hash.startsWith('#') || hash === '#') {
-    //   return
-    // }
-    //
-    // const section = document.querySelector<HTMLElement>(hash)
-    // if (!section) {
-    //   return
-    // }
-    //
-    // event.preventDefault()
-    // section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    // history.pushState(null, '', hash)
   })
 
   window.addEventListener('keydown', (event) => {
@@ -169,11 +155,6 @@ const initReviewForms = (): void => {
       setStatus()
       clearFieldErrors()
 
-      // if (!consentInput.checked) {
-      //   setFieldError('consent', i18n['form.consent_required'] || 'Нужно согласие на обработку данных')
-      //   return
-      // }
-
       submitButton.disabled = true
 
       try {
@@ -184,8 +165,8 @@ const initReviewForms = (): void => {
           },
           body: JSON.stringify({
             name: nameInput.value.trim(),
-            phone: contentInput.value.trim(),
-            content: phoneInput.value.trim(),
+            phone: phoneInput.value.trim(),
+            content: contentInput.value.trim(),
             consent: consentInput.checked,
           }),
         })

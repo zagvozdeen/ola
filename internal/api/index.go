@@ -33,6 +33,7 @@ type PageData struct {
 	SelectedCatalogType   string
 	Title                 string
 	IsBlock               bool
+	IsProduction          bool
 }
 
 type viteManifestEntry struct {
@@ -131,6 +132,7 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		SelectedCatalogType: catalogTypeAll,
 		Title:               title,
 		IsBlock:             isBlock,
+		IsProduction:        s.cfg.App.IsProduction,
 	}
 
 	switch page {
