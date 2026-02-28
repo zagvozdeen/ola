@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
@@ -91,11 +90,6 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	//filenames := []string{}
-	//switch r.URL.Path {
-	//case "/delivery", "/delivery/":
-	//	filenames[0] =
-	//}
 	var templates *template.Template
 	templates, err = s.getTemplates()
 	if err != nil {
@@ -121,39 +115,30 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		head = `<script type="module" src="http://localhost:5173/@vite/client"></script> <script type="module" src="http://localhost:5173/web/landing/src/main.ts"></script>`
 	}
 
-	allProducts, err := s.store.GetAllProducts(r.Context())
+	products, err := s.store.GetMainProducts(r.Context())
 	if err != nil {
-		s.log.Error("Failed to get products", err)
+		s.log.Error("Failed to get main products", err)
 		return
 	}
-	products := make([]models.Product, 0, len(allProducts))
-	services := make([]models.Product, 0, len(allProducts))
-	for _, product := range allProducts {
-		switch product.Type {
-		case enums.ProductTypeProduct:
-			products = append(products, product)
-		case enums.ProductTypeService:
-			services = append(services, product)
-		}
+
+	services, err := s.store.GetMainServices(r.Context())
+	if err != nil {
+		s.log.Error("Failed to get main services", err)
+		return
 	}
-	data := PageData{
-		Head:     head,
-		Products: products,
-		Services: services,
-		Title:    title,
-		IsBlock:  isBlock,
-	}
-	data.Categories, err = s.store.GetAllCategories(r.Context())
+	categories, err := s.store.GetAllCategories(r.Context())
 	if err != nil {
 		s.log.Error("Failed to get categories", err)
 		return
 	}
-	//data.Reviews, err = s.store.GetAllReviews(r.Context())
-	//if err != nil {
-	//	s.log.Error("Failed to get all reviews", err)
-	//	return
-	//}
-	err = templates.ExecuteTemplate(w, page, data)
+	err = templates.ExecuteTemplate(w, page, PageData{
+		Head:       head,
+		Products:   products,
+		Services:   services,
+		Categories: categories,
+		Title:      title,
+		IsBlock:    isBlock,
+	})
 	if err != nil {
 		s.log.Error("Failed to execute template", err, slog.String("path", r.URL.Path))
 		return
@@ -185,6 +170,8 @@ func getTemplate(r *http.Request) (isBlock bool, title string, template string, 
 		return false, "OLA Studio", "index.html", nil
 	case "/delivery", "/delivery/":
 		return true, "Доставка, оплата и возврат | OLA Studio", "delivery.html", nil
+	case "/catalog", "/catalog/":
+		return true, "Каталог товаров и услуг | OLA Studio", "catalog.html", nil
 	case "/privacy", "/privacy/":
 		return true, "Политика конфиденциальности | OLA studio", "privacy.html", nil
 	default:

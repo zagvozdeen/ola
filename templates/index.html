@@ -15,11 +15,11 @@
 <body class="antialiased font-inter overflow-x-hidden">
 {{ template "header" }}
 
-<div class="relative h-132">
+<div class="relative min-h-dvh">
     <img class="-z-20 absolute inset-0 h-full w-full object-cover" src="/image_1.png" alt="Задний фон в виде шариков">
     <div class="-z-20 absolute inset-0 bg-black/10"></div>
-    <div class="max-w-350 mx-auto px-4 pt-28 sm:pt-32 lg:pt-40">
-        <div class="text-4xl sm:text-5xl lg:text-6xl text-white font-bold">Воздушный декор<br>для неповторимых<br>событий</div>
+    <div class="max-w-350 mx-auto px-4 pb-8">
+        <div class="text-4xl sm:text-5xl lg:text-6xl text-white font-bold pt-[30dvh]">Воздушный декор<br>для неповторимых<br>событий</div>
         <a class="inline-block mt-8 sm:mt-10 bg-purple-500 hover:bg-yellow-500 hover:text-black transition-colors text-white rounded-full px-8 sm:px-10 py-3 sm:py-4 font-bold text-base sm:text-lg lg:text-xl" href="#order">оформить праздник</a>
     </div>
 </div>
@@ -60,7 +60,7 @@
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
             {{ range .Products }}
             <article class="flex h-full flex-col bg-white">
-                <img class="h-80 w-full object-cover" src="{{ with .FileContent }}{{ . }}{{ else }}/logo.png{{ end }}" alt="{{ .Name }}" width="360" height="208">
+                <img class="h-80 w-full object-cover" src="{{ .FileContent }}" alt="Фотография для товара «{{ .Name }}»" width="360" height="208">
                 <p class="mt-4 text-lg font-bold text-purple-500">от {{ .PriceFrom }} ₽</p>
                 <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
                 <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>
@@ -81,7 +81,7 @@
         <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
             {{ range .Services }}
             <article class="flex h-full flex-col bg-white">
-                <img class="h-80 w-full object-cover" src="{{ with .FileContent }}{{ . }}{{ else }}/logo.png{{ end }}" alt="{{ .Name }}" width="360" height="208">
+                <img class="h-80 w-full object-cover" src="{{ .FileContent }}" alt="Фотография для услуги «{{ .Name }}»" width="360" height="208">
                 <p class="mt-4 text-lg font-bold text-purple-500">от {{ .PriceFrom }} ₽</p>
                 <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
                 <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>

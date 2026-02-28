@@ -3,8 +3,10 @@
 @source "../../../templates/index.html";
 
 @theme {
-    /*--font-gothic: "Gothic A1", sans-serif;*/
     --font-inter: "Inter", sans-serif;
+
+    --color-lemon: #FDFDA7;
+    --color-grape: #A17FD3;
 }
 
 @keyframes categories-marquee {

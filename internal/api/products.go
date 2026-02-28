@@ -13,12 +13,12 @@ import (
 )
 
 type upsertProductRequest struct {
-	Name        string `json:"name" mold:"trim" validate:"required,max=255"`
-	Description string `json:"description" mold:"trim" validate:"required,max=3000"`
-	PriceFrom   int    `json:"price_from" validate:"required,gte=0"`
-	PriceTo     *int   `json:"price_to" validate:"omitempty,gte=0"`
-	Type        string `json:"type" mold:"trim,lcase" validate:"required,oneof=product service"`
-	FileID      int    `json:"file_id" validate:"required,gt=0"`
+	Name        string            `json:"name" mold:"trim" validate:"required,max=255"`
+	Description string            `json:"description" mold:"trim" validate:"required,max=3000"`
+	PriceFrom   int               `json:"price_from" validate:"required,gte=0"`
+	PriceTo     *int              `json:"price_to" validate:"omitempty,gte=0"`
+	Type        enums.ProductType `json:"type"`
+	FileContent string            `json:"file_content" validate:"required"`
 }
 
 func (s *Service) getProducts(r *http.Request, user *models.User) core.Response {
@@ -64,10 +64,10 @@ func (s *Service) createProduct(r *http.Request, user *models.User) core.Respons
 		return core.Err(http.StatusBadRequest, fmt.Errorf("price_to must be greater than or equal to price_from"))
 	}
 
-	pType, err := enums.NewProductType(req.Type)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid product type: %w", err))
-	}
+	//pType, err := enums.NewProductType(req.Type)
+	//if err != nil {
+	//	return core.Err(http.StatusBadRequest, fmt.Errorf("invalid product type: %w", err))
+	//}
 
 	uid, err := uuid.NewV7()
 	if err != nil {
@@ -81,8 +81,8 @@ func (s *Service) createProduct(r *http.Request, user *models.User) core.Respons
 		Description: req.Description,
 		PriceFrom:   req.PriceFrom,
 		PriceTo:     req.PriceTo,
-		Type:        pType,
-		FileID:      req.FileID,
+		Type:        req.Type,
+		FileContent: req.FileContent,
 		UserID:      user.ID,
 		CreatedAt:   now,
 		UpdatedAt:   now,
@@ -119,10 +119,10 @@ func (s *Service) updateProduct(r *http.Request, user *models.User) core.Respons
 		return core.Err(http.StatusBadRequest, fmt.Errorf("price_to must be greater than or equal to price_from"))
 	}
 
-	pType, err := enums.NewProductType(req.Type)
-	if err != nil {
-		return core.Err(http.StatusBadRequest, fmt.Errorf("invalid product type: %w", err))
-	}
+	//pType, err := enums.NewProductType(req.Type)
+	//if err != nil {
+	//	return core.Err(http.StatusBadRequest, fmt.Errorf("invalid product type: %w", err))
+	//}
 
 	product, err := s.store.GetProductByUUID(r.Context(), uid)
 	if err != nil {
@@ -136,8 +136,8 @@ func (s *Service) updateProduct(r *http.Request, user *models.User) core.Respons
 	product.Description = req.Description
 	product.PriceFrom = req.PriceFrom
 	product.PriceTo = req.PriceTo
-	product.Type = pType
-	product.FileID = req.FileID
+	product.Type = req.Type
+	product.FileContent = req.FileContent
 	product.UserID = user.ID
 	product.UpdatedAt = time.Now()
 

@@ -5,12 +5,6 @@ import { MaskInput } from 'maska'
 
 new MaskInput('[data-maska]')
 
-type FeedbackFormConfig = {
-  endpoint: string
-  successMessage: string
-  submitErrorMessage: string
-}
-
 type ValidationField = 'name' | 'phone' | 'content' | 'consent'
 type FormField = ValidationField
 
@@ -97,161 +91,136 @@ const initMobileMenu = (): void => {
   })
 }
 
-const initFeedbackForm = (
-  form: HTMLFormElement,
-  config: FeedbackFormConfig,
-): void => {
-  const nameInput = form.elements.namedItem('name')
-  const phoneInput = form.elements.namedItem('phone')
-  const contentInput = form.elements.namedItem('content')
-  const consentInput = form.elements.namedItem('consent')
-  const statusNode = form.querySelector<HTMLElement>('[data-form-status]')
-  const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')
+const initReviewForms = (): void => {
+  const form = document.querySelector<HTMLFormElement>('#order-form')
+  if (form) {
+    const nameInput = form.elements.namedItem('name')
+    const phoneInput = form.elements.namedItem('phone')
+    const contentInput = form.elements.namedItem('content')
+    const consentInput = form.elements.namedItem('consent')
+    const statusNode = form.querySelector<HTMLElement>('[data-form-status]')
+    const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]')
 
-  if (
-    !(nameInput instanceof HTMLInputElement) ||
-    !(phoneInput instanceof HTMLInputElement) ||
-    !(contentInput instanceof HTMLTextAreaElement) ||
-    !(consentInput instanceof HTMLInputElement) ||
-    !(statusNode instanceof HTMLElement) ||
-    !(submitButton instanceof HTMLButtonElement)
-  ) {
-    return
-  }
-
-  const setStatus = (message = '', type: 'idle' | 'error' | 'success' = 'idle'): void => {
-    statusNode.textContent = message
-    statusNode.classList.remove('text-red-600', 'text-green-700')
-
-    if (type === 'error') {
-      statusNode.classList.add('text-red-600')
-    }
-
-    if (type === 'success') {
-      statusNode.classList.add('text-green-700')
-    }
-
-    statusNode.classList.toggle('invisible', message.length === 0)
-  }
-
-  const setFieldError = (field: FormField, message = ''): void => {
-    const errorNode = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`)
-    if (!(errorNode instanceof HTMLElement)) {
+    if (
+      !(nameInput instanceof HTMLInputElement) ||
+      !(phoneInput instanceof HTMLInputElement) ||
+      !(contentInput instanceof HTMLTextAreaElement) ||
+      !(consentInput instanceof HTMLInputElement) ||
+      !(statusNode instanceof HTMLElement) ||
+      !(submitButton instanceof HTMLButtonElement)
+    ) {
       return
     }
 
-    errorNode.textContent = message
-    errorNode.classList.toggle('invisible', message.length === 0)
-  }
+    const setStatus = (message = '', type: 'idle' | 'error' | 'success' = 'idle'): void => {
+      statusNode.textContent = message
+      statusNode.classList.remove('text-red-600', 'text-green-700')
 
-  const clearFieldErrors = (): void => {
-    validationFields.forEach((field) => setFieldError(field))
-  }
+      if (type === 'error') {
+        statusNode.classList.add('text-red-600')
+      }
 
-  const setValidationErrors = (errors: Record<string, string>): boolean => {
-    let hasValidationErrors = false
+      if (type === 'success') {
+        statusNode.classList.add('text-green-700')
+      }
 
-    validationFields.forEach((field) => {
-      const tag = errors[field]
-      if (typeof tag !== 'string' || tag.length === 0) {
-        setFieldError(field)
+      statusNode.classList.toggle('invisible', message.length === 0)
+    }
+
+    const setFieldError = (field: FormField, message = ''): void => {
+      const errorNode = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`)
+      if (!(errorNode instanceof HTMLElement)) {
         return
       }
 
-      setFieldError(field, getValidationMessage(field, tag))
-      hasValidationErrors = true
-    })
-
-    return hasValidationErrors
-  }
-
-  consentInput.addEventListener('change', () => {
-    if (consentInput.checked) {
-      setFieldError('consent')
-    }
-  })
-
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault()
-    setStatus()
-    clearFieldErrors()
-
-    const name = nameInput.value.trim()
-    const content = contentInput.value.trim()
-    const phone = phoneInput.value.trim()
-
-    if (!consentInput.checked) {
-      setFieldError('consent', i18n['form.consent_required'] || 'Нужно согласие на обработку данных')
-      return
+      errorNode.textContent = message
+      errorNode.classList.toggle('invisible', message.length === 0)
     }
 
-    submitButton.disabled = true
+    const clearFieldErrors = (): void => {
+      validationFields.forEach((field) => setFieldError(field))
+    }
 
-    try {
-      const response = await fetch(config.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          phone,
-          content,
-          consent: consentInput.checked,
-        }),
-      })
+    const setValidationErrors = (errors: Record<string, string>): boolean => {
+      let hasValidationErrors = false
 
-      if (!response.ok) {
-        const contentType = response.headers.get('Content-Type')?.toLowerCase() || ''
-        if (contentType.includes('application/json')) {
-          let error: ValidationError
-          try {
-            error = await response.json() as ValidationError
-          } catch {
-            setStatus(config.submitErrorMessage, 'error')
-            return
-          }
-
-          if (setValidationErrors(error.errors)) {
-            return
-          }
-
-          setStatus(config.submitErrorMessage, 'error')
+      validationFields.forEach((field) => {
+        const tag = errors[field]
+        if (typeof tag !== 'string' || tag.length === 0) {
+          setFieldError(field)
           return
         }
 
-        const errorText = (await response.text()).trim()
-        setStatus(errorText || config.submitErrorMessage, 'error')
-        return
-      }
+        setFieldError(field, getValidationMessage(field, tag))
+        hasValidationErrors = true
+      })
 
-      setStatus(config.successMessage, 'success')
-      form.reset()
-      // phoneMask.value = ''
-    } catch {
-      setStatus(i18n['form.network_error'] || 'Ошибка сети. Попробуйте позже', 'error')
-    } finally {
-      submitButton.disabled = false
+      return hasValidationErrors
     }
-  })
-}
 
-const initReviewForms = (): void => {
-  // const feedbackForm = document.querySelector<HTMLFormElement>('#feedback-form')
-  // if (feedbackForm) {
-  //   initFeedbackForm(feedbackForm, {
-  //     endpoint: '/api/guest/feedback',
-  //     successMessage: 'Спасибо! Отзыв отправлен',
-  //     submitErrorMessage: 'Не удалось отправить отзыв',
-  //   })
-  // }
+    consentInput.addEventListener('change', () => {
+      if (consentInput.checked) {
+        setFieldError('consent')
+      }
+    })
 
-  const orderForm = document.querySelector<HTMLFormElement>('#order-form')
-  if (orderForm) {
-    initFeedbackForm(orderForm, {
-      endpoint: '/api/guest/orders',
-      successMessage: 'Спасибо, заявка отправлена!',
-      submitErrorMessage: 'Не удалось отправить заявку',
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      setStatus()
+      clearFieldErrors()
+
+      // if (!consentInput.checked) {
+      //   setFieldError('consent', i18n['form.consent_required'] || 'Нужно согласие на обработку данных')
+      //   return
+      // }
+
+      submitButton.disabled = true
+
+      try {
+        const response = await fetch('/api/guest/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: nameInput.value.trim(),
+            phone: contentInput.value.trim(),
+            content: phoneInput.value.trim(),
+            consent: consentInput.checked,
+          }),
+        })
+
+        if (!response.ok) {
+          const contentType = response.headers.get('Content-Type')?.toLowerCase() || ''
+          if (contentType.includes('application/json')) {
+            let error: ValidationError
+            try {
+              error = await response.json() as ValidationError
+            } catch {
+              setStatus('Не удалось отправить заявку', 'error')
+              return
+            }
+
+            if (setValidationErrors(error.errors)) {
+              return
+            }
+
+            setStatus('Не удалось отправить заявку', 'error')
+            return
+          }
+
+          const errorText = (await response.text()).trim()
+          setStatus(errorText || 'Не удалось отправить заявку', 'error')
+          return
+        }
+
+        setStatus('Спасибо, заявка отправлена!', 'success')
+        form.reset()
+      } catch {
+        setStatus(i18n['form.network_error'] || 'Ошибка сети. Попробуйте позже', 'error')
+      } finally {
+        submitButton.disabled = false
+      }
     })
   }
 }

@@ -11,9 +11,9 @@ func (s *Store) GetFileByUUID(ctx context.Context, uuid uuid.UUID) (*models.File
 	file := &models.File{}
 	err := s.querier(ctx).QueryRow(
 		ctx,
-		"SELECT id, uuid, content, size, mime_type, origin_name, user_id, created_at FROM files WHERE uuid = $1",
+		"SELECT uuid, content, size, mime_type, origin_name, user_id, created_at FROM files WHERE uuid = $1",
 		uuid,
-	).Scan(&file.ID, &file.UUID, &file.Content, &file.Size, &file.MimeType, &file.OriginName, &file.UserID, &file.CreatedAt)
+	).Scan(&file.UUID, &file.Content, &file.Size, &file.MimeType, &file.OriginName, &file.UserID, &file.CreatedAt)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -21,10 +21,10 @@ func (s *Store) GetFileByUUID(ctx context.Context, uuid uuid.UUID) (*models.File
 }
 
 func (s *Store) CreateFile(ctx context.Context, file *models.File) error {
-	err := s.querier(ctx).QueryRow(
+	_, err := s.querier(ctx).Exec(
 		ctx,
-		"INSERT INTO files (uuid, content, size, mime_type, origin_name, user_id, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		"INSERT INTO files (uuid, content, size, mime_type, origin_name, user_id, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		file.UUID, file.Content, file.Size, file.MimeType, file.OriginName, file.UserID, file.CreatedAt,
-	).Scan(&file.ID)
+	)
 	return wrapDBError(err)
 }

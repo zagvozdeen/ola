@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS files
 (
 --     id          SERIAL PRIMARY KEY,
     uuid        UUID                          NOT NULL UNIQUE,
-    content     VARCHAR(255)                  NOT NULL UNIQUE PRIMARY KEY,
+    content     VARCHAR(255) PRIMARY KEY,
     size        BIGINT                        NOT NULL,
     mime_type   VARCHAR(255)                  NOT NULL,
     origin_name VARCHAR(255)                  NOT NULL,
@@ -45,17 +45,17 @@ CREATE TYPE request_status AS ENUM ('created', 'in_progress', 'reviewed');
 CREATE TABLE IF NOT EXISTS products
 (
     id           SERIAL PRIMARY KEY,
-    uuid         UUID                                                  NOT NULL UNIQUE,
-    name         VARCHAR(255)                                          NOT NULL,
-    description  TEXT                                                  NOT NULL,
-    price_from   INTEGER                                               NOT NULL,
-    price_to     INTEGER                                               NULL,
-    type         product_type                                          NOT NULL,
-    is_main      BOOLEAN                                               NOT NULL,
-    file_content INTEGER REFERENCES files (content) ON DELETE RESTRICT NOT NULL,
-    user_id      INTEGER REFERENCES users (id) ON DELETE RESTRICT      NOT NULL,
-    created_at   TIMESTAMPTZ                                           NOT NULL,
-    updated_at   TIMESTAMPTZ                                           NOT NULL
+    uuid         UUID                                                       NOT NULL UNIQUE,
+    name         VARCHAR(255)                                               NOT NULL,
+    description  TEXT                                                       NOT NULL,
+    price_from   INTEGER                                                    NOT NULL,
+    price_to     INTEGER                                                    NULL,
+    type         product_type                                               NOT NULL,
+    is_main      BOOLEAN                                                    NOT NULL,
+    file_content VARCHAR(255) REFERENCES files (content) ON DELETE RESTRICT NOT NULL,
+    user_id      INTEGER REFERENCES users (id) ON DELETE RESTRICT           NOT NULL,
+    created_at   TIMESTAMPTZ                                                NOT NULL,
+    updated_at   TIMESTAMPTZ                                                NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS category_product

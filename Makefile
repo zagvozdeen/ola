@@ -29,3 +29,10 @@ deploy: build
 	ssh root@185.221.214.4 "systemctl daemon-reload && service ola restart && nginx -s reload"
 #	rm ola && rm -rf dist
 	rm ola
+
+download:
+	scp root@185.221.214.4:/var/www/ola.creavo.ru/.data/files/1.jpg ./.data/files/1.jpg
+	scp root@185.221.214.4:/var/www/ola.creavo.ru/.data/files/2.jpg ./.data/files/2.jpg
+	scp root@185.221.214.4:/var/www/ola.creavo.ru/.data/files/3.jpg ./.data/files/3.jpg
+	scp root@185.221.214.4:/var/www/ola.creavo.ru/.data/files/4.jpg ./.data/files/4.jpg
+

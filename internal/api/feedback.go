@@ -90,7 +90,7 @@ func (s *Service) createFeedback(r *http.Request, user *models.User) core.Respon
 		Name:      req.Name,
 		Phone:     req.Phone,
 		Content:   req.Content,
-		UserID:    &user.ID,
+		UserID:    user.ID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

@@ -70,18 +70,13 @@ func (s *Seeder) Run(ctx context.Context) error {
 	}
 
 	files := []struct {
-		id   int
-		uuid uuid.UUID
+		content string
+		uuid    uuid.UUID
 	}{
 		{uuid: uuid.MustParse("f3aaf3df-11af-11f1-b4af-c87f54a92045")},
 		{uuid: uuid.MustParse("f3ab0dd5-11af-11f1-b4af-c87f54a92045")},
 		{uuid: uuid.MustParse("f3ab14fe-11af-11f1-b4af-c87f54a92045")},
 		{uuid: uuid.MustParse("f3ab1996-11af-11f1-b4af-c87f54a92045")},
-		{uuid: uuid.MustParse("f3ab1e48-11af-11f1-b4af-c87f54a92045")},
-		{uuid: uuid.MustParse("f3ab240c-11af-11f1-b4af-c87f54a92045")},
-		{uuid: uuid.MustParse("f3ab2978-11af-11f1-b4af-c87f54a92045")},
-		{uuid: uuid.MustParse("f3ab2cd4-11af-11f1-b4af-c87f54a92045")},
-		{uuid: uuid.MustParse("f3ab308d-11af-11f1-b4af-c87f54a92045")},
 	}
 	for i, f := range files {
 		var file *models.File
@@ -104,7 +99,7 @@ func (s *Seeder) Run(ctx context.Context) error {
 				return fmt.Errorf("failed to create file: %w", err)
 			}
 		}
-		files[i].id = file.ID
+		files[i].content = file.Content
 	}
 
 	categories := []struct {
@@ -139,20 +134,20 @@ func (s *Seeder) Run(ctx context.Context) error {
 	products := []struct {
 		uuid        uuid.UUID
 		t           enums.ProductType
-		file        int
+		file        string
 		from        int
 		to          *int
 		name        string
 		description string
 	}{
-		{uuid: uuid.MustParse("671838e9-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[0].id, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события"},
-		{uuid: uuid.MustParse("671853bf-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[1].id, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну"},
-		{uuid: uuid.MustParse("67185b7b-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[2].id, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события"},
-		{uuid: uuid.MustParse("6bb9ab38-11b1-11f1-a6a2-c87f54a92045"), t: enums.ProductTypeProduct, file: files[3].id, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс"},
-		{uuid: uuid.MustParse("671868fb-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[0].id, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события"},
-		{uuid: uuid.MustParse("67186e98-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[1].id, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну"},
-		{uuid: uuid.MustParse("671874da-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[2].id, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события"},
-		{uuid: uuid.MustParse("67186286-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[3].id, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс"},
+		{uuid: uuid.MustParse("671838e9-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[0].content, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события"},
+		{uuid: uuid.MustParse("671853bf-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[1].content, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну"},
+		{uuid: uuid.MustParse("67185b7b-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[2].content, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события"},
+		{uuid: uuid.MustParse("6bb9ab38-11b1-11f1-a6a2-c87f54a92045"), t: enums.ProductTypeProduct, file: files[3].content, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс"},
+		{uuid: uuid.MustParse("671868fb-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[0].content, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события"},
+		{uuid: uuid.MustParse("67186e98-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[1].content, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну"},
+		{uuid: uuid.MustParse("671874da-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[2].content, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события"},
+		{uuid: uuid.MustParse("67186286-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[3].content, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс"},
 	}
 	for _, p := range products {
 		_, err = s.store.GetProductByUUID(ctx, p.uuid)
@@ -167,7 +162,8 @@ func (s *Seeder) Run(ctx context.Context) error {
 				PriceFrom:   p.from,
 				PriceTo:     p.to,
 				Type:        p.t,
-				FileID:      p.file,
+				IsMain:      true,
+				FileContent: p.file,
 				UserID:      user.ID,
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
@@ -177,42 +173,6 @@ func (s *Seeder) Run(ctx context.Context) error {
 			}
 		}
 	}
-
-	//reviews := []struct {
-	//	uuid    uuid.UUID
-	//	name    string
-	//	content string
-	//}{
-	//	{uuid: uuid.MustParse("f3ab6d17-11af-11f1-b4af-c87f54a92045"), name: "Елена", content: "Огромное спасибо за шарики! Именинник был в восторге и доставка порадовала, все вовремя) Не пожалела, что обратилась именно к вам!"},
-	//	{uuid: uuid.MustParse("f3ab78e7-11af-11f1-b4af-c87f54a92045"), name: "Евгений", content: "Обратился за бабл боксом с украшением внутри, хотелось поздравить девушку с годовщиной. Она очень удивилась такой креативной идее. Я тоже не видел ничего подобного в нашем городе до этого)) Желаю вам дальнейшего развития, вы классные!"},
-	//	{uuid: uuid.MustParse("f3ab7f35-11af-11f1-b4af-c87f54a92045"), name: "Александр", content: "Выражаю благодарность студии за профессиональное оформление нашего корпоратива. Требовался лаконичный декор в цветах компании. Результат превзошел ожидания: композиции у входа и фотозона были выполнены безупречно, с вниманием к деталям. Отдельно отмечу пунктуальность, четкое соблюдение сроков и договоренностей."},
-	//	{uuid: uuid.MustParse("f3ab84ad-11af-11f1-b4af-c87f54a92045"), name: "Любовь", content: "Благодарю персонал за то, что взялись за очень срочный заказ, выполнили и доставили максимально быстро. Посоветую вас друзьям и сама обращусь еще не раз."},
-	//	{uuid: uuid.MustParse("f3ab8aa7-11af-11f1-b4af-c87f54a92045"), name: "Анна", content: "Как человек, который ценит визуал, долго искала в Екатеринбурге студию, которая умеет в тренды. Команда Ola предложила крутые цветовые сочетания для моей вечеринки. Шары держались несколько дней, не теряя вид! Ни одного лопнувшего. Это показатель. Если вам важен дизайн, атмосфера и стойкость - выбор очевиден."},
-	//}
-	//for i, r := range reviews {
-	//	if err != nil {
-	//		return fmt.Errorf("failed to create uuid: %w", err)
-	//	}
-	//	_, err = s.store.GetReviewByUUID(ctx, r.uuid)
-	//	if err != nil {
-	//		if !errors.Is(err, models.ErrNotFound) {
-	//			return fmt.Errorf("failed to get review by id: %w", err)
-	//		}
-	//		err = s.store.CreateReview(ctx, &models.Review{
-	//			UUID:        r.uuid,
-	//			Name:        r.name,
-	//			Content:     r.content,
-	//			FileID:      files[i+4].id,
-	//			UserID:      user.ID,
-	//			PublishedAt: time.Now(),
-	//			CreatedAt:   time.Now(),
-	//			UpdatedAt:   time.Now(),
-	//		})
-	//		if err != nil {
-	//			return fmt.Errorf("failed to create review: %w", err)
-	//		}
-	//	}
-	//}
 
 	s.store.Commit(ctx)
 	s.log.Info("Seeder complete the work")
