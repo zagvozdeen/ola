@@ -114,8 +114,8 @@ const getCategories = async (notify: Notify) => {
   }, { notify })
 }
 
-const getCategory = async (notify: Notify, uuid: string) => {
-  return fetchJson<Category>(`/api/categories/${uuid}`, {
+const getCategory = async (notify: Notify, slug: string) => {
+  return fetchJson<Category>(`/api/categories/${slug}`, {
     headers: getAuthHeaders(),
   }, { notify })
 }
@@ -132,9 +132,9 @@ const createCategory = async (notify: Notify, payload: UpsertCategoryRequest) =>
   )
 }
 
-const updateCategory = async (notify: Notify, uuid: string, payload: UpsertCategoryRequest) => {
+const updateCategory = async (notify: Notify, slug: string, payload: UpsertCategoryRequest) => {
   return fetchJson<Category>(
-    `/api/categories/${uuid}`,
+    `/api/categories/${slug}`,
     {
       method: 'PATCH',
       headers: getAuthJsonHeaders(),
@@ -144,9 +144,9 @@ const updateCategory = async (notify: Notify, uuid: string, payload: UpsertCateg
   )
 }
 
-const deleteCategory = async (notify: Notify, uuid: string) => {
+const deleteCategory = async (notify: Notify, slug: string) => {
   return fetchJson<null>(
-    `/api/categories/${uuid}`,
+    `/api/categories/${slug}`,
     {
       method: 'DELETE',
       headers: getAuthHeaders(),

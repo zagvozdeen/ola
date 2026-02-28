@@ -25,28 +25,31 @@
     >
       <li
         v-for="category in categories"
-        :key="category.id"
+        :key="category.slug"
         class="bg-gray-500/20 border border-gray-500/20 p-3 rounded-xl overflow-hidden flex justify-between items-center gap-2"
       >
-        <span class="font-bold text-sm truncate">{{ category.name }}</span>
+        <div class="min-w-0">
+          <span class="block font-bold text-sm truncate">{{ category.name }}</span>
+          <span class="block text-[10px] text-gray-300 truncate">{{ category.slug }}</span>
+        </div>
         <div class="flex gap-2 shrink-0">
           <router-link
             class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
-            :to="{ name: 'categories.edit', params: { uuid: category.uuid } }"
+            :to="{ name: 'categories.edit', params: { slug: category.slug } }"
           >
             Редактировать
           </router-link>
           <NPopconfirm
             negative-text="Отмена"
             positive-text="Удалить"
-            @positive-click="() => handleDeleteCategory(category.uuid)"
+            @positive-click="() => handleDeleteCategory(category.slug)"
           >
             <template #trigger>
               <button
                 class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
-                :disabled="deleting === category.uuid"
+                :disabled="deleting === category.slug"
               >
-                {{ deleting === category.uuid ? 'Удаляем...' : 'Удалить' }}
+                {{ deleting === category.slug ? 'Удаляем...' : 'Удалить' }}
               </button>
             </template>
 
@@ -80,13 +83,13 @@ const categories = ref<Category[]>([])
 const isLoading = ref(true)
 const deleting = ref<string | null>(null)
 
-const handleDeleteCategory = (uuid: string) => {
-  deleting.value = uuid
+const handleDeleteCategory = (slug: string) => {
+  deleting.value = slug
 
-  fetcher.deleteCategory(uuid)
+  fetcher.deleteCategory(slug)
     .then(data => {
       if (data.ok) {
-        categories.value = categories.value.filter(category => category.uuid !== uuid)
+        categories.value = categories.value.filter(category => category.slug !== slug)
         notify.info('Категория удалена')
       }
     })

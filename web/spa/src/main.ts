@@ -45,7 +45,7 @@ const router = createRouter({
     { path: '/orders/:uuid/edit', name: 'orders.edit', component: PageOrderEdit, meta: { requiresOrderManager: true } },
     { path: '/categories', name: 'categories', component: PageCategories, meta: { requiresModerator: true } },
     { path: '/categories/create', name: 'categories.create', component: PageCategoryEdit, meta: { requiresModerator: true } },
-    { path: '/categories/:uuid/edit', name: 'categories.edit', component: PageCategoryEdit, meta: { requiresModerator: true } },
+    { path: '/categories/:slug/edit', name: 'categories.edit', component: PageCategoryEdit, meta: { requiresModerator: true } },
     { path: '/users', name: 'users', component: PageUsers, meta: { requiresAdmin: true } },
     { path: '/users/:uuid/edit', name: 'users.edit', component: PageUserEdit, meta: { requiresAdmin: true } },
   ],

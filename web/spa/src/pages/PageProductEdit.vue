@@ -96,13 +96,19 @@
         />
       </n-form-item>
 
+      <n-form-item label="На главной странице">
+        <n-checkbox v-model:checked="form.is_main">
+          Отображать на главной странице
+        </n-checkbox>
+      </n-form-item>
+
       <n-form-item label="Категории">
-        <n-checkbox-group v-model:value="form.category_uuids">
+        <n-checkbox-group v-model:value="form.category_slugs">
           <n-space vertical>
             <n-checkbox
               v-for="category in categories"
-              :key="category.uuid"
-              :value="category.uuid"
+              :key="category.slug"
+              :value="category.slug"
               :label="category.name"
             />
           </n-space>
@@ -142,8 +148,9 @@ const form = reactive<CreateProductRequest>({
   price_from: null,
   price_to: null,
   type: null,
+  is_main: false,
   file_content: null,
-  category_uuids: [],
+  category_slugs: [],
 })
 const rules: FormRules = {
   name: {
@@ -200,8 +207,9 @@ const onSubmit = () => {
       price_from: form.price_from,
       price_to: form.price_to,
       type: form.type,
+      is_main: form.is_main,
       file_content: form.file_content,
-      category_uuids: form.category_uuids,
+      category_slugs: form.category_slugs,
     }
 
     if (isCreating) {
@@ -255,8 +263,9 @@ onMounted(() => {
       form.price_from = data.data.price_from
       form.price_to = data.data.price_to ?? null
       form.type = data.data.type
+      form.is_main = data.data.is_main
       form.file_content = data.data.file_content
-      form.category_uuids = data.data.categories.map(category => category.uuid)
+      form.category_slugs = data.data.categories.map(category => category.slug)
     }
 
     isLoading.value = false

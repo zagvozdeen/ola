@@ -28,6 +28,16 @@
       @submit.prevent="onSubmit"
     >
       <n-form-item
+        label="Slug"
+        path="slug"
+      >
+        <n-input
+          v-model:value="form.slug"
+          placeholder="Например: detskie-prazdniki"
+        />
+      </n-form-item>
+
+      <n-form-item
         label="Название"
         path="name"
       >
@@ -63,10 +73,27 @@ const title = isCreating ? 'Создание категории' : 'Редакт
 const formRef = useTemplateRef<FormInst>('formRef')
 const isLoading = ref(true)
 const form = reactive<UpsertCategoryRequest>({
+  slug: null,
   name: null,
 })
 
 const rules: FormRules = {
+  slug: {
+    required: true,
+    type: 'string',
+    message: 'Введите slug',
+    min: 1,
+    max: 255,
+    validator: (_rule, value: string | null) => {
+      if (value === null || value === '') {
+        return new Error('Введите slug')
+      }
+      if (!/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/.test(value)) {
+        return new Error('Используйте латиницу, цифры, "-" или "_"')
+      }
+      return true
+    },
+  },
   name: {
     required: true,
     type: 'string',
@@ -79,7 +106,7 @@ const rules: FormRules = {
 const onSubmit = () => {
   sender.submit(formRef.value, async () => {
     if (isCreating) {
-      const data = await fetcher.createCategory({ name: form.name })
+      const data = await fetcher.createCategory({ slug: form.slug, name: form.name })
       if (data.ok) {
         notify.info('Категория создана')
         await router.push({ name: 'categories' })
@@ -87,14 +114,14 @@ const onSubmit = () => {
       return
     }
 
-    const uuid = route.params['uuid']
-    if (typeof uuid !== 'string' || !uuid) {
-      notify.error('Некорректный ID категории')
+    const slug = route.params['slug']
+    if (typeof slug !== 'string' || !slug) {
+      notify.error('Некорректный slug категории')
       await router.push({ name: 'categories' })
       return
     }
 
-    const data = await fetcher.updateCategory(uuid, { name: form.name })
+    const data = await fetcher.updateCategory(slug, { slug: form.slug, name: form.name })
     if (data.ok) {
       notify.info('Категория обновлена')
       await router.push({ name: 'categories' })
@@ -108,17 +135,18 @@ onMounted(() => {
     return
   }
 
-  const uuid = route.params['uuid']
-  if (typeof uuid !== 'string' || !uuid) {
-    notify.error('Некорректный ID категории')
+  const slug = route.params['slug']
+  if (typeof slug !== 'string' || !slug) {
+    notify.error('Некорректный slug категории')
     router.push({ name: 'categories' })
     isLoading.value = false
     return
   }
 
-  fetcher.getCategory(uuid)
+  fetcher.getCategory(slug)
     .then(data => {
       if (data.ok) {
+        form.slug = data.data.slug
         form.name = data.data.name
       }
     })

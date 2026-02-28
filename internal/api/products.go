@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,8 +20,9 @@ type upsertProductRequest struct {
 	PriceFrom     int               `json:"price_from" validate:"required,gte=0"`
 	PriceTo       *int              `json:"price_to" validate:"omitempty,gte=0"`
 	Type          enums.ProductType `json:"type"`
+	IsMain        bool              `json:"is_main"`
 	FileContent   string            `json:"file_content" validate:"required"`
-	CategoryUUIDs []uuid.UUID       `json:"category_uuids"`
+	CategorySlugs []string          `json:"category_slugs"`
 }
 
 func (s *Service) getProducts(r *http.Request, user *models.User) core.Response {
@@ -89,7 +91,7 @@ func (s *Service) createProduct(r *http.Request, user *models.User) core.Respons
 		return core.Err(http.StatusInternalServerError, fmt.Errorf("failed to generate uuid v7: %w", err))
 	}
 
-	categories, err := s.resolveProductCategories(r.Context(), req.CategoryUUIDs)
+	categories, err := s.resolveProductCategories(r.Context(), req.CategorySlugs)
 	if err != nil {
 		return core.Err(http.StatusBadRequest, err)
 	}
@@ -108,6 +110,7 @@ func (s *Service) createProduct(r *http.Request, user *models.User) core.Respons
 		PriceFrom:   req.PriceFrom,
 		PriceTo:     req.PriceTo,
 		Type:        req.Type,
+		IsMain:      req.IsMain,
 		FileContent: req.FileContent,
 		UserID:      user.ID,
 		CreatedAt:   now,
@@ -164,7 +167,7 @@ func (s *Service) updateProduct(r *http.Request, user *models.User) core.Respons
 	//	return core.Err(http.StatusBadRequest, fmt.Errorf("invalid product type: %w", err))
 	//}
 
-	categories, err := s.resolveProductCategories(r.Context(), req.CategoryUUIDs)
+	categories, err := s.resolveProductCategories(r.Context(), req.CategorySlugs)
 	if err != nil {
 		return core.Err(http.StatusBadRequest, err)
 	}
@@ -182,6 +185,7 @@ func (s *Service) updateProduct(r *http.Request, user *models.User) core.Respons
 	product.PriceFrom = req.PriceFrom
 	product.PriceTo = req.PriceTo
 	product.Type = req.Type
+	product.IsMain = req.IsMain
 	product.FileContent = req.FileContent
 	product.UserID = user.ID
 	product.UpdatedAt = time.Now()
@@ -262,23 +266,27 @@ func (s *Service) attachProductCategories(ctx context.Context, products []models
 	return nil
 }
 
-func (s *Service) resolveProductCategories(ctx context.Context, categoryUUIDs []uuid.UUID) ([]models.Category, error) {
-	if len(categoryUUIDs) == 0 {
+func (s *Service) resolveProductCategories(ctx context.Context, categorySlugs []string) ([]models.Category, error) {
+	if len(categorySlugs) == 0 {
 		return []models.Category{}, nil
 	}
 
-	categories := make([]models.Category, 0, len(categoryUUIDs))
-	seen := make(map[uuid.UUID]struct{}, len(categoryUUIDs))
-	for _, categoryUUID := range categoryUUIDs {
-		if _, ok := seen[categoryUUID]; ok {
+	categories := make([]models.Category, 0, len(categorySlugs))
+	seen := make(map[string]struct{}, len(categorySlugs))
+	for _, rawSlug := range categorySlugs {
+		categorySlug := strings.TrimSpace(rawSlug)
+		if categorySlug == "" {
 			continue
 		}
-		seen[categoryUUID] = struct{}{}
+		if _, ok := seen[categorySlug]; ok {
+			continue
+		}
+		seen[categorySlug] = struct{}{}
 
-		category, err := s.store.GetCategoryByUUID(ctx, categoryUUID)
+		category, err := s.store.GetCategoryBySlug(ctx, categorySlug)
 		if err != nil {
 			if errors.Is(err, models.ErrNotFound) {
-				return nil, fmt.Errorf("category not found: %s", categoryUUID.String())
+				return nil, fmt.Errorf("category not found: %s", categorySlug)
 			}
 			return nil, fmt.Errorf("failed to get category: %w", err)
 		}

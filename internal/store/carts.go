@@ -79,7 +79,7 @@ func (s *Store) GetUserCartItems(ctx context.Context, userID int) ([]models.Cart
 
 	rows, err := s.querier(ctx).Query(
 		ctx,
-		"SELECT ci.product_id, p.uuid, p.name, p.price_from, p.price_to, p.type, f.content, ci.qty FROM cart_items ci JOIN products p ON p.id = ci.product_id JOIN files f ON f.id = p.file_id WHERE ci.cart_id = $1 ORDER BY p.created_at DESC",
+		"SELECT ci.product_id, p.uuid, p.name, p.price_from, p.price_to, p.type, p.file_content, ci.qty FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.cart_id = $1 ORDER BY p.created_at DESC",
 		cart.ID,
 	)
 	if err != nil {

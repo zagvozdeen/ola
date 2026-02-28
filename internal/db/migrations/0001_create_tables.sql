@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS files
 CREATE TABLE IF NOT EXISTS categories
 (
     id         SERIAL PRIMARY KEY,
-    uuid       UUID         NOT NULL UNIQUE,
+    slug       VARCHAR(255) NOT NULL UNIQUE,
     name       VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ  NOT NULL,
     updated_at TIMESTAMPTZ  NOT NULL

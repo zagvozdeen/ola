@@ -110,7 +110,7 @@ type Feedback struct {
 
 type Category struct {
 	ID        int       `json:"id"`
-	UUID      uuid.UUID `json:"uuid"`
+	Slug      string    `json:"slug"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

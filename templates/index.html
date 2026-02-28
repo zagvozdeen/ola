@@ -43,26 +43,47 @@
     <div class="max-w-250 mx-auto px-4">
         <h2 class="text-center text-4xl sm:text-5xl lg:text-6xl text-grape-500 font-bold mb-10">Почему выбирают OLA Studio?</h2>
         <h3 class="text-center font-bold text-xl mb-25">Мы подходим к каждому заказу с душой. Наша главная задача<br>— сделать ваш праздник особенным и подарить яркие<br>впечатления!</h3>
-        <ul class="flex flex-col gap-8 lg:gap-0">
+        <ul class="flex flex-col gap-8 lg:gap-4">
             <li>
-                <div class="relative pl-18">
-                    <h4 class="text-grape-500 font-bold text-2xl lowercase">гарантия качества</h4>
-                    <p class="font-medium mt-4">премиальные материалы и долгий срок<br>службы шаров</p>
+                <div class="relative pl-18 w-120">
+                    <h4 class="text-grape-500 font-bold text-2xl">Формат онлайн заказа</h4>
+                    <p class="font-medium mt-4">Оформление заказа через Telegram-бота: быстро, удобно, без ожиданий.</p>
                     <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">01</span>
                 </div>
             </li>
-            <li class="ml-auto">
-                <div class="relative pl-18">
-                    <h4 class="text-grape-500 font-bold text-2xl lowercase">гарантия качества</h4>
-                    <p class="font-medium mt-4">премиальные материалы и долгий срок<br>службы шаров</p>
+            <li class="lg:ml-auto">
+                <div class="relative pl-18 w-120">
+                    <h4 class="text-grape-500 font-bold text-2xl">На связи 24/7</h4>
+                    <p class="font-medium mt-4">Мы рядом, когда это действительно важно.</p>
                     <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">02</span>
                 </div>
             </li>
             <li>
-                <div class="relative pl-18">
-                    <h4 class="text-grape-500 font-bold text-2xl lowercase">гарантия качества</h4>
-                    <p class="font-medium mt-4">премиальные материалы и долгий срок<br>службы шаров</p>
+                <div class="relative pl-18 w-120">
+                    <h4 class="text-grape-500 font-bold text-2xl">Праздник под ключ</h4>
+                    <p class="font-medium mt-4">От идеи до финального воплощения.</p>
                     <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">03</span>
+                </div>
+            </li>
+            <li class="lg:ml-auto">
+                <div class="relative pl-18 w-120">
+                    <h4 class="text-grape-500 font-bold text-2xl">Выездное оформление</h4>
+                    <p class="font-medium mt-4">Создаем атмосферу там, где удобно вам.</p>
+                    <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">04</span>
+                </div>
+            </li>
+            <li>
+                <div class="relative pl-18 w-120">
+                    <h4 class="text-grape-500 font-bold text-2xl">Индивидуальный стиль</h4>
+                    <p class="font-medium mt-4">Каждый проект — персональная история.</p>
+                    <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">05</span>
+                </div>
+            </li>
+            <li class="lg:ml-auto">
+                <div class="relative pl-18 w-120">
+                    <h4 class="text-grape-500 font-bold text-2xl">Гибкость бюджета</h4>
+                    <p class="font-medium mt-4">Максимальный результат при разумных вложениях.</p>
+                    <span class="absolute -z-10 left-0 right-0 top-0 text-9xl text-black/5 font-black">06</span>
                 </div>
             </li>
         </ul>
@@ -116,22 +137,22 @@
         {{ if .Categories }}
         <div class="categories-marquee-track flex w-max items-center gap-4">
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ .Slug }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ .Slug }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ .Slug }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ .Slug }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ .Slug }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
+            <a href="/catalog?category={{ .Slug }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape-500 bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape-500 transition hover:bg-grape-600 hover:text-white">{{ .Name }}</a>
             {{ end }}
         </div>
         {{ else }}

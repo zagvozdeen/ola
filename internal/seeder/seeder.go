@@ -103,28 +103,28 @@ func (s *Seeder) Run(ctx context.Context) error {
 	}
 
 	categories := []struct {
-		uuid uuid.UUID
+		slug string
 		name string
 		id   int
 	}{
-		{uuid: uuid.MustParse("f3ab3f6c-11af-11f1-b4af-c87f54a92045"), name: "Детские праздники"},
-		{uuid: uuid.MustParse("f3ab46b4-11af-11f1-b4af-c87f54a92045"), name: "Корпоратив"},
-		{uuid: uuid.MustParse("f3ab4a71-11af-11f1-b4af-c87f54a92045"), name: "День рождение"},
-		{uuid: uuid.MustParse("f3ab4e03-11af-11f1-b4af-c87f54a92045"), name: "Свадьба"},
-		{uuid: uuid.MustParse("f3ab5261-11af-11f1-b4af-c87f54a92045"), name: "Выписка"},
-		{uuid: uuid.MustParse("f3ab56ce-11af-11f1-b4af-c87f54a92045"), name: "Гендер пати"},
-		{uuid: uuid.MustParse("f3ab5a58-11af-11f1-b4af-c87f54a92045"), name: "8 марта"},
-		{uuid: uuid.MustParse("f3ab5e39-11af-11f1-b4af-c87f54a92045"), name: "23 февраля"},
-		{uuid: uuid.MustParse("f3ab61f8-11af-11f1-b4af-c87f54a92045"), name: "Без повода"},
+		{slug: "detskie-prazdniki", name: "Детские праздники"},
+		{slug: "korporativ", name: "Корпоратив"},
+		{slug: "den-rozhdeniya", name: "День рождение"},
+		{slug: "svadba", name: "Свадьба"},
+		{slug: "vypiska", name: "Выписка"},
+		{slug: "gender-pati", name: "Гендер пати"},
+		{slug: "8-marta", name: "8 марта"},
+		{slug: "23-fevralya", name: "23 февраля"},
+		{slug: "bez-povoda", name: "Без повода"},
 	}
 	for _, category := range categories {
-		item, getErr := s.store.GetCategoryByUUID(ctx, category.uuid)
+		item, getErr := s.store.GetCategoryBySlug(ctx, category.slug)
 		if getErr != nil {
 			if !errors.Is(getErr, models.ErrNotFound) {
 				return fmt.Errorf("failed to get category by name: %w", getErr)
 			}
 			createErr := s.store.CreateCategory(ctx, &models.Category{
-				UUID:      category.uuid,
+				Slug:      category.slug,
 				Name:      category.name,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
@@ -133,13 +133,13 @@ func (s *Seeder) Run(ctx context.Context) error {
 				return fmt.Errorf("failed to create category: %w", createErr)
 			}
 
-			item, getErr = s.store.GetCategoryByUUID(ctx, category.uuid)
+			item, getErr = s.store.GetCategoryBySlug(ctx, category.slug)
 			if getErr != nil {
 				return fmt.Errorf("failed to reload category: %w", getErr)
 			}
 		}
 		for i := range categories {
-			if categories[i].uuid == category.uuid {
+			if categories[i].slug == category.slug {
 				categories[i].id = item.ID
 				break
 			}

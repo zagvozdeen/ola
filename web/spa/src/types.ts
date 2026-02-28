@@ -199,7 +199,7 @@ export type Feedback = {
 
 export type Category = {
   id: number
-  uuid: UUID
+  slug: string
   name: string
   created_at: DateTime
   updated_at: DateTime
@@ -246,6 +246,7 @@ export type UpdateOrderStatusRequest = {
 }
 
 export type UpsertCategoryRequest = {
+  slug: string | null
   name: string | null
 }
 
@@ -259,8 +260,9 @@ export type CreateProductRequest = {
   price_from: number | null
   price_to: number | null
   type: ProductType | null
+  is_main: boolean
   file_content: string | null
-  category_uuids: UUID[]
+  category_slugs: string[]
 }
 
 export type ValidationError = {

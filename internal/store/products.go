@@ -82,11 +82,11 @@ func (s *Store) GetMainServices(ctx context.Context) ([]models.Product, error) {
 }
 
 // GetCatalogProducts
-func (s *Store) GetCatalogProducts(ctx context.Context, categoryUUIDs []uuid.UUID, productType *enums.ProductType) ([]models.Product, error) {
+func (s *Store) GetCatalogProducts(ctx context.Context, categorySlugs []string, productType *enums.ProductType) ([]models.Product, error) {
 	query := strings.Builder{}
 	query.WriteString("SELECT p.id, p.uuid, p.name, p.description, p.price_from, p.price_to, p.type, p.file_content, p.user_id, p.created_at, p.updated_at FROM products p")
 
-	args := make([]any, 0, len(categoryUUIDs)+1)
+	args := make([]any, 0, len(categorySlugs)+1)
 	conditions := make([]string, 0, 2)
 
 	if productType != nil {
@@ -94,16 +94,16 @@ func (s *Store) GetCatalogProducts(ctx context.Context, categoryUUIDs []uuid.UUI
 		conditions = append(conditions, fmt.Sprintf("p.type = $%d", len(args)))
 	}
 
-	if len(categoryUUIDs) > 0 {
-		placeholders := make([]string, 0, len(categoryUUIDs))
-		for _, categoryUUID := range categoryUUIDs {
-			args = append(args, categoryUUID)
+	if len(categorySlugs) > 0 {
+		placeholders := make([]string, 0, len(categorySlugs))
+		for _, categorySlug := range categorySlugs {
+			args = append(args, categorySlug)
 			placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
 		}
 
 		conditions = append(
 			conditions,
-			"EXISTS (SELECT 1 FROM category_product cp JOIN categories c ON c.id = cp.category_id WHERE cp.product_id = p.id AND c.uuid IN ("+strings.Join(placeholders, ", ")+"))",
+			"EXISTS (SELECT 1 FROM category_product cp JOIN categories c ON c.id = cp.category_id WHERE cp.product_id = p.id AND c.slug IN ("+strings.Join(placeholders, ", ")+"))",
 		)
 	}
 

@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
@@ -29,7 +28,7 @@ type PageData struct {
 	Services              []models.Product
 	CatalogProducts       []models.Product
 	Categories            []models.Category
-	SelectedCategoryUUIDs map[string]bool
+	SelectedCategorySlugs map[string]bool
 	SelectedCatalogType   string
 	Title                 string
 	IsBlock               bool
@@ -161,11 +160,11 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		categoryUUIDs, selectedCategoryUUIDs, productType, selectedType := parseCatalogFilters(r)
-		pageData.SelectedCategoryUUIDs = selectedCategoryUUIDs
+		categorySlugs, selectedCategorySlugs, productType, selectedType := parseCatalogFilters(r)
+		pageData.SelectedCategorySlugs = selectedCategorySlugs
 		pageData.SelectedCatalogType = selectedType
 
-		pageData.CatalogProducts, err = s.store.GetCatalogProducts(r.Context(), categoryUUIDs, productType)
+		pageData.CatalogProducts, err = s.store.GetCatalogProducts(r.Context(), categorySlugs, productType)
 		if err != nil {
 			s.log.Error("Failed to get catalog products", err)
 			return
@@ -179,35 +178,34 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func parseCatalogFilters(r *http.Request) ([]uuid.UUID, map[string]bool, *enums.ProductType, string) {
-	selectedCategoryUUIDs := make(map[string]bool)
-	categoryUUIDs := make([]uuid.UUID, 0)
+func parseCatalogFilters(r *http.Request) ([]string, map[string]bool, *enums.ProductType, string) {
+	selectedCategorySlugs := make(map[string]bool)
+	categorySlugs := make([]string, 0)
 
 	for _, rawValue := range r.URL.Query()["category"] {
-		categoryUUID, err := uuid.Parse(strings.TrimSpace(rawValue))
-		if err != nil {
+		categorySlug := strings.TrimSpace(strings.ToLower(rawValue))
+		if !isValidCategorySlug(categorySlug) {
 			continue
 		}
 
-		key := categoryUUID.String()
-		if selectedCategoryUUIDs[key] {
+		if selectedCategorySlugs[categorySlug] {
 			continue
 		}
 
-		selectedCategoryUUIDs[key] = true
-		categoryUUIDs = append(categoryUUIDs, categoryUUID)
+		selectedCategorySlugs[categorySlug] = true
+		categorySlugs = append(categorySlugs, categorySlug)
 	}
 
 	selectedType := strings.TrimSpace(strings.ToLower(r.URL.Query().Get("type")))
 	switch selectedType {
 	case catalogTypeProduct:
 		productType := enums.ProductTypeProduct
-		return categoryUUIDs, selectedCategoryUUIDs, &productType, selectedType
+		return categorySlugs, selectedCategorySlugs, &productType, selectedType
 	case catalogTypeService:
 		productType := enums.ProductTypeService
-		return categoryUUIDs, selectedCategoryUUIDs, &productType, selectedType
+		return categorySlugs, selectedCategorySlugs, &productType, selectedType
 	default:
-		return categoryUUIDs, selectedCategoryUUIDs, nil, catalogTypeAll
+		return categorySlugs, selectedCategorySlugs, nil, catalogTypeAll
 	}
 }
 

@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
 // GetAllCategories
 func (s *Store) GetAllCategories(ctx context.Context) ([]models.Category, error) {
-	rows, err := s.querier(ctx).Query(ctx, "SELECT id, uuid, name, created_at, updated_at FROM categories ORDER BY name")
+	rows, err := s.querier(ctx).Query(ctx, "SELECT id, slug, name, created_at, updated_at FROM categories ORDER BY name")
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +18,7 @@ func (s *Store) GetAllCategories(ctx context.Context) ([]models.Category, error)
 	categories := make([]models.Category, 0)
 	for rows.Next() {
 		var category models.Category
-		err = rows.Scan(&category.ID, &category.UUID, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		err = rows.Scan(&category.ID, &category.Slug, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -36,22 +35,22 @@ func (s *Store) GetCategoryByName(ctx context.Context, name string) (*models.Cat
 	category := &models.Category{}
 	err := s.querier(ctx).QueryRow(
 		ctx,
-		"SELECT id, uuid, name, created_at, updated_at FROM categories WHERE name = $1",
+		"SELECT id, slug, name, created_at, updated_at FROM categories WHERE name = $1",
 		name,
-	).Scan(&category.ID, &category.UUID, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+	).Scan(&category.ID, &category.Slug, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
 	return category, nil
 }
 
-func (s *Store) GetCategoryByUUID(ctx context.Context, categoryUUID uuid.UUID) (*models.Category, error) {
+func (s *Store) GetCategoryBySlug(ctx context.Context, categorySlug string) (*models.Category, error) {
 	category := &models.Category{}
 	err := s.querier(ctx).QueryRow(
 		ctx,
-		"SELECT id, uuid, name, created_at, updated_at FROM categories WHERE uuid = $1",
-		categoryUUID,
-	).Scan(&category.ID, &category.UUID, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		"SELECT id, slug, name, created_at, updated_at FROM categories WHERE slug = $1",
+		categorySlug,
+	).Scan(&category.ID, &category.Slug, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -62,8 +61,8 @@ func (s *Store) GetCategoryByUUID(ctx context.Context, categoryUUID uuid.UUID) (
 func (s *Store) CreateCategory(ctx context.Context, category *models.Category) error {
 	err := s.querier(ctx).QueryRow(
 		ctx,
-		"INSERT INTO categories (uuid, name, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id",
-		category.UUID, category.Name, category.CreatedAt, category.UpdatedAt,
+		"INSERT INTO categories (slug, name, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id",
+		category.Slug, category.Name, category.CreatedAt, category.UpdatedAt,
 	).Scan(&category.ID)
 	return wrapDBError(err)
 }
@@ -71,8 +70,8 @@ func (s *Store) CreateCategory(ctx context.Context, category *models.Category) e
 func (s *Store) UpdateCategory(ctx context.Context, category *models.Category) error {
 	tag, err := s.querier(ctx).Exec(
 		ctx,
-		"UPDATE categories SET name = $1, updated_at = $2 WHERE id = $3",
-		category.Name, category.UpdatedAt, category.ID,
+		"UPDATE categories SET slug = $1, name = $2, updated_at = $3 WHERE id = $4",
+		category.Slug, category.Name, category.UpdatedAt, category.ID,
 	)
 	if err != nil {
 		return wrapDBError(err)
@@ -83,17 +82,17 @@ func (s *Store) UpdateCategory(ctx context.Context, category *models.Category) e
 	return nil
 }
 
-func (s *Store) DeleteCategoryByUUID(ctx context.Context, categoryUUID uuid.UUID) error {
+func (s *Store) DeleteCategoryBySlug(ctx context.Context, categorySlug string) error {
 	_, err := s.querier(ctx).Exec(
 		ctx,
-		"DELETE FROM category_product WHERE category_id = (SELECT id FROM categories WHERE uuid = $1)",
-		categoryUUID,
+		"DELETE FROM category_product WHERE category_id = (SELECT id FROM categories WHERE slug = $1)",
+		categorySlug,
 	)
 	if err != nil {
 		return wrapDBError(err)
 	}
 
-	tag, err := s.querier(ctx).Exec(ctx, "DELETE FROM categories WHERE uuid = $1", categoryUUID)
+	tag, err := s.querier(ctx).Exec(ctx, "DELETE FROM categories WHERE slug = $1", categorySlug)
 	if err != nil {
 		return wrapDBError(err)
 	}
@@ -118,7 +117,7 @@ func (s *Store) GetCategoriesByProductIDs(ctx context.Context, productIDs []int)
 
 	rows, err := s.querier(ctx).Query(
 		ctx,
-		"SELECT cp.product_id, c.id, c.uuid, c.name, c.created_at, c.updated_at FROM category_product cp JOIN categories c ON c.id = cp.category_id WHERE cp.product_id IN ("+strings.Join(placeholders, ", ")+") ORDER BY c.name",
+		"SELECT cp.product_id, c.id, c.slug, c.name, c.created_at, c.updated_at FROM category_product cp JOIN categories c ON c.id = cp.category_id WHERE cp.product_id IN ("+strings.Join(placeholders, ", ")+") ORDER BY c.name",
 		args...,
 	)
 	if err != nil {
@@ -131,7 +130,7 @@ func (s *Store) GetCategoriesByProductIDs(ctx context.Context, productIDs []int)
 			productID int
 			category  models.Category
 		)
-		err = rows.Scan(&productID, &category.ID, &category.UUID, &category.Name, &category.CreatedAt, &category.UpdatedAt)
+		err = rows.Scan(&productID, &category.ID, &category.Slug, &category.Name, &category.CreatedAt, &category.UpdatedAt)
 		if err != nil {
 			return nil, wrapDBError(err)
 		}

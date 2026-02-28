@@ -50,7 +50,7 @@
           >
             <span
               v-for="category in product.categories"
-              :key="category.uuid"
+              :key="category.slug"
               class="rounded-full bg-yellow-500/15 px-2 py-0.5 text-[10px] font-bold text-yellow-200"
             >
               {{ category.name }}
