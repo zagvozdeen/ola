@@ -12,16 +12,27 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
+	"github.com/zagvozdeen/ola/internal/store/enums"
 	"github.com/zagvozdeen/ola/internal/store/models"
 )
 
+const (
+	catalogTypeAll     = "all"
+	catalogTypeProduct = "product"
+	catalogTypeService = "service"
+)
+
 type PageData struct {
-	Head       template.HTML
-	Products   []models.Product
-	Services   []models.Product
-	Categories []models.Category
-	Title      string
-	IsBlock    bool
+	Head                  template.HTML
+	Products              []models.Product
+	Services              []models.Product
+	CatalogProducts       []models.Product
+	Categories            []models.Category
+	SelectedCategoryUUIDs map[string]bool
+	SelectedCatalogType   string
+	Title                 string
+	IsBlock               bool
 }
 
 type viteManifestEntry struct {
@@ -115,33 +126,86 @@ func (s *Service) renderMainPage(w http.ResponseWriter, r *http.Request) {
 		head = `<script type="module" src="http://localhost:5173/@vite/client"></script> <script type="module" src="http://localhost:5173/web/landing/src/main.ts"></script>`
 	}
 
-	products, err := s.store.GetMainProducts(r.Context())
-	if err != nil {
-		s.log.Error("Failed to get main products", err)
-		return
+	pageData := PageData{
+		Head:                head,
+		SelectedCatalogType: catalogTypeAll,
+		Title:               title,
+		IsBlock:             isBlock,
 	}
 
-	services, err := s.store.GetMainServices(r.Context())
-	if err != nil {
-		s.log.Error("Failed to get main services", err)
-		return
+	switch page {
+	case "index.html":
+		pageData.Products, err = s.store.GetMainProducts(r.Context())
+		if err != nil {
+			s.log.Error("Failed to get main products", err)
+			return
+		}
+
+		pageData.Services, err = s.store.GetMainServices(r.Context())
+		if err != nil {
+			s.log.Error("Failed to get main services", err)
+			return
+		}
+
+		pageData.Categories, err = s.store.GetAllCategories(r.Context())
+		if err != nil {
+			s.log.Error("Failed to get categories", err)
+			return
+		}
+	case "catalog.html":
+		pageData.Categories, err = s.store.GetAllCategories(r.Context())
+		if err != nil {
+			s.log.Error("Failed to get categories", err)
+			return
+		}
+
+		categoryUUIDs, selectedCategoryUUIDs, productType, selectedType := parseCatalogFilters(r)
+		pageData.SelectedCategoryUUIDs = selectedCategoryUUIDs
+		pageData.SelectedCatalogType = selectedType
+
+		pageData.CatalogProducts, err = s.store.GetCatalogProducts(r.Context(), categoryUUIDs, productType)
+		if err != nil {
+			s.log.Error("Failed to get catalog products", err)
+			return
+		}
 	}
-	categories, err := s.store.GetAllCategories(r.Context())
-	if err != nil {
-		s.log.Error("Failed to get categories", err)
-		return
-	}
-	err = templates.ExecuteTemplate(w, page, PageData{
-		Head:       head,
-		Products:   products,
-		Services:   services,
-		Categories: categories,
-		Title:      title,
-		IsBlock:    isBlock,
-	})
+
+	err = templates.ExecuteTemplate(w, page, pageData)
 	if err != nil {
 		s.log.Error("Failed to execute template", err, slog.String("path", r.URL.Path))
 		return
+	}
+}
+
+func parseCatalogFilters(r *http.Request) ([]uuid.UUID, map[string]bool, *enums.ProductType, string) {
+	selectedCategoryUUIDs := make(map[string]bool)
+	categoryUUIDs := make([]uuid.UUID, 0)
+
+	for _, rawValue := range r.URL.Query()["category"] {
+		categoryUUID, err := uuid.Parse(strings.TrimSpace(rawValue))
+		if err != nil {
+			continue
+		}
+
+		key := categoryUUID.String()
+		if selectedCategoryUUIDs[key] {
+			continue
+		}
+
+		selectedCategoryUUIDs[key] = true
+		categoryUUIDs = append(categoryUUIDs, categoryUUID)
+	}
+
+	selectedType := strings.TrimSpace(strings.ToLower(r.URL.Query().Get("type")))
+	switch selectedType {
+	case catalogTypeProduct:
+		productType := enums.ProductTypeProduct
+		return categoryUUIDs, selectedCategoryUUIDs, &productType, selectedType
+	case catalogTypeService:
+		productType := enums.ProductTypeService
+		return categoryUUIDs, selectedCategoryUUIDs, &productType, selectedType
+	default:
+		return categoryUUIDs, selectedCategoryUUIDs, nil, catalogTypeAll
 	}
 }
 
@@ -150,7 +214,7 @@ func (s *Service) getTemplates() (templates *template.Template, err error) {
 	defer s.mu.Unlock()
 
 	if s.templates == nil {
-		templates, err = template.ParseFiles("templates/index.html", "templates/delivery.html", "templates/privacy.html", "templates/templates.html")
+		templates, err = template.ParseFiles("templates/index.html", "templates/catalog.html", "templates/delivery.html", "templates/privacy.html", "templates/templates.html")
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse template: %w", err)
 		}

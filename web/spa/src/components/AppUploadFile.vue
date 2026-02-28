@@ -16,13 +16,12 @@
 import { type UploadFileInfo, NUpload } from 'naive-ui'
 import { onMounted, ref, watch } from 'vue'
 import { useFetch } from '@/composables/useFetch'
-import { type File } from '@/types'
 import { useNotifications } from '@/composables/useNotifications'
 
 const notify = useNotifications()
 const fetcher = useFetch()
 
-const value = defineModel<number | null>('value')
+const value = defineModel<string | null>('value')
 
 const { content } = defineProps<{
   content: string | null | undefined
@@ -49,7 +48,7 @@ const onBeforeUpload = async (data: { file: UploadFileInfo }) => {
         type: response.data.mime_type,
       })
 
-      value.value = response.data.id
+      value.value = response.data.content
     }
   } catch (e) {
     notify.error('При загрузке файла произошла ошибка')
@@ -66,15 +65,20 @@ const onRemove = () => {
 }
 
 const updateFileList = () => {
-  if (value.value && content) {
-    fileList.value.push({
-      id: content,
-      name: content,
+  const fileURL = value.value || content
+
+  if (fileURL) {
+    fileList.value = [{
+      id: fileURL,
+      name: fileURL,
       status: 'finished',
-      url: content,
+      url: fileURL,
       // type: file.mime_type,
-    })
+    }]
+    return
   }
+
+  fileList.value = []
 }
 
 watch(value, (newValue) => {

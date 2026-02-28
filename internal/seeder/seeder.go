@@ -105,6 +105,7 @@ func (s *Seeder) Run(ctx context.Context) error {
 	categories := []struct {
 		uuid uuid.UUID
 		name string
+		id   int
 	}{
 		{uuid: uuid.MustParse("f3ab3f6c-11af-11f1-b4af-c87f54a92045"), name: "Детские праздники"},
 		{uuid: uuid.MustParse("f3ab46b4-11af-11f1-b4af-c87f54a92045"), name: "Корпоратив"},
@@ -117,17 +118,31 @@ func (s *Seeder) Run(ctx context.Context) error {
 		{uuid: uuid.MustParse("f3ab61f8-11af-11f1-b4af-c87f54a92045"), name: "Без повода"},
 	}
 	for _, category := range categories {
-		_, err = s.store.GetCategoryByUUID(ctx, category.uuid)
-		if err != nil {
-			if !errors.Is(err, models.ErrNotFound) {
-				return fmt.Errorf("failed to get category by name: %w", err)
+		item, getErr := s.store.GetCategoryByUUID(ctx, category.uuid)
+		if getErr != nil {
+			if !errors.Is(getErr, models.ErrNotFound) {
+				return fmt.Errorf("failed to get category by name: %w", getErr)
 			}
-			err = s.store.CreateCategory(ctx, &models.Category{
+			createErr := s.store.CreateCategory(ctx, &models.Category{
 				UUID:      category.uuid,
 				Name:      category.name,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 			})
+			if createErr != nil {
+				return fmt.Errorf("failed to create category: %w", createErr)
+			}
+
+			item, getErr = s.store.GetCategoryByUUID(ctx, category.uuid)
+			if getErr != nil {
+				return fmt.Errorf("failed to reload category: %w", getErr)
+			}
+		}
+		for i := range categories {
+			if categories[i].uuid == category.uuid {
+				categories[i].id = item.ID
+				break
+			}
 		}
 	}
 
@@ -139,23 +154,24 @@ func (s *Seeder) Run(ctx context.Context) error {
 		to          *int
 		name        string
 		description string
+		categories  []int
 	}{
-		{uuid: uuid.MustParse("671838e9-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[0].content, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события"},
-		{uuid: uuid.MustParse("671853bf-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[1].content, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну"},
-		{uuid: uuid.MustParse("67185b7b-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[2].content, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события"},
-		{uuid: uuid.MustParse("6bb9ab38-11b1-11f1-a6a2-c87f54a92045"), t: enums.ProductTypeProduct, file: files[3].content, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс"},
-		{uuid: uuid.MustParse("671868fb-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[0].content, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события"},
-		{uuid: uuid.MustParse("67186e98-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[1].content, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну"},
-		{uuid: uuid.MustParse("671874da-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[2].content, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события"},
-		{uuid: uuid.MustParse("67186286-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[3].content, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс"},
+		{uuid: uuid.MustParse("671838e9-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[0].content, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события", categories: []int{categories[0].id, categories[2].id, categories[6].id, categories[7].id, categories[8].id}},
+		{uuid: uuid.MustParse("671853bf-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[1].content, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну", categories: []int{categories[1].id, categories[2].id, categories[3].id, categories[8].id}},
+		{uuid: uuid.MustParse("67185b7b-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeProduct, file: files[2].content, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события", categories: []int{categories[2].id, categories[4].id, categories[5].id}},
+		{uuid: uuid.MustParse("6bb9ab38-11b1-11f1-a6a2-c87f54a92045"), t: enums.ProductTypeProduct, file: files[3].content, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс", categories: []int{categories[2].id, categories[3].id, categories[5].id, categories[8].id}},
+		{uuid: uuid.MustParse("671868fb-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[0].content, from: 3500, to: nil, name: "Фонтан из воздушных шаров", description: "Композиция по индивидуальному дизайну для любого события", categories: []int{categories[0].id, categories[2].id, categories[6].id, categories[7].id, categories[8].id}},
+		{uuid: uuid.MustParse("67186e98-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[1].content, from: 7000, to: nil, name: "Оформление помещения / фотозона", description: "Декорирование любого помещения по индивидуальному дизайну", categories: []int{categories[1].id, categories[2].id, categories[3].id, categories[8].id}},
+		{uuid: uuid.MustParse("671874da-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[2].content, from: 5000, to: nil, name: "Коробка - сюрприз", description: "Подарочный бокс с композицией из шаров для любого события", categories: []int{categories[2].id, categories[4].id, categories[5].id}},
+		{uuid: uuid.MustParse("67186286-11b1-11f1-afae-c87f54a92045"), t: enums.ProductTypeService, file: files[3].content, from: 3000, to: nil, name: "Бабл бокс", description: "Креативная упаковка для небольшого подарка с шаром баблс", categories: []int{categories[2].id, categories[3].id, categories[5].id, categories[8].id}},
 	}
 	for _, p := range products {
-		_, err = s.store.GetProductByUUID(ctx, p.uuid)
-		if err != nil {
-			if !errors.Is(err, models.ErrNotFound) {
-				return fmt.Errorf("failed to get product by id: %w", err)
+		product, getErr := s.store.GetProductByUUID(ctx, p.uuid)
+		if getErr != nil {
+			if !errors.Is(getErr, models.ErrNotFound) {
+				return fmt.Errorf("failed to get product by id: %w", getErr)
 			}
-			err = s.store.CreateProduct(ctx, &models.Product{
+			createErr := s.store.CreateProduct(ctx, &models.Product{
 				UUID:        p.uuid,
 				Name:        p.name,
 				Description: p.description,
@@ -168,9 +184,19 @@ func (s *Seeder) Run(ctx context.Context) error {
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			})
-			if err != nil {
-				return fmt.Errorf("failed to create product: %w", err)
+			if createErr != nil {
+				return fmt.Errorf("failed to create product: %w", createErr)
 			}
+
+			product, getErr = s.store.GetProductByUUID(ctx, p.uuid)
+			if getErr != nil {
+				return fmt.Errorf("failed to reload product: %w", getErr)
+			}
+		}
+
+		err = s.store.ReplaceProductCategories(ctx, product.ID, p.categories)
+		if err != nil {
+			return fmt.Errorf("failed to create product categories: %w", err)
 		}
 	}
 

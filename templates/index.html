@@ -13,7 +13,7 @@
     {{ .Head }}
 </head>
 <body class="antialiased font-inter overflow-x-hidden">
-{{ template "header" }}
+{{ template "header" . }}
 
 <div class="relative min-h-dvh">
     <img class="-z-20 absolute inset-0 h-full w-full object-cover" src="/image_1.png" alt="Задний фон в виде шариков">
@@ -61,7 +61,7 @@
             {{ range .Products }}
             <article class="flex h-full flex-col bg-white">
                 <img class="h-80 w-full object-cover" src="{{ .FileContent }}" alt="Фотография для товара «{{ .Name }}»" width="360" height="208">
-                <p class="mt-4 text-lg font-bold text-grape">от {{ .PriceFrom }} ₽</p>
+                <p class="mt-4 text-lg font-bold text-grape">от {{ .PriceFrom }} ₽{{ if .PriceTo }} до {{ .PriceTo }} ₽{{ end }}</p>
                 <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
                 <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>
                 <a href="#order" class="mt-auto rounded-full inline-flex items-center justify-center bg-lemon px-4 py-2 text-xs font-bold text-black transition hover:bg-yellow-300">узнать больше и сделать заказ</a>
@@ -82,7 +82,7 @@
             {{ range .Services }}
             <article class="flex h-full flex-col bg-white">
                 <img class="h-80 w-full object-cover" src="{{ .FileContent }}" alt="Фотография для услуги «{{ .Name }}»" width="360" height="208">
-                <p class="mt-4 text-lg font-bold text-grape">от {{ .PriceFrom }} ₽</p>
+                <p class="mt-4 text-lg font-bold text-grape">от {{ .PriceFrom }} ₽{{ if .PriceTo }} до {{ .PriceTo }} ₽{{ end }}</p>
                 <h3 class="mt-2 text-base font-bold text-black">{{ .Name }}</h3>
                 <p class="mt-2 mb-4 text-xs font-medium leading-relaxed text-black/70">{{ .Description }}</p>
                 <a href="#order" class="mt-auto rounded-full inline-flex items-center justify-center bg-lemon px-4 py-2 text-xs font-bold text-black transition hover:bg-yellow-300">узнать больше и сделать заказ</a>
@@ -101,22 +101,22 @@
         {{ if .Categories }}
         <div class="categories-marquee-track flex w-max items-center gap-4">
             {{ range .Categories }}
-            <span class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</span>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <span class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</span>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <span class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</span>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <span class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</span>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <span class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</span>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
             {{ end }}
             {{ range .Categories }}
-            <span class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</span>
+            <a href="/catalog?category={{ printf "%s" .UUID }}" class="mt-auto inline-flex items-center justify-center rounded-full border-2 border-grape bg-transparent cursor-pointer select-none px-7 py-3 text-base font-bold text-grape transition hover:bg-grape hover:text-white">{{ .Name }}</a>
             {{ end }}
         </div>
         {{ else }}

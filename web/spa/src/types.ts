@@ -109,6 +109,7 @@ export type Product = {
   type: ProductType
   is_main: boolean
   file_content: string
+  categories: Category[]
   user_id: number
   created_at: DateTime
   updated_at: DateTime
@@ -222,7 +223,8 @@ export type CreateProductRequest = {
   price_from: number | null
   price_to: number | null
   type: ProductType | null
-  file_id: number | null
+  file_content: string | null
+  category_uuids: UUID[]
 }
 
 export type ValidationError = {

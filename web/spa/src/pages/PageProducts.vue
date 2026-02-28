@@ -44,6 +44,24 @@
           <p class="text-xs mt-1 font-medium">
             от {{ product.price_from }} ₽{{ product.price_to ? ` до ${product.price_to} ₽` : '' }}
           </p>
+          <div
+            v-if="product.categories.length > 0"
+            class="mt-2 flex flex-wrap gap-1"
+          >
+            <span
+              v-for="category in product.categories"
+              :key="category.uuid"
+              class="rounded-full bg-yellow-500/15 px-2 py-0.5 text-[10px] font-bold text-yellow-200"
+            >
+              {{ category.name }}
+            </span>
+          </div>
+          <p
+            v-else
+            class="mt-2 text-[10px] font-medium text-gray-400"
+          >
+            Без категорий
+          </p>
           <div class="flex gap-2 mt-2">
             <router-link
               class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"

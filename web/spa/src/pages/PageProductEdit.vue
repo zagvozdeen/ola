@@ -88,12 +88,25 @@
 
       <n-form-item
         label="Изображение продукта"
-        path="file_id"
+        path="file_content"
       >
         <AppUploadFile
-          v-model:value="form.file_id"
+          v-model:value="form.file_content"
           :content="form.file_content"
         />
+      </n-form-item>
+
+      <n-form-item label="Категории">
+        <n-checkbox-group v-model:value="form.category_uuids">
+          <n-space vertical>
+            <n-checkbox
+              v-for="category in categories"
+              :key="category.uuid"
+              :value="category.uuid"
+              :label="category.name"
+            />
+          </n-space>
+        </n-checkbox-group>
       </n-form-item>
     </n-form>
     <!--    </div>-->
@@ -107,8 +120,8 @@ import AppUploadFile from '@/components/AppUploadFile.vue'
 import { useFetch } from '@/composables/useFetch'
 import { useNotifications } from '@/composables/useNotifications'
 import { useSender } from '@/composables/useSender'
-import { type CreateProductRequest, ProductTypeOptions } from '@/types'
-import { type FormInst, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpin, type FormRules } from 'naive-ui'
+import { type Category, type CreateProductRequest, ProductTypeOptions } from '@/types'
+import { NCheckbox, NCheckboxGroup, type FormInst, NForm, NFormItem, NInput, NInputNumber, NSelect, NSpace, NSpin, type FormRules } from 'naive-ui'
 import AppLayout from '@/components/AppLayout.vue'
 
 const route = useRoute()
@@ -120,20 +133,17 @@ const sender = useSender()
 const isCreating = String(route.name).endsWith('create')
 const title = isCreating ? 'Создание продукта' : 'Редактирование продукта'
 
-type ProductForm = CreateProductRequest & {
-  file_content: string | null
-}
-
 const formRef = useTemplateRef<FormInst>('formRef')
 const isLoading = ref(true)
-const form = reactive<ProductForm>({
+const categories = ref<Category[]>([])
+const form = reactive<CreateProductRequest>({
   name: null,
   description: null,
   price_from: null,
   price_to: null,
   type: null,
-  file_id: null,
   file_content: null,
+  category_uuids: [],
 })
 const rules: FormRules = {
   name: {
@@ -175,11 +185,10 @@ const rules: FormRules = {
       return true
     },
   },
-  file_id: {
+  file_content: {
     required: true,
-    type: 'number',
+    type: 'string',
     message: 'Выберите изображение',
-    min: 1,
   },
 }
 
@@ -191,7 +200,8 @@ const onSubmit = () => {
       price_from: form.price_from,
       price_to: form.price_to,
       type: form.type,
-      file_id: form.file_id,
+      file_content: form.file_content,
+      category_uuids: form.category_uuids,
     }
 
     if (isCreating) {
@@ -210,8 +220,6 @@ const onSubmit = () => {
       return
     }
 
-    if(unsureUUID(notify, router)) return
-
     const data = await fetcher.updateProduct(uuid, payload)
     if (data.ok) {
       notify.info('Продукт обновлён')
@@ -221,34 +229,39 @@ const onSubmit = () => {
 }
 
 onMounted(() => {
-  if (isCreating) {
-    isLoading.value = false
-    return
-  }
+  const init = async () => {
+    const categoriesData = await fetcher.getCategories()
+    if (categoriesData.ok) {
+      categories.value = categoriesData.data
+    }
 
-  const uuid = route.params['uuid']
-  if (typeof uuid !== 'string' || !uuid) {
-    notify.error('Некорректный ID продукта')
-    router.push({ name: 'products' })
-    isLoading.value = false
-    return
-  }
-
-  fetcher
-    .getProduct(uuid)
-    .then(data => {
-      if (data.ok) {
-        form.name = data.data.name
-        form.description = data.data.description
-        form.price_from = data.data.price_from
-        form.price_to = data.data.price_to ?? null
-        form.type = data.data.type
-        form.file_id = data.data.file_id
-        form.file_content = data.data.file_content
-      }
-    })
-    .finally(() => {
+    if (isCreating) {
       isLoading.value = false
-    })
+      return
+    }
+
+    const uuid = route.params['uuid']
+    if (typeof uuid !== 'string' || !uuid) {
+      notify.error('Некорректный ID продукта')
+      await router.push({ name: 'products' })
+      isLoading.value = false
+      return
+    }
+
+    const data = await fetcher.getProduct(uuid)
+    if (data.ok) {
+      form.name = data.data.name
+      form.description = data.data.description
+      form.price_from = data.data.price_from
+      form.price_to = data.data.price_to ?? null
+      form.type = data.data.type
+      form.file_content = data.data.file_content
+      form.category_uuids = data.data.categories.map(category => category.uuid)
+    }
+
+    isLoading.value = false
+  }
+
+  void init()
 })
 </script>

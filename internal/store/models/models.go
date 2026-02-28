@@ -43,6 +43,7 @@ type Product struct {
 	Type        enums.ProductType `json:"type"`
 	IsMain      bool              `json:"is_main"`
 	FileContent string            `json:"file_content"`
+	Categories  []Category        `json:"categories"`
 	UserID      int               `json:"user_id"`
 	CreatedAt   time.Time         `json:"created_at"`
 	UpdatedAt   time.Time         `json:"updated_at"`
