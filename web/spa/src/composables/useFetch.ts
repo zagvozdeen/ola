@@ -18,6 +18,7 @@ import type {
   Order,
   Product,
   // Review,
+  UpdateOrderStatusRequest,
   UpdateRequestStatusRequest,
   UpdateUserRoleRequest,
   UpsertCategoryRequest,
@@ -25,7 +26,7 @@ import type {
 } from '@/types'
 
 const login = async (notify: Notify, payload: AuthLoginRequest) => {
-  return fetchJson<User>('/api/auth/login', {
+  return fetchJson<{token: string}>('/api/auth/login', {
     method: 'POST',
     headers: getJsonHeaders(),
     body: JSON.stringify(payload),
@@ -249,7 +250,7 @@ const getOrder = async (notify: Notify, uuid: string) => {
   }, { notify })
 }
 
-const updateOrderStatus = async (notify: Notify, uuid: string, payload: UpdateRequestStatusRequest) => {
+const updateOrderStatus = async (notify: Notify, uuid: string, payload: UpdateOrderStatusRequest) => {
   return fetchJson<Order>(
     `/api/orders/${uuid}/status`,
     {
@@ -369,7 +370,7 @@ export const useFetch = () => {
     // deleteReview: (uuid: string) => deleteReview(notify, uuid),
     getOrders: () => getOrders(notify),
     getOrder: (uuid: string) => getOrder(notify, uuid),
-    updateOrderStatus: (uuid: string, payload: UpdateRequestStatusRequest) => updateOrderStatus(notify, uuid, payload),
+    updateOrderStatus: (uuid: string, payload: UpdateOrderStatusRequest) => updateOrderStatus(notify, uuid, payload),
     getCart: () => getCart(notify),
     upsertCartItem: (productID: number, qty: number) => upsertCartItem(notify, productID, qty),
     deleteCartItem: (productUUID: string) => deleteCartItem(notify, productUUID),

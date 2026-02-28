@@ -3,7 +3,7 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import App from '@/App.vue'
 import { configureHttp } from '@/composables/httpCore'
-import { isUserAdmin, isUserModerator, useAuthState } from '@/composables/useAuthState'
+import { isUserAdmin, isUserModerator, isUserOrderManager, useAuthState } from '@/composables/useAuthState'
 import PageCart from '@/pages/PageCart.vue'
 import PageCategories from '@/pages/PageCategories.vue'
 import PageCategoryEdit from '@/pages/PageCategoryEdit.vue'
@@ -41,8 +41,8 @@ const router = createRouter({
     { path: '/products/:uuid/edit', name: 'products.edit', component: PageProductEdit, meta: { requiresModerator: true } },
     { path: '/feedback', name: 'feedback', component: PageFeedbacks, meta: { requiresModerator: true } },
     { path: '/feedback/:uuid/edit', name: 'feedback.edit', component: PageFeedbackEdit, meta: { requiresModerator: true } },
-    { path: '/orders', name: 'orders', component: PageOrders, meta: { requiresModerator: true } },
-    { path: '/orders/:uuid/edit', name: 'orders.edit', component: PageOrderEdit, meta: { requiresModerator: true } },
+    { path: '/orders', name: 'orders', component: PageOrders, meta: { requiresOrderManager: true } },
+    { path: '/orders/:uuid/edit', name: 'orders.edit', component: PageOrderEdit, meta: { requiresOrderManager: true } },
     { path: '/categories', name: 'categories', component: PageCategories, meta: { requiresModerator: true } },
     { path: '/categories/create', name: 'categories.create', component: PageCategoryEdit, meta: { requiresModerator: true } },
     { path: '/categories/:uuid/edit', name: 'categories.edit', component: PageCategoryEdit, meta: { requiresModerator: true } },
@@ -90,6 +90,7 @@ router.beforeEach(async (to, from) => {
   }
 
   const isAuthPage = to.name === 'login' || to.name === 'register'
+  const requiresOrderManager = Boolean(to.meta['requiresOrderManager'])
   const requiresModerator = Boolean(to.meta['requiresModerator'])
   const requiresAdmin = Boolean(to.meta['requiresAdmin'])
 
@@ -99,6 +100,16 @@ router.beforeEach(async (to, from) => {
 
   if (isAuthPage && auth.hasAuthCredentials.value) {
     return { name: 'main' }
+  }
+
+  if (requiresOrderManager) {
+    await auth.ensureUserLoaded()
+
+    const user = auth.currentUser.value
+
+    if (!user || !isUserOrderManager(user)) {
+      return { name: 'main' }
+    }
   }
 
   if (requiresModerator) {

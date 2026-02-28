@@ -2,6 +2,8 @@ package store
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,7 +12,7 @@ import (
 )
 
 func (s *Store) GetAllOrders(ctx context.Context) ([]models.Order, error) {
-	rows, err := s.querier(ctx).Query(ctx, "SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders ORDER BY created_at DESC")
+	rows, err := s.querier(ctx).Query(ctx, "SELECT id, uuid, status, source, name, phone, content, user_id, created_at, updated_at FROM orders ORDER BY updated_at DESC, created_at DESC")
 	if err != nil {
 		return nil, wrapDBError(err)
 	}
@@ -80,6 +82,57 @@ func (s *Store) UpdateOrderStatus(ctx context.Context, order *models.Order) erro
 		order.Status, order.UpdatedAt, order.ID,
 	)
 	return wrapDBError(err)
+}
+
+func (s *Store) GetOrderItemsByOrderIDs(ctx context.Context, orderIDs []int) (map[int][]models.OrderItem, error) {
+	itemsByOrderID := make(map[int][]models.OrderItem, len(orderIDs))
+	if len(orderIDs) == 0 {
+		return itemsByOrderID, nil
+	}
+
+	placeholders := make([]string, 0, len(orderIDs))
+	args := make([]any, 0, len(orderIDs))
+	for _, orderID := range orderIDs {
+		args = append(args, orderID)
+		placeholders = append(placeholders, fmt.Sprintf("$%d", len(args)))
+	}
+
+	rows, err := s.querier(ctx).Query(
+		ctx,
+		`SELECT oi.order_id, oi.product_id, oi.product_name, oi.price_from, oi.price_to, oi.qty, p.file_content
+		FROM order_items oi
+		LEFT JOIN products p ON p.id = oi.product_id
+		WHERE oi.order_id IN (`+strings.Join(placeholders, ", ")+`)
+		ORDER BY oi.order_id, oi.product_name, oi.product_id`,
+		args...,
+	)
+	if err != nil {
+		return nil, wrapDBError(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := models.OrderItem{}
+		err = rows.Scan(
+			&item.OrderID,
+			&item.ProductID,
+			&item.ProductName,
+			&item.PriceFrom,
+			&item.PriceTo,
+			&item.Qty,
+			&item.FileContent,
+		)
+		if err != nil {
+			return nil, wrapDBError(err)
+		}
+
+		itemsByOrderID[item.OrderID] = append(itemsByOrderID[item.OrderID], item)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, wrapDBError(err)
+	}
+
+	return itemsByOrderID, nil
 }
 
 func (s *Store) CreateOrderFromUserCart(ctx context.Context, userID int, source enums.OrderSource, name, phone, content string) (*models.Order, error) {

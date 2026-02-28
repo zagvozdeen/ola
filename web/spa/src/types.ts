@@ -147,7 +147,38 @@ export type Order = {
   name: string
   phone: string
   content: string
+  items?: OrderItem[]
+  comments?: OrderComment[]
   user_id: number | null
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+export type OrderItem = {
+  order_id: number
+  product_id: number
+  product_name: string
+  price_from: number
+  price_to?: number
+  qty: number
+  file_content?: string
+}
+
+export type OrderCommentAuthor = {
+  id: number
+  uuid: UUID
+  first_name: string
+  last_name: string | null
+  username: string | null
+}
+
+export type OrderComment = {
+  id: number
+  uuid: UUID
+  content: string
+  order_id: number
+  user_id: number
+  author?: OrderCommentAuthor
   created_at: DateTime
   updated_at: DateTime
 }
@@ -207,6 +238,11 @@ export type CreateOrderRequest = {
 
 export type UpdateRequestStatusRequest = {
   status: RequestStatus | null
+}
+
+export type UpdateOrderStatusRequest = {
+  status: RequestStatus | null
+  comment: string | null
 }
 
 export type UpsertCategoryRequest = {

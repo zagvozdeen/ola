@@ -77,9 +77,21 @@ type Order struct {
 	Name      string              `json:"name"`
 	Phone     string              `json:"phone"`
 	Content   string              `json:"content"`
+	Items     []OrderItem         `json:"items"`
+	Comments  []OrderComment      `json:"comments"`
 	UserID    *int                `json:"user_id"`
 	CreatedAt time.Time           `json:"created_at"`
 	UpdatedAt time.Time           `json:"updated_at"`
+}
+
+type OrderItem struct {
+	OrderID     int     `json:"order_id"`
+	ProductID   int     `json:"product_id"`
+	ProductName string  `json:"product_name"`
+	PriceFrom   int     `json:"price_from"`
+	PriceTo     *int    `json:"price_to"`
+	Qty         int     `json:"qty"`
+	FileContent *string `json:"file_content,omitempty"`
 }
 
 type Feedback struct {
@@ -122,13 +134,22 @@ type FeedbackTelegramMessage struct {
 }
 
 type OrderComment struct {
-	ID        int
-	UUID      uuid.UUID
-	Content   string
-	OrderID   int
-	UserID    int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        int                 `json:"id"`
+	UUID      uuid.UUID           `json:"uuid"`
+	Content   string              `json:"content"`
+	OrderID   int                 `json:"order_id"`
+	UserID    int                 `json:"user_id"`
+	Author    *OrderCommentAuthor `json:"author,omitempty"`
+	CreatedAt time.Time           `json:"created_at"`
+	UpdatedAt time.Time           `json:"updated_at"`
+}
+
+type OrderCommentAuthor struct {
+	ID        int       `json:"id"`
+	UUID      uuid.UUID `json:"uuid"`
+	FirstName string    `json:"first_name"`
+	LastName  *string   `json:"last_name"`
+	Username  *string   `json:"username"`
 }
 
 type Action struct {

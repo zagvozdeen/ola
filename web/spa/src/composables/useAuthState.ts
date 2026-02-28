@@ -86,6 +86,10 @@ export const isUserModerator = (user: User): boolean => {
   return user.role === UserRole.Moderator || user.role === UserRole.Admin
 }
 
+export const isUserOrderManager = (user: User): boolean => {
+  return user.role === UserRole.Manager || user.role === UserRole.Moderator || user.role === UserRole.Admin
+}
+
 export const isUserAdmin = (user: User): boolean => {
   return user.role === UserRole.Admin
 }
@@ -103,6 +107,10 @@ export const useAuthState = () => {
 
   const isModerator = computed(() => {
     return currentUser.value ? isUserModerator(currentUser.value) : false
+  })
+
+  const isOrderManager = computed(() => {
+    return currentUser.value ? isUserOrderManager(currentUser.value) : false
   })
 
   const isAdmin = computed(() => {
@@ -229,6 +237,7 @@ export const useAuthState = () => {
     isAuthenticated,
     authorizationHeader,
 
+    isOrderManager,
     isModerator,
     isAdmin,
 

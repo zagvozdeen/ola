@@ -26,7 +26,7 @@ func (s *Service) startBot(ctx context.Context) error {
 	b, err := bot.New(
 		s.cfg.Telegram.BotToken,
 		bot.WithDefaultHandler(s.defaultHandler),
-		bot.WithCallbackQueryDataHandler(orderCallbackPrefix, bot.MatchTypePrefix, s.callbackQueryHandler(s.handleOrderStatusCallback, enums.UserRoleModerator, enums.UserRoleAdmin)),
+		bot.WithCallbackQueryDataHandler(orderCallbackPrefix, bot.MatchTypePrefix, s.callbackQueryHandler(s.handleOrderStatusCallback, enums.UserRoleManager, enums.UserRoleModerator, enums.UserRoleAdmin)),
 		bot.WithCallbackQueryDataHandler(feedbackCallbackPrefix, bot.MatchTypePrefix, s.callbackQueryHandler(s.handleFeedbackStatusCallback, enums.UserRoleModerator, enums.UserRoleAdmin)),
 	)
 	if err != nil {

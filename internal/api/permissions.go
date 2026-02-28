@@ -26,3 +26,10 @@ func allowForModeratorOrAdmin(user *models.User) core.Response {
 	}
 	return nil
 }
+
+func allowForOrderManager(user *models.User) core.Response {
+	if user.Role != enums.UserRoleManager && user.Role != enums.UserRoleModerator && user.Role != enums.UserRoleAdmin {
+		return forbidByRole("manager, moderator or admin", user.Role)
+	}
+	return nil
+}
