@@ -45,7 +45,7 @@ func (s *Service) registerListeners() {
 		err = s.store.CreateOrderTelegramMessage(ctx, &model.OrderTelegramMessage{
 			OrderID:   order.ID,
 			ChatID:    message.Chat.ID,
-			MessageID: message.ID,
+			MessageID: int64(message.ID),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to save order telegram message: %w", err)
@@ -78,7 +78,7 @@ func (s *Service) registerListeners() {
 
 		_, err = s.bot.EditMessageText(ctx, &bot.EditMessageTextParams{
 			ChatID:      message.ChatID,
-			MessageID:   message.MessageID,
+			MessageID:   int(message.MessageID),
 			ParseMode:   models.ParseModeMarkdown,
 			Text:        buildOrderTelegramText(order, user),
 			ReplyMarkup: getKeyboard(order.Status, orderCallbackPrefix, order.ID, order.UUID),
@@ -97,11 +97,9 @@ func (s *Service) registerListeners() {
 
 		var user *model.User
 		var err error
-		if feedback.UserID != nil {
-			user, err = s.store.GetUserByID(ctx, *feedback.UserID)
-			if err != nil {
-				return fmt.Errorf("failed to get user: %w", err)
-			}
+		user, err = s.store.GetUserByID(ctx, feedback.UserID)
+		if err != nil {
+			return fmt.Errorf("failed to get user: %w", err)
 		}
 
 		message, err := s.bot.SendMessage(ctx, &bot.SendMessageParams{
@@ -117,7 +115,7 @@ func (s *Service) registerListeners() {
 		err = s.store.CreateFeedbackTelegramMessage(ctx, &model.FeedbackTelegramMessage{
 			FeedbackID: feedback.ID,
 			ChatID:     message.Chat.ID,
-			MessageID:  message.ID,
+			MessageID:  int64(message.ID),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to save feedback telegram message: %w", err)
@@ -133,11 +131,9 @@ func (s *Service) registerListeners() {
 
 		var user *model.User
 		var err error
-		if feedback.UserID != nil {
-			user, err = s.store.GetUserByID(ctx, *feedback.UserID)
-			if err != nil {
-				return fmt.Errorf("failed to get user: %w", err)
-			}
+		user, err = s.store.GetUserByID(ctx, feedback.UserID)
+		if err != nil {
+			return fmt.Errorf("failed to get user: %w", err)
 		}
 
 		message, err := s.store.GetFeedbackTelegramMessageByFeedbackID(ctx, feedback.ID)
@@ -150,7 +146,7 @@ func (s *Service) registerListeners() {
 
 		_, err = s.bot.EditMessageText(ctx, &bot.EditMessageTextParams{
 			ChatID:      message.ChatID,
-			MessageID:   message.MessageID,
+			MessageID:   int(message.MessageID),
 			ParseMode:   models.ParseModeMarkdown,
 			Text:        buildFeedbackTelegramText(feedback, user),
 			ReplyMarkup: getKeyboard(feedback.Status, feedbackCallbackPrefix, feedback.ID, feedback.UUID),

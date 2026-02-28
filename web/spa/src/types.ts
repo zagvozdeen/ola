@@ -3,6 +3,7 @@ export type DateTime = string
 
 export enum UserRole {
   User = 'user',
+  Manager = 'manager',
   Moderator = 'moderator',
   Admin = 'admin',
 }
@@ -64,6 +65,7 @@ export const RequestStatusOptions = Object.values(RequestStatus).map((key) => ({
 
 export const UserRoleTranslates: Record<UserRole, string> = {
   [UserRole.User]: 'Пользователь',
+  [UserRole.Manager]: 'Менеджер',
   [UserRole.Moderator]: 'Модератор',
   [UserRole.Admin]: 'Администратор',
 }
@@ -88,7 +90,6 @@ export type User = {
 }
 
 export type File = {
-  id: number
   uuid: UUID
   content: string
   size: number
@@ -106,7 +107,7 @@ export type Product = {
   price_from: number
   price_to?: number
   type: ProductType
-  file_id: number
+  is_main: boolean
   file_content: string
   user_id: number
   created_at: DateTime
@@ -145,7 +146,7 @@ export type Order = {
   name: string
   phone: string
   content: string
-  user_id?: number
+  user_id: number | null
   created_at: DateTime
   updated_at: DateTime
 }
@@ -159,7 +160,7 @@ export type Feedback = {
   name: string
   phone: string
   content: string
-  user_id?: number
+  user_id: number
   created_at: DateTime
   updated_at: DateTime
 }
