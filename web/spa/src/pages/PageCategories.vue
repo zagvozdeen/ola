@@ -26,15 +26,15 @@
       <li
         v-for="category in categories"
         :key="category.slug"
-        class="bg-gray-500/20 border border-gray-500/20 p-3 rounded-xl overflow-hidden flex justify-between items-center gap-2"
+        class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 p-3 rounded-xl overflow-hidden flex justify-between items-center gap-2"
       >
         <div class="min-w-0">
           <span class="block font-bold text-sm truncate">{{ category.name }}</span>
-          <span class="block text-[10px] text-gray-300 truncate">{{ category.slug }}</span>
+          <span class="block text-[10px] text-gray-600 dark:text-gray-300 truncate">{{ category.slug }}</span>
         </div>
         <div class="flex gap-2 shrink-0">
           <router-link
-            class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
+            class="bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
             :to="{ name: 'categories.edit', params: { slug: category.slug } }"
           >
             Редактировать
@@ -46,7 +46,7 @@
           >
             <template #trigger>
               <button
-                class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                class="bg-red-700 text-white hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
                 :disabled="deleting === category.slug"
               >
                 {{ deleting === category.slug ? 'Удаляем...' : 'Удалить' }}
@@ -61,7 +61,7 @@
 
     <div
       v-if="!isLoading && categories.length === 0"
-      class="text-sm text-gray-300"
+      class="text-sm text-gray-600 dark:text-gray-300"
     >
       Список категорий пуст.
     </div>

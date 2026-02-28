@@ -6,7 +6,7 @@
   >
     <n-form
       ref="formRef"
-      class="w-full bg-gray-500/20 p-4 rounded-2xl"
+      class="w-full bg-black/5 dark:bg-gray-500/20 p-4 rounded-2xl"
       :rules="rules"
       :model="form"
       @submit.prevent="onSubmit"

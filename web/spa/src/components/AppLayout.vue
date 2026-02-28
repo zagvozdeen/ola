@@ -4,7 +4,7 @@
     style="padding-top: calc(var(--tg-content-safe-area-inset-top) + var(--tg-safe-area-inset-top) + calc(var(--spacing) * 6));"
   >
     <div
-      class="max-w-md w-full pb-6 px-4 top-0 left-1/2 -translate-x-1/2 z-10 bg-linear-to-t from-transparent to-gray-950"
+      class="max-w-md w-full pb-6 px-4 top-0 left-1/2 -translate-x-1/2 z-10 bg-linear-to-t from-transparent to-white dark:to-gray-950"
       :class="{ 'fixed': back || authState.isTelegramEnv.value, 'absolute': !(back || authState.isTelegramEnv.value) }"
       style="padding-top: calc(var(--tg-safe-area-inset-top) + calc(var(--spacing) * 2))"
     >
@@ -14,7 +14,7 @@
       >
         <router-link
           v-if="!authState.isTelegramEnv.value && back"
-          class="inline-flex items-center justify-center size-8 text-sm font-semibold transition bg-gray-500/20 backdrop-blur-lg border border-gray-500/20 rounded-full shadow-lg hover:bg-gray-500/25 cursor-pointer"
+          class="inline-flex items-center justify-center size-8 text-sm font-semibold transition bg-black/5 dark:bg-gray-500/20 backdrop-blur-lg border border-black/10 dark:border-gray-500/20 rounded-full shadow-lg hover:bg-black/10 dark:bg-gray-500/25 cursor-pointer"
           type="button"
           :to="{ name: back }"
         >
@@ -40,7 +40,7 @@
       class="fixed max-w-md w-full pb-6 px-4 bottom-0 left-1/2 -translate-x-1/2 z-10"
     >
       <button
-        class="w-full bg-blue-600 focus:bg-blue-700 hover:bg-blue-700 rounded-xl px-2 py-2 cursor-pointer"
+        class="w-full bg-blue-600 text-white focus:bg-blue-700 hover:bg-blue-700 rounded-xl px-2 py-2 cursor-pointer"
         type="button"
         @click="save"
       >

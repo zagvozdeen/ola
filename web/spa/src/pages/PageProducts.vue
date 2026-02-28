@@ -26,7 +26,7 @@
       <li
         v-for="product in products"
         :key="product.id"
-        class="bg-gray-500/20 border border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
+        class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
       >
         <img
           class="size-20 object-cover rounded-lg"
@@ -36,9 +36,9 @@
         <div class="flex-1 min-w-0">
           <div class="flex justify-between gap-2">
             <span class="font-bold text-sm truncate">{{ product.name }}</span>
-            <span class="text-xs uppercase bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ ProductTypeTranslates[product.type] }}</span>
+            <span class="text-xs uppercase bg-gray-700 text-white dark:bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ ProductTypeTranslates[product.type] }}</span>
           </div>
-          <p class="text-xs text-gray-300 line-clamp-2 mt-1">
+          <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
             {{ product.description }}
           </p>
           <p class="text-xs mt-1 font-medium">
@@ -51,20 +51,20 @@
             <span
               v-for="category in product.categories"
               :key="category.slug"
-              class="rounded-full bg-yellow-500/15 px-2 py-0.5 text-[10px] font-bold text-yellow-200"
+              class="rounded-full bg-yellow-500/15 px-2 py-0.5 text-[10px] font-bold text-yellow-700 dark:text-yellow-200"
             >
               {{ category.name }}
             </span>
           </div>
           <p
             v-else
-            class="mt-2 text-[10px] font-medium text-gray-400"
+            class="mt-2 text-[10px] font-medium text-gray-500 dark:text-gray-400"
           >
             Без категорий
           </p>
           <div class="flex gap-2 mt-2">
             <router-link
-              class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
+              class="bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
               :to="{ name: 'products.edit', params: { uuid: product.uuid } }"
             >
               Редактировать
@@ -76,7 +76,7 @@
             >
               <template #trigger>
                 <button
-                  class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                  class="bg-red-700 text-white hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
                   :disabled="deleting === product.uuid"
                 >
                   {{ deleting === product.uuid ? 'Удаляем...' : 'Удалить' }}
@@ -92,7 +92,7 @@
 
     <div
       v-if="!isLoading && products.length === 0"
-      class="text-sm text-gray-300"
+      class="text-sm text-gray-600 dark:text-gray-300"
     >
       Список продуктов пуст.
     </div>

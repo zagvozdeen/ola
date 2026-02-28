@@ -10,7 +10,7 @@
       <div
         v-for="n in notifications"
         :key="n.id"
-        class="bg-gray-500/20 backdrop-blur-lg border border-gray-500/20 shadow-lg py-2 px-3 rounded-xl grid grid-cols-[min-content_1fr] items-center gap-2 select-none"
+        class="bg-black/5 dark:bg-gray-500/20 backdrop-blur-lg border border-black/10 dark:border-gray-500/20 shadow-lg py-2 px-3 rounded-xl grid grid-cols-[min-content_1fr] items-center gap-2 select-none"
       >
         <i
           class="bi"

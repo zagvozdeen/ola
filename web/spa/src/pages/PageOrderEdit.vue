@@ -14,23 +14,23 @@
     <n-form
       v-else
       ref="formRef"
-      class="w-full bg-gray-500/20 p-4 rounded-2xl"
+      class="w-full bg-black/5 dark:bg-gray-500/20 p-4 rounded-2xl"
       :rules="rules"
       :model="form"
       @submit.prevent="onSubmit"
     >
       <div
         v-if="orderItems.length > 0"
-        class="mb-4 rounded-2xl border border-gray-500/20 bg-gray-500/10 p-3"
+        class="mb-4 rounded-2xl border border-black/10 dark:border-gray-500/20 bg-black/5 dark:bg-gray-500/10 p-3"
       >
-        <p class="text-xs font-semibold uppercase tracking-wide text-gray-300">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
           Состав заказа
         </p>
         <ul class="mt-3 flex flex-col gap-2">
           <li
             v-for="item in orderItems"
             :key="`${item.order_id}-${item.product_id}`"
-            class="grid grid-cols-[3rem_1fr] gap-3 rounded-xl bg-gray-500/10 p-2"
+            class="grid grid-cols-[3rem_1fr] gap-3 rounded-xl bg-black/5 dark:bg-gray-500/10 p-2"
           >
             <img
               v-if="item.file_content"
@@ -40,13 +40,13 @@
             >
             <div
               v-else
-              class="size-12 rounded-lg bg-gray-500/20"
+              class="size-12 rounded-lg bg-black/5 dark:bg-gray-500/20"
             />
             <div class="min-w-0">
               <p class="truncate text-sm font-medium">
                 {{ item.product_name }}
               </p>
-              <p class="text-xs text-gray-300">
+              <p class="text-xs text-gray-600 dark:text-gray-300">
                 {{ formatPrice(item) }} x {{ item.qty }}
               </p>
             </div>
@@ -102,19 +102,19 @@
 
       <div
         v-if="orderComments.length > 0"
-        class="rounded-2xl border border-gray-500/20 bg-gray-500/10 p-3"
+        class="rounded-2xl border border-black/10 dark:border-gray-500/20 bg-black/5 dark:bg-gray-500/10 p-3"
       >
-        <p class="text-xs font-semibold uppercase tracking-wide text-gray-300">
+        <p class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">
           История комментариев
         </p>
         <ul class="mt-3 flex flex-col gap-3">
           <li
             v-for="comment in orderComments"
             :key="comment.uuid"
-            class="rounded-xl border border-gray-500/20 bg-gray-500/10 p-3"
+            class="rounded-xl border border-black/10 dark:border-gray-500/20 bg-black/5 dark:bg-gray-500/10 p-3"
           >
-            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-              <span class="font-semibold text-white">{{ formatAuthor(comment) }}</span>
+            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+              <span class="font-semibold text-gray-900 dark:text-white">{{ formatAuthor(comment) }}</span>
               <span>{{ formatDate(comment.created_at) }}</span>
             </div>
             <p class="mt-2 whitespace-pre-line text-sm">

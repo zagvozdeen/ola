@@ -11,13 +11,13 @@
       <template v-else>
         <div
           v-if="cart.items.length === 0"
-          class="bg-gray-500/20 border border-gray-500/30 rounded-2xl p-4"
+          class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/30 rounded-2xl p-4"
         >
-          <p class="text-sm text-gray-300">
+          <p class="text-sm text-gray-600 dark:text-gray-300">
             В корзине пока нет товаров.
           </p>
           <router-link
-            class="inline-flex mt-3 bg-gray-600 hover:bg-gray-700 rounded px-3 py-1.5 text-xs font-bold"
+            class="inline-flex mt-3 bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-3 py-1.5 text-xs font-bold"
             :to="{ name: 'main' }"
           >
             Перейти к ассортименту
@@ -29,7 +29,7 @@
             <li
               v-for="item in cart.items"
               :key="item.product_id"
-              class="bg-gray-500/20 border border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
+              class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 p-2 rounded-xl overflow-hidden flex gap-2"
             >
               <img
                 class="size-20 object-cover rounded-lg"
@@ -52,7 +52,7 @@
 
                 <div class="flex items-center gap-2 mt-2">
                   <button
-                    class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                    class="bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
                     :disabled="isUpdating(item.product_id)"
                     @click="() => handleDecrementQty(item.product_id, item.product_uuid, item.qty)"
                   >
@@ -60,14 +60,14 @@
                   </button>
                   <span class="text-xs min-w-6 text-center">{{ item.qty }}</span>
                   <button
-                    class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
+                    class="bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer"
                     :disabled="isUpdating(item.product_id)"
                     @click="() => handleIncrementQty(item.product_id, item.qty)"
                   >
                     +
                   </button>
                   <button
-                    class="bg-red-700 hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer ml-auto"
+                    class="bg-red-700 text-white hover:bg-red-800 rounded px-2 py-1 text-xs font-bold disabled:opacity-50 cursor-pointer ml-auto"
                     :disabled="isUpdating(item.product_id)"
                     @click="() => handleRemoveItem(item.product_id, item.product_uuid)"
                   >
@@ -78,7 +78,7 @@
             </li>
           </ul>
 
-          <div class="bg-gray-500/20 border border-gray-500/20 rounded-2xl p-4">
+          <div class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 rounded-2xl p-4">
             <p class="text-sm">
               Позиций: <b>{{ totalItemsQty }}</b>
             </p>
@@ -89,7 +89,7 @@
 
           <n-form
             ref="formRef"
-            class="w-full bg-gray-500/20 p-4 rounded-2xl"
+            class="w-full bg-black/5 dark:bg-gray-500/20 p-4 rounded-2xl"
             :rules="rules"
             :model="form"
             @submit.prevent="onSubmitOrder"

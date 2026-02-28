@@ -4,7 +4,7 @@
       <li
         v-for="product in products"
         :key="product.id"
-        class="bg-gray-500/20 border border-gray-500/20 p-2 rounded-xl overflow-hidden flex flex-col"
+        class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 p-2 rounded-xl overflow-hidden flex flex-col"
       >
         <img
           class="h-40 w-full object-cover rounded-xl"
@@ -31,7 +31,7 @@
           </button>
           <button
             v-else
-            class="w-full bg-gray-600 rounded hover:bg-gray-700 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center disabled:opacity-50"
+            class="w-full bg-gray-700 text-white dark:bg-gray-600 rounded hover:bg-gray-800 dark:hover:bg-gray-700 px-4 py-1 mt-auto cursor-pointer text-xs uppercase font-bold text-center disabled:opacity-50"
             :disabled="isSubmitting(product.id)"
             @click="() => handleRemoveProductButton(product.id, product.uuid)"
           >

@@ -2,7 +2,7 @@
   <div class="min-h-dvh w-full flex items-center justify-center">
     <n-form
       ref="formRef"
-      class="w-full bg-gray-500/20 p-4 my-8 rounded-2xl"
+      class="w-full bg-black/5 dark:bg-gray-500/20 p-4 my-8 rounded-2xl"
       :rules="rules"
       :model="form"
       @submit.prevent="onSubmitForm"

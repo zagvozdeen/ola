@@ -18,21 +18,21 @@
       <li
         v-for="item in feedbacks"
         :key="item.id"
-        class="bg-gray-500/20 border border-gray-500/20 p-3 rounded-xl overflow-hidden flex flex-col gap-2"
+        class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 p-3 rounded-xl overflow-hidden flex flex-col gap-2"
       >
         <div class="flex justify-between gap-2">
           <span class="font-bold text-sm truncate">{{ item.name }}</span>
-          <span class="text-xs uppercase bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ RequestStatusTranslates[item.status] }}</span>
+          <span class="text-xs uppercase bg-gray-700 text-white dark:bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ RequestStatusTranslates[item.status] }}</span>
         </div>
-        <p class="text-xs text-gray-300 line-clamp-2">
+        <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
           {{ item.content }}
         </p>
-        <p class="text-xs text-gray-300">
+        <p class="text-xs text-gray-600 dark:text-gray-300">
           {{ item.phone }}
         </p>
         <div class="flex justify-end">
           <router-link
-            class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
+            class="bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
             :to="{ name: 'feedback.edit', params: { uuid: item.uuid } }"
           >
             Редактировать
@@ -43,7 +43,7 @@
 
     <div
       v-if="!isLoading && feedbacks.length === 0"
-      class="text-sm text-gray-300"
+      class="text-sm text-gray-600 dark:text-gray-300"
     >
       Список заявок пуст.
     </div>

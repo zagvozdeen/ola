@@ -2,6 +2,8 @@
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-nunito: "Nunito", sans-serif;
 
@@ -13,3 +15,11 @@
     --color-grape-500: #A17FD3;
     --color-grape-600: #8E67C4;
 }
+
+/*:root {*/
+/*    color-scheme: light dark;*/
+/*}*/
+
+/*body {*/
+/*    font-family: var(--font-nunito);*/
+/*}*/

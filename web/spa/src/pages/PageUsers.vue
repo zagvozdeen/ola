@@ -18,18 +18,18 @@
       <li
         v-for="user in users"
         :key="user.id"
-        class="bg-gray-500/20 border border-gray-500/20 p-3 rounded-xl overflow-hidden flex flex-col gap-2"
+        class="bg-black/5 dark:bg-gray-500/20 border border-black/10 dark:border-gray-500/20 p-3 rounded-xl overflow-hidden flex flex-col gap-2"
       >
         <div class="flex justify-between gap-2">
           <span class="font-bold text-sm truncate">{{ user.first_name }} {{ user.last_name || '' }}</span>
-          <span class="text-xs uppercase bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ UserRoleTranslates[user.role] }}</span>
+          <span class="text-xs uppercase bg-gray-700 text-white dark:bg-gray-600 font-bold px-2 py-0.5 rounded-full">{{ UserRoleTranslates[user.role] }}</span>
         </div>
-        <p class="text-xs text-gray-300 truncate">
+        <p class="text-xs text-gray-600 dark:text-gray-300 truncate">
           {{ user.email || user.username || 'Без e-mail' }}
         </p>
         <div class="flex justify-end">
           <router-link
-            class="bg-gray-600 hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
+            class="bg-gray-700 text-white dark:bg-gray-600 hover:bg-gray-800 dark:hover:bg-gray-700 rounded px-2 py-1 text-xs font-bold"
             :to="{ name: 'users.edit', params: { uuid: user.uuid } }"
           >
             Редактировать
@@ -40,7 +40,7 @@
 
     <div
       v-if="!isLoading && users.length === 0"
-      class="text-sm text-gray-300"
+      class="text-sm text-gray-600 dark:text-gray-300"
     >
       Список пользователей пуст.
     </div>

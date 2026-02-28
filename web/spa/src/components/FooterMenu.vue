@@ -1,10 +1,10 @@
 <template>
   <div class="fixed flex flex-col gap-2 w-full max-w-md px-4 bottom-4 left-1/2 -translate-x-1/2">
-    <div class="grid grid-cols-3 grid-cвols-[1fr_min-content_1fr_min-content_1fr] gap-1 p-1 bg-gray-500/20 backdrop-blur-lg border border-gray-500/20 rounded-full shadow-lg">
+    <div class="grid grid-cols-3 grid-cвols-[1fr_min-content_1fr_min-content_1fr] gap-1 p-1 bg-black/5 dark:bg-gray-500/20 backdrop-blur-lg border border-black/10 dark:border-gray-500/20 rounded-full shadow-lg">
       <router-link
-        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-black/10 dark:hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
         :class="{
-          'bg-gray-500/25': route.name === 'main',
+          'bg-black/10 dark:bg-gray-500/25': route.name === 'main',
         }"
         :to="{ name: 'main' }"
         type="button"
@@ -13,9 +13,9 @@
         <span>Ассортимент</span>
       </router-link>
       <router-link
-        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center relative"
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-black/10 dark:hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center relative"
         :class="{
-          'bg-gray-500/25': route.name === 'cart',
+          'bg-black/10 dark:bg-gray-500/25': route.name === 'cart',
         }"
         :to="{ name: 'cart' }"
         type="button"
@@ -28,9 +28,9 @@
         <span>Корзина</span>
       </router-link>
       <router-link
-        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
+        class="flex flex-col rounded-full py-1 px-3 transition hover:bg-black/10 dark:hover:bg-gray-500/25 cursor-pointer text-xs font-bold text-center"
         :class="{
-          'bg-gray-500/25': route.name === 'settings',
+          'bg-black/10 dark:bg-gray-500/25': route.name === 'settings',
         }"
         :to="{ name: 'settings' }"
         type="button"
